@@ -90,11 +90,7 @@ const BecomeSellerPage = () => {
             const data = await response.json();
             
             if (data.success) {
-                setSellerStatus({
-                    ...data.data,
-                    verificationDocuments: data.data.verificationDocuments || [],
-                    requiredDocuments: data.data.requiredDocuments || []
-                });
+                setSellerStatus(data.data);
                 
                 // Set active step based on status
                 if (data.data.sellerStatus === 'not_seller') {
@@ -107,15 +103,6 @@ const BecomeSellerPage = () => {
             }
         } catch (error) {
             console.error('Error fetching seller status:', error);
-            // Set default safe state if API fails
-            setSellerStatus({
-                sellerStatus: 'not_seller',
-                applicationDate: null,
-                verificationDate: null,
-                canReceivePayments: false,
-                verificationDocuments: [],
-                requiredDocuments: []
-            });
         } finally {
             setLoading(false);
         }

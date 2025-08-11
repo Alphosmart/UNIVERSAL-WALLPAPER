@@ -107,15 +107,6 @@ const BecomeSellerPage = () => {
             }
         } catch (error) {
             console.error('Error fetching seller status:', error);
-            // Set default safe state if API fails
-            setSellerStatus({
-                sellerStatus: 'not_seller',
-                applicationDate: null,
-                verificationDate: null,
-                canReceivePayments: false,
-                verificationDocuments: [],
-                requiredDocuments: []
-            });
         } finally {
             setLoading(false);
         }
