@@ -47,20 +47,20 @@ const {
     clearCart,
     syncCart
 } = require('../controller/cartController');
-// const {
-//     applyToBeSeller,
-//     uploadVerificationDocument,
-//     getSellerApplications,
-//     getPendingSellerApplications,
-//     updateSellerStatus,
-//     reviewSellerApplication,
-//     updateProfileForSeller,
-//     checkSellerEligibility,
-//     getSellerPaymentDetails,
-//     updateSellerPaymentDetails,
-//     uploadSellerDocument,
-//     getSellerApplicationStatus
-// } = require('../controller/sellerController');
+const {
+    applyToBeSeller,
+    uploadVerificationDocument,
+    getSellerApplications,
+    getPendingSellerApplications,
+    updateSellerStatus,
+    reviewSellerApplication,
+    updateProfileForSeller,
+    checkSellerEligibility,
+    getSellerPaymentDetails,
+    updateSellerPaymentDetails,
+    uploadSellerDocument,
+    getSellerApplicationStatus
+} = require('../controller/sellerController');
 const {
     getSellerOrders,
     updateSellerOrderStatus,
@@ -156,10 +156,10 @@ router.get('/admin/all-products', authToken, getAllProductsAdmin);
 router.delete('/admin/delete-product/:productId', authToken, deleteProductAdmin);
 router.put('/admin/update-product-status/:productId', authToken, updateProductStatus);
 router.get('/admin/dashboard-stats', authToken, getDashboardStats);
-// router.get('/admin/seller-applications', authToken, getSellerApplications);
-// router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
-// router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
-// router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
+router.get('/admin/seller-applications', authToken, getSellerApplications);
+router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
+router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
+router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
 router.get('/admin/settings', authToken, getAdminSettings);
 router.put('/admin/settings', authToken, updateAdminSettings);
 
