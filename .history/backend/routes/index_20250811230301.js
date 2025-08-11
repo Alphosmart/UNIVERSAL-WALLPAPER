@@ -156,10 +156,10 @@ router.get('/admin/all-products', authToken, getAllProductsAdmin);
 router.delete('/admin/delete-product/:productId', authToken, deleteProductAdmin);
 router.put('/admin/update-product-status/:productId', authToken, updateProductStatus);
 router.get('/admin/dashboard-stats', authToken, getDashboardStats);
-router.get('/admin/seller-applications', authToken, getSellerApplications);
-router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
-router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
-router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
+// router.get('/admin/seller-applications', authToken, getSellerApplications);
+// router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
+// router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
+// router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
 router.get('/admin/settings', authToken, getAdminSettings);
 router.put('/admin/settings', authToken, updateAdminSettings);
 
@@ -172,18 +172,17 @@ router.post('/admin/backup/:backupId/restore', authToken, restoreFromBackup);
 router.delete('/admin/backup/:backupId', authToken, deleteBackup);
 
 // Seller routes
-// Seller application routes
-router.post('/seller/apply', authToken, applyToBeSeller);
-router.get('/seller/application-status', authToken, getSellerApplicationStatus);
-router.post('/seller/upload-document', authToken, uploadVerificationDocument);
-router.post('/upload-verification-document', authToken, uploadVerificationDocument);
-router.put('/seller/update-profile', authToken, updateProfileForSeller);
-router.get('/seller/check-eligibility', authToken, checkSellerEligibility);
+// router.post('/seller/apply', authToken, applyToBeSeller);
+// router.get('/seller/application-status', authToken, getSellerApplicationStatus);
+// router.post('/seller/upload-document', authToken, uploadVerificationDocument);
+// router.post('/upload-verification-document', authToken, uploadVerificationDocument);
+// router.put('/seller/update-profile', authToken, updateProfileForSeller);
+// router.get('/seller/check-eligibility', authToken, checkSellerEligibility);
 
 // Seller payment management routes
-router.get('/seller-payment-details', authToken, getSellerPaymentDetails);
-router.put('/seller-payment-details', authToken, updateSellerPaymentDetails);
-router.post('/seller-document-upload', authToken, uploadSellerDocument);
+// router.get('/seller-payment-details', authToken, getSellerPaymentDetails);
+// router.put('/seller-payment-details', authToken, updateSellerPaymentDetails);
+// router.post('/seller-document-upload', authToken, uploadSellerDocument);
 
 // Seller order management routes
 router.get('/seller/orders', authToken, getSellerOrders);
