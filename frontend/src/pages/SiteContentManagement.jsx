@@ -57,9 +57,8 @@ const SiteContentManagement = () => {
                 
                 if (data.success && data.data && Object.keys(data.data).length > 0) {
                     setContentData(prev => ({ ...prev, ...data.data }));
-                    console.log('Content data loaded from backend');
                 } else {
-                    console.log('Using default content data');
+                    // Using default content data
                 }
             } catch (error) {
                 console.error('Error loading content data:', error);
@@ -394,7 +393,7 @@ const SiteContentManagement = () => {
                                         <input
                                             type="text"
                                             value={contentData.siteSettings.siteName}
-                                            onChange={(e) => updateNestedContentData('siteSettings', 'siteName', '', e.target.value)}
+                                            onChange={(e) => updateContentData('siteSettings', 'siteName', e.target.value)}
                                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         />
                                     </div>
