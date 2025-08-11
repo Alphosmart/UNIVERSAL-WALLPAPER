@@ -16,9 +16,6 @@ require('./models/productModel')
 require('./models/cartModel')
 require('./models/orderModel')
 require('./models/bannerModel')
-require('./models/backupModel')
-require('./models/settingsModel')
-require('./models/shippingModel')
 
 const app = express()
 
