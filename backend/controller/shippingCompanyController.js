@@ -1,8 +1,9 @@
 const userModel = require('../models/userModel');
 const ShippingQuote = require('../models/shippingQuoteModel');
-const Delivery = require('../models/deliveryModel');
+const deliveryModel = require('../models/deliveryModel');
 const orderModel = require('../models/orderModel');
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 
 // Register shipping company
 async function registerShippingCompany(request, response) {
@@ -441,6 +442,159 @@ async function getShippingCompanyStats(request, response) {
     }
 }
 
+// Get shipping quotes for a specific order (for sellers)
+async function getOrderShippingQuotes(request, response) {
+    try {
+        const { orderId } = request.params;
+        const currentUserId = request.userId;
+
+        // Verify the order exists and belongs to the seller
+        const order = await orderModel.findById(orderId);
+
+        if (!order) {
+            return response.status(404).json({
+                message: "Order not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Check if user is the seller of this order or an admin
+        if (order.seller.toString() !== currentUserId && request.userRole !== 'ADMIN') {
+            return response.status(403).json({
+                message: "Access denied",
+                error: true,
+                success: false
+            });
+        }
+
+        // Get all quotes for this order
+        const quotes = await ShippingQuote.find({ orderId })
+            .populate('shippingCompanyId', 'name companyInfo ratings stats')
+            .sort({ quotedPrice: 1 }) // Sort by price ascending
+            .lean();
+
+        response.json({
+            data: quotes,
+            success: true,
+            error: false,
+            message: "Shipping quotes retrieved successfully"
+        });
+
+    } catch (err) {
+        console.error("Error in getOrderShippingQuotes:", err);
+        response.status(500).json({
+            message: err.message || "Internal server error",
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Select shipping quote for an order (for sellers)
+async function selectShippingQuote(request, response) {
+    try {
+        const { orderId } = request.params;
+        const { quoteId } = request.body;
+        const currentUserId = request.userId;
+
+        // Verify the order exists and belongs to the seller
+        const order = await orderModel.findById(orderId);
+
+        if (!order) {
+            return response.status(404).json({
+                message: "Order not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Check if user is the seller of this order
+        if (order.seller.toString() !== currentUserId) {
+            return response.status(403).json({
+                message: "Access denied",
+                error: true,
+                success: false
+            });
+        }
+
+        // Verify the quote exists and belongs to this order
+        const quote = await ShippingQuote.findOne({
+            _id: quoteId,
+            orderId
+        }).populate('shippingCompanyId', 'name companyInfo');
+
+        if (!quote) {
+            return response.status(404).json({
+                message: "Shipping quote not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Update quote status to accepted
+        quote.status = 'accepted';
+        quote.acceptedAt = new Date();
+        await quote.save();
+
+        // Reject all other quotes for this order
+        await ShippingQuote.updateMany(
+            { 
+                orderId, 
+                _id: { $ne: quoteId } 
+            },
+            { 
+                status: 'rejected',
+                rejectedAt: new Date()
+            }
+        );
+
+        // Create delivery record
+        const deliveryData = {
+            orderId,
+            quoteId: quote._id,
+            shippingCompanyId: quote.shippingCompanyId._id,
+            sellerId: order.seller,
+            buyerId: order.buyer,
+            deliveryFee: quote.quotedPrice,
+            estimatedDeliveryDate: new Date(Date.now() + (quote.estimatedDeliveryTime * 24 * 60 * 60 * 1000)),
+            pickupAddress: quote.pickupAddress,
+            deliveryAddress: quote.deliveryAddress,
+            packageDetails: quote.packageDetails
+        };
+
+        const delivery = new deliveryModel(deliveryData);
+        await delivery.save();
+
+        // Update order with shipping information
+        await orderModel.findByIdAndUpdate(orderId, {
+            shippingCompany: quote.shippingCompanyId._id,
+            shippingQuote: quote._id,
+            deliveryId: delivery._id,
+            shippingFee: quote.quotedPrice,
+            orderStatus: 'out_for_delivery'
+        });
+
+        response.json({
+            data: {
+                quote,
+                delivery
+            },
+            success: true,
+            error: false,
+            message: "Shipping partner selected successfully"
+        });
+
+    } catch (err) {
+        console.error("Error in selectShippingQuote:", err);
+        response.status(500).json({
+            message: err.message || "Internal server error",
+            error: true,
+            success: false
+        });
+    }
+}
+
 module.exports = {
     registerShippingCompany,
     getShippingCompanyProfile,
@@ -448,5 +602,7 @@ module.exports = {
     getAvailableOrders,
     submitShippingQuote,
     getMyQuotes,
-    getShippingCompanyStats
+    getShippingCompanyStats,
+    getOrderShippingQuotes,
+    selectShippingQuote
 };

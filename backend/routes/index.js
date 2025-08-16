@@ -25,7 +25,9 @@ const {
     getAllProductsAdmin, 
     deleteProductAdmin, 
     updateProductStatus, 
-    getDashboardStats 
+    getDashboardStats,
+    getAllShippingCompanies,
+    updateShippingCompanyStatus
 } = require('../controller/adminController');
 const createAdminUser = require('../controller/createAdminUser');
 const {
@@ -73,7 +75,9 @@ const {
     getAvailableOrders,
     submitShippingQuote,
     getMyQuotes,
-    getShippingCompanyStats
+    getShippingCompanyStats,
+    getOrderShippingQuotes,
+    selectShippingQuote
 } = require('../controller/shippingCompanyController');
 const {
     getAdminSettings,
@@ -203,6 +207,10 @@ router.put('/admin/review-seller-application/:userId', authToken, reviewSellerAp
 router.get('/admin/settings', authToken, getAdminSettings);
 router.put('/admin/settings', authToken, updateAdminSettings);
 
+// Admin shipping company routes
+router.get('/admin/shipping-companies', authToken, getAllShippingCompanies);
+router.put('/admin/shipping-companies', authToken, updateShippingCompanyStatus);
+
 // Contact message routes
 router.post('/contact', submitContactMessage);
 router.get('/admin/contact-messages', authToken, getContactMessages);
@@ -290,6 +298,10 @@ router.get('/shipping-company/available-orders', authToken, getAvailableOrders);
 router.post('/shipping-company/orders/:orderId/quote', authToken, submitShippingQuote);
 router.get('/shipping-company/quotes', authToken, getMyQuotes);
 router.get('/shipping-company/stats', authToken, getShippingCompanyStats);
+
+// Order shipping management (for sellers)
+router.get('/orders/:orderId/shipping-quotes', authToken, getOrderShippingQuotes);
+router.post('/orders/:orderId/shipping', authToken, selectShippingQuote);
 
 // Development route to create admin user
 router.get('/create-admin', createAdminUser);
