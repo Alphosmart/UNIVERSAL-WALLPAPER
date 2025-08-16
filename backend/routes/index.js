@@ -67,6 +67,15 @@ const {
     getSellerOrderStats
 } = require('../controller/sellerOrdersController');
 const {
+    registerShippingCompany,
+    getShippingCompanyProfile,
+    updateShippingCompanyProfile,
+    getAvailableOrders,
+    submitShippingQuote,
+    getMyQuotes,
+    getShippingCompanyStats
+} = require('../controller/shippingCompanyController');
+const {
     getAdminSettings,
     updateAdminSettings
 } = require('../controller/settingsController');
@@ -272,6 +281,15 @@ router.get('/orders/:orderId/tracking', authToken, getOrderTracking);
 router.get('/buyer/orders/tracking', authToken, getBuyerOrdersWithTracking);
 router.put('/seller/orders/:orderId/tracking', authToken, updateOrderTracking);
 router.get('/track/:trackingNumber', trackByTrackingNumber); // Public endpoint
+
+// Shipping Company Routes
+router.post('/shipping-company/register', checkDatabaseConnection, registerShippingCompany);
+router.get('/shipping-company/profile', authToken, getShippingCompanyProfile);
+router.put('/shipping-company/profile', authToken, updateShippingCompanyProfile);
+router.get('/shipping-company/available-orders', authToken, getAvailableOrders);
+router.post('/shipping-company/orders/:orderId/quote', authToken, submitShippingQuote);
+router.get('/shipping-company/quotes', authToken, getMyQuotes);
+router.get('/shipping-company/stats', authToken, getShippingCompanyStats);
 
 // Development route to create admin user
 router.get('/create-admin', createAdminUser);
