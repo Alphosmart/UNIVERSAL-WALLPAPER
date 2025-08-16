@@ -9,7 +9,10 @@ const ContactUs = () => {
         message: ''
     });
 
-    const { content, loading, error } = useSiteContent('contactUs');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitMessage, setSubmitMessage] = useState('');
+
+    const { content, loading } = useSiteContent('contactUs');
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -19,12 +22,39 @@ const ContactUs = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Handle form submission here
-        console.log('Form submitted:', formData);
-        // You can add your form submission logic here
-        alert('Thank you for your message! We will get back to you soon.');
+        setIsSubmitting(true);
+        setSubmitMessage('');
+
+        try {
+            const response = await fetch('http://localhost:8080/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                setSubmitMessage('Thank you for your message! We will get back to you soon.');
+                setFormData({
+                    name: '',
+                    email: '',
+                    subject: '',
+                    message: ''
+                });
+            } else {
+                setSubmitMessage(data.message || 'Something went wrong. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error submitting contact form:', error);
+            setSubmitMessage('Network error. Please check your connection and try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     // Use dynamic content or fallback to defaults
@@ -134,11 +164,22 @@ const ContactUs = () => {
                                 />
                             </div>
 
+                            {submitMessage && (
+                                <div className={`p-4 rounded-lg ${submitMessage.includes('Thank you') ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
+                                    {submitMessage}
+                                </div>
+                            )}
+
                             <button
                                 type="submit"
-                                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-200 font-medium"
+                                disabled={isSubmitting}
+                                className={`w-full py-3 px-6 rounded-lg font-medium transition duration-200 ${
+                                    isSubmitting 
+                                        ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                                }`}
                             >
-                                Send Message
+                                {isSubmitting ? 'Sending...' : 'Send Message'}
                             </button>
                         </form>
                     </div>

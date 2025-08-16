@@ -19,7 +19,7 @@ import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
 import SellerAccountSettings from '../pages/SellerAccountSettings';
 import BecomeSellerPage from '../pages/BecomeSellerPage';
-import SellerApplications from '../pages/SellerApplications';
+import AdminSellerApplications from '../pages/AdminSellerApplications';
 import SellerDashboard from '../pages/SellerDashboard';
 import Analytics from '../pages/Analytics';
 import Settings from '../pages/Settings';
@@ -39,6 +39,8 @@ import TrackOrder from '../pages/TrackOrder';
 import CancelOrder from '../pages/CancelOrder';
 import ReturnsRefunds from '../pages/ReturnsRefunds';
 import ContactUs from '../pages/ContactUs';
+import ShippingInfo from '../pages/ShippingInfo';
+import AdminContactMessages from '../pages/AdminContactMessages';
 import DevLogin from '../pages/DevLogin';
 import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute } from '../components/AuthGuard';
 import SellerProtectedRoute from '../components/SellerProtectedRoute';
@@ -196,6 +198,11 @@ const router = createBrowserRouter([
                 errorElement: <ErrorPage />
             },
             {
+                path: "shipping-info",
+                element: <ShippingInfo />,
+                errorElement: <ErrorPage />
+            },
+            {
                 path: "returns-refunds",
                 element: <ReturnsRefunds />,
                 errorElement: <ErrorPage />
@@ -228,12 +235,16 @@ const router = createBrowserRouter([
                         element: <AllUsers />
                     },
                     {
+                        path: "contact-messages",
+                        element: <AdminContactMessages />
+                    },
+                    {
                         path: "banners",
                         element: <BannerManagement />
                     },
                     {
                         path: "seller-applications",
-                        element: <SellerApplications />
+                        element: <AdminSellerApplications />
                     },
                     {
                         path: "analytics",

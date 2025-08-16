@@ -3,8 +3,8 @@ const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const compression = require('compression')
 const path = require('path')
-// Load environment variables first
-require('dotenv').config()
+// Load environment variables first with explicit path
+require('dotenv').config({ path: path.join(__dirname, '.env') })
 const connectDB = require('./config/db')
 const { globalErrorHandler, notFoundHandler } = require('./utils/responseHandler')
 const logger = require('./utils/logger')
@@ -18,6 +18,7 @@ require('./models/orderModel')
 require('./models/bannerModel')
 require('./models/backupModel')
 require('./models/settingsModel')
+require('./models/contactMessageModel')
 require('./models/shippingModel')
 
 const app = express()

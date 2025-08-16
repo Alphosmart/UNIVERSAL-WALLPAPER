@@ -89,7 +89,8 @@ const {
     updateShippingZone,
     deleteShippingZone,
     calculateShippingCost,
-    getShippingMethods
+    getShippingMethods,
+    getShippingInfo
 } = require('../controller/shippingController');
 const {
     getBanners,
@@ -111,6 +112,27 @@ const {
     updateOrderTracking,
     trackByTrackingNumber
 } = require('../controller/orderTrackingController');
+
+// Social features controller for real database
+const {
+    likeProduct,
+    rateProduct,
+    addReview,
+    getProductReviews,
+    shareProduct,
+    getProductStats,
+    likeReview
+} = require('../controller/socialFeaturesController');
+
+// Contact message controller
+const {
+    submitContactMessage,
+    getContactMessages,
+    updateContactMessageStatus,
+    deleteContactMessage,
+    getContactMessage
+} = require('../controller/contactMessageController');
+// const resetAdminPassword = require('../controller/resetAdminPassword');
 
 // User authentication routes
 router.post('/signup', checkDatabaseConnection, userSignUpController);
@@ -134,6 +156,15 @@ router.post('/add-product', authToken, addProductController);
 router.get('/user-products', authToken, getUserProductsController);
 router.put('/update-product/:productId', authToken, updateProductController);
 router.delete('/delete-product/:productId', authToken, deleteProductController);
+
+// Social features routes
+router.post('/products/:productId/like', authToken, likeProduct);
+router.post('/products/:productId/rate', authToken, rateProduct);
+router.post('/products/:productId/review', authToken, addReview);
+router.get('/products/:productId/reviews', getProductReviews);
+router.post('/products/:productId/review/:reviewId/like', authToken, likeReview);
+router.post('/products/:productId/share', authToken, shareProduct);
+router.get('/products/:productId/stats', getProductStats);
 
 // Order/Purchase routes
 router.post('/buy-product', authToken, buyProductController);
@@ -162,6 +193,13 @@ router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus)
 router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
 router.get('/admin/settings', authToken, getAdminSettings);
 router.put('/admin/settings', authToken, updateAdminSettings);
+
+// Contact message routes
+router.post('/contact', submitContactMessage);
+router.get('/admin/contact-messages', authToken, getContactMessages);
+router.get('/admin/contact-messages/:messageId', authToken, getContactMessage);
+router.put('/admin/contact-messages/:messageId/status', authToken, updateContactMessageStatus);
+router.delete('/admin/contact-messages/:messageId', authToken, deleteContactMessage);
 
 // Database backup routes (admin only)
 router.post('/admin/backup/create', authToken, createDatabaseBackup);
@@ -201,6 +239,7 @@ router.delete('/admin/shipping/zones/:zoneId', authToken, deleteShippingZone);
 // Public shipping endpoints
 router.post('/shipping/calculate', calculateShippingCost);
 router.get('/shipping/methods/:country', getShippingMethods);
+router.get('/shipping/info', getShippingInfo);
 
 // Banner routes (public)
 router.get('/banners', getBanners);
@@ -236,5 +275,6 @@ router.get('/track/:trackingNumber', trackByTrackingNumber); // Public endpoint
 
 // Development route to create admin user
 router.get('/create-admin', createAdminUser);
+// router.post('/reset-admin-password', resetAdminPassword);
 
 module.exports = router

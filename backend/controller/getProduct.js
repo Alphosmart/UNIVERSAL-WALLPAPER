@@ -37,11 +37,25 @@ const getProductController = async(req, res) => {
             // Add converted pricing for buyer
             const convertedPricing = CurrencyService.convertProductPricing(productObj, buyerCurrency);
             
+            // Calculate basic social features statistics
+            const totalLikes = product.likes ? product.likes.length : 0;
+            const totalRatings = product.ratings ? product.ratings.length : 0;
+            const averageRating = totalRatings > 0 
+                ? product.ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings 
+                : 0;
+            const totalReviews = product.reviews ? product.reviews.length : 0;
+            
             return {
                 ...productObj,
                 displayPricing: convertedPricing,
                 // Keep original pricing for reference
-                originalCurrency: productObj.pricing?.originalPrice?.currency || 'NGN'
+                originalCurrency: productObj.pricing?.originalPrice?.currency || 'NGN',
+                socialFeatures: {
+                    likes: totalLikes,
+                    averageRating: parseFloat(averageRating.toFixed(1)),
+                    totalRatings: totalRatings,
+                    totalReviews: totalReviews
+                }
             };
         });
 

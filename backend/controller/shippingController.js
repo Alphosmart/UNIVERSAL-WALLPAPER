@@ -483,6 +483,58 @@ async function getShippingMethods(req, res) {
     }
 }
 
+// Get public shipping information (for shipping info page)
+async function getShippingInfo(req, res) {
+    try {
+        const shippingZones = await ShippingZone.find({ isActive: true });
+        let globalSettings = await GlobalShippingSettings.findOne({});
+        
+        // Create default global settings if none exist
+        if (!globalSettings) {
+            globalSettings = new GlobalShippingSettings({});
+            await globalSettings.save();
+        }
+
+        // Filter only public information
+        const publicZones = shippingZones.map(zone => ({
+            name: zone.name,
+            description: zone.description,
+            countries: zone.countries,
+            rates: zone.rates.filter(rate => rate.isActive).map(rate => ({
+                name: rate.name,
+                description: rate.description,
+                amount: rate.amount,
+                freeShippingThreshold: rate.freeShippingThreshold
+            }))
+        }));
+
+        const publicGlobalSettings = {
+            enableShipping: globalSettings.enableShipping,
+            currency: globalSettings.currency,
+            weightUnit: globalSettings.weightUnit,
+            freeShippingGlobal: globalSettings.freeShippingGlobal
+        };
+
+        res.json({
+            message: "Shipping information retrieved successfully",
+            data: {
+                zones: publicZones,
+                global: publicGlobalSettings
+            },
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        console.error("Error getting shipping info:", err);
+        res.status(500).json({
+            message: err.message || "Failed to get shipping information",
+            error: true,
+            success: false
+        });
+    }
+}
+
 module.exports = {
     getShippingSettings,
     updateGlobalShippingSettings,
@@ -490,5 +542,6 @@ module.exports = {
     updateShippingZone,
     deleteShippingZone,
     calculateShippingCost,
-    getShippingMethods
+    getShippingMethods,
+    getShippingInfo
 };
