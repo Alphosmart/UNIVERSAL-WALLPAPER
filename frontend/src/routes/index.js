@@ -20,6 +20,7 @@ import Checkout from '../pages/Checkout';
 import SellerAccountSettings from '../pages/SellerAccountSettings';
 import BecomeSellerPage from '../pages/BecomeSellerPage';
 import AdminSellerApplications from '../pages/AdminSellerApplications';
+import AdminShippingCompanies from '../pages/AdminShippingCompanies';
 import SellerDashboard from '../pages/SellerDashboard';
 import Analytics from '../pages/Analytics';
 import Settings from '../pages/Settings';
@@ -41,7 +42,10 @@ import ContactUs from '../pages/ContactUs';
 import ShippingInfo from '../pages/ShippingInfo';
 import AdminContactMessages from '../pages/AdminContactMessages';
 import DevLogin from '../pages/DevLogin';
-import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute } from '../components/AuthGuard';
+import ShippingCompanyRegistration from '../pages/ShippingCompanyRegistration';
+import ShippingCompanyDashboard from '../pages/ShippingCompanyDashboard';
+import ShippingCompanyProfile from '../pages/ShippingCompanyProfile';
+import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute, ShippingCompanyRoute } from '../components/AuthGuard';
 import SellerProtectedRoute from '../components/SellerProtectedRoute';
 
 
@@ -192,6 +196,21 @@ const router = createBrowserRouter([
                 errorElement: <ErrorPage />
             },
             {
+                path: "shipping-company/register",
+                element: <ShippingCompanyRegistration />,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "shipping-company/dashboard",
+                element: <ShippingCompanyRoute><ShippingCompanyDashboard /></ShippingCompanyRoute>,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "shipping-company/profile",
+                element: <ShippingCompanyRoute><ShippingCompanyProfile /></ShippingCompanyRoute>,
+                errorElement: <ErrorPage />
+            },
+            {
                 path: "returns-refunds",
                 element: <ReturnsRefunds />,
                 errorElement: <ErrorPage />
@@ -234,6 +253,10 @@ const router = createBrowserRouter([
                     {
                         path: "seller-applications",
                         element: <AdminSellerApplications />
+                    },
+                    {
+                        path: "shipping-companies",
+                        element: <AdminShippingCompanies />
                     },
                     {
                         path: "analytics",

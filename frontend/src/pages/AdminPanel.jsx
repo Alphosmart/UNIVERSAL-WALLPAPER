@@ -96,6 +96,11 @@ const AdminPanel = () => {
       icon: <FaUserCheck />
     },
     {
+      label: 'Shipping Companies',
+      path: '/admin-panel/shipping-companies',
+      icon: <FaShippingFast />
+    },
+    {
       label: 'Analytics',
       path: '/admin-panel/analytics',
       icon: <FaChartBar />

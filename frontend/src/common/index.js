@@ -379,6 +379,26 @@ const SummaryApi = {
     getShippingCompanyStats : {
         url : `${backendDomain}/api/shipping-company/stats`,
         method : 'get'
+    },
+    
+    // Order Shipping APIs
+    getOrderShippingQuotes : {
+        url : `${backendDomain}/api/orders`,
+        method : 'get'
+    },
+    selectShippingQuote : {
+        url : `${backendDomain}/api/orders`,
+        method : 'post'
+    },
+    
+    // Admin Shipping Company Management
+    getAllShippingCompanies : {
+        url : `${backendDomain}/api/admin/shipping-companies`,
+        method : 'get'
+    },
+    updateShippingCompanyStatus : {
+        url : `${backendDomain}/api/admin/shipping-companies`,
+        method : 'put'
     }
 }
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye, FaShippingFast, FaCheck, FaBox, FaClock, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaEye, FaShippingFast, FaCheck, FaBox, FaClock, FaSearch, FaFilter, FaTruck } from 'react-icons/fa';
 import SummaryApi from '../common';
 import { toast } from 'react-toastify';
+import ShippingQuoteSelector from '../components/ShippingQuoteSelector';
 
 const SellerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -11,6 +12,8 @@ const SellerOrders = () => {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [statusFilter, setStatusFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [showShippingModal, setShowShippingModal] = useState(false);
+    const [shippingOrder, setShippingOrder] = useState(null);
 
     // Fetch seller orders
     const fetchOrders = async () => {
@@ -89,6 +92,20 @@ const SellerOrders = () => {
             console.error('Error updating order status:', error);
             toast.error('Failed to update order status');
         }
+    };
+
+    // Handle shipping selection
+    const handleSelectShipping = (order) => {
+        setShippingOrder(order);
+        setShowShippingModal(true);
+    };
+
+    const onShippingSelected = (selectedQuote) => {
+        // Refresh orders to get updated shipping information
+        fetchOrders();
+        fetchOrderStats();
+        setShowShippingModal(false);
+        setShippingOrder(null);
     };
 
     // Filter orders based on status and search term
@@ -467,16 +484,27 @@ const SellerOrders = () => {
                                         {new Date(order.createdAt).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                        <button
-                                            onClick={() => {
-                                                setSelectedOrder(order);
-                                                setShowDetailModal(true);
-                                            }}
-                                            className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
-                                        >
-                                            <FaEye />
-                                            <span>View</span>
-                                        </button>
+                                        <div className="flex items-center space-x-2">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedOrder(order);
+                                                    setShowDetailModal(true);
+                                                }}
+                                                className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
+                                            >
+                                                <FaEye />
+                                                <span>View</span>
+                                            </button>
+                                            {(order.orderStatus === 'confirmed' || order.orderStatus === 'processing') && !order.shippingCompany && (
+                                                <button
+                                                    onClick={() => handleSelectShipping(order)}
+                                                    className="text-green-600 hover:text-green-900 flex items-center space-x-1"
+                                                >
+                                                    <FaTruck />
+                                                    <span>Ship</span>
+                                                </button>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -504,6 +532,18 @@ const SellerOrders = () => {
                         setSelectedOrder(null);
                     }}
                     onUpdateStatus={updateOrderStatus}
+                />
+            )}
+
+            {/* Shipping Quote Selector Modal */}
+            {showShippingModal && shippingOrder && (
+                <ShippingQuoteSelector
+                    order={shippingOrder}
+                    onSelectShipping={onShippingSelected}
+                    onClose={() => {
+                        setShowShippingModal(false);
+                        setShippingOrder(null);
+                    }}
                 />
             )}
         </div>

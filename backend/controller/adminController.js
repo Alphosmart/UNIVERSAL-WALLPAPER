@@ -341,11 +341,145 @@ async function getDashboardStats(req, res) {
     }
 }
 
+// Get all shipping companies (admin only)
+async function getAllShippingCompanies(req, res) {
+    try {
+        // Check if user is admin
+        if (req.userId) {
+            const currentUser = await userModel.findById(req.userId);
+            if (!currentUser || currentUser.role !== 'ADMIN') {
+                return res.status(403).json({
+                    message: "Access denied. Admin privileges required.",
+                    error: true,
+                    success: false
+                });
+            }
+        } else {
+            return res.status(401).json({
+                message: "Please login to access this resource",
+                error: true,
+                success: false
+            });
+        }
+
+        const { status, search } = req.query;
+        let query = { role: 'SHIPPING_COMPANY' };
+
+        // Filter by status if provided
+        if (status && status !== 'all') {
+            query.shippingCompanyStatus = status;
+        }
+
+        // Search by company name or contact email
+        if (search) {
+            query.$or = [
+                { 'companyInfo.companyName': { $regex: search, $options: 'i' } },
+                { email: { $regex: search, $options: 'i' } }
+            ];
+        }
+
+        const shippingCompanies = await userModel.find(query).select('-password').sort({ createdAt: -1 });
+
+        res.json({
+            message: "Shipping companies fetched successfully",
+            data: shippingCompanies,
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || err,
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Update shipping company status (admin only)
+async function updateShippingCompanyStatus(req, res) {
+    try {
+        const { companyId, status, rejectionReason } = req.body;
+
+        // Check if user is admin
+        if (req.userId) {
+            const currentUser = await userModel.findById(req.userId);
+            if (!currentUser || currentUser.role !== 'ADMIN') {
+                return res.status(403).json({
+                    message: "Access denied. Admin privileges required.",
+                    error: true,
+                    success: false
+                });
+            }
+        } else {
+            return res.status(401).json({
+                message: "Please login to access this resource",
+                error: true,
+                success: false
+            });
+        }
+
+        // Validate status
+        const validStatuses = ['pending_verification', 'verified', 'rejected', 'suspended'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                message: "Invalid status. Must be one of: " + validStatuses.join(', '),
+                error: true,
+                success: false
+            });
+        }
+
+        // Find the shipping company
+        const shippingCompany = await userModel.findOne({ _id: companyId, role: 'SHIPPING_COMPANY' });
+        if (!shippingCompany) {
+            return res.status(404).json({
+                message: "Shipping company not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Update the status and add admin action timestamp
+        const updateData = {
+            shippingCompanyStatus: status,
+            adminActionDate: new Date(),
+            adminId: req.userId
+        };
+
+        // Add rejection reason if status is rejected
+        if (status === 'rejected' && rejectionReason) {
+            updateData.rejectionReason = rejectionReason;
+        }
+
+        const updatedCompany = await userModel.findByIdAndUpdate(
+            companyId,
+            updateData,
+            { new: true }
+        ).select('-password');
+
+        res.json({
+            message: `Shipping company status updated to ${status} successfully`,
+            data: updatedCompany,
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || err,
+            error: true,
+            success: false
+        });
+    }
+}
+
 module.exports = {
     getAllUsers,
     updateUserRole,
     getAllProductsAdmin,
     deleteProductAdmin,
     updateProductStatus,
-    getDashboardStats
+    getDashboardStats,
+    getAllShippingCompanies,
+    updateShippingCompanyStatus
 };

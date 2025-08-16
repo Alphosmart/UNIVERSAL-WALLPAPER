@@ -49,36 +49,6 @@ Thumbs.db
 
 # Custom
 .history/
+*.sh
 cookies.txt
 uploads/
-
-# Documentation files (not needed for production)
-*.md
-!README.md
-!CHANGELOG.md
-
-# Test and debug files
-test-*.js
-test-*.sh
-test_*.sh
-*test*.js
-debug-*.js
-debug-*.sh
-
-# Shell scripts (development/testing only)
-*.sh
-!build.sh
-!deploy.sh
-!start.sh
-
-# Log files
-backend.log
-*.log
-
-# Development documentation
-*_GUIDE.md
-*_IMPLEMENTATION.md
-*_SUMMARY.md
-*_COMPLETE.md
-*_FIX.md
-*_SUCCESS.md
