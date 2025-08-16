@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaTimes, FaExclamationTriangle, FaInfoCircle, FaClock, FaCheckCircle, FaSearch, FaUndo } from 'react-icons/fa';
+import { toast } from 'react-toastify';
+import SummaryApi from '../common';
 
 const CancelOrder = () => {
   const [orderNumber, setOrderNumber] = useState('');
   const [cancelReason, setCancelReason] = useState('');
   const [orderFound, setOrderFound] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [cancellationSuccess, setCancellationSuccess] = useState(false);
   const [searchParams] = useSearchParams();
@@ -14,9 +17,45 @@ const CancelOrder = () => {
     const orderId = searchParams.get('orderId');
     if (orderId) {
       setOrderNumber(orderId);
-      setOrderFound(true);
+      fetchOrderDetails(orderId);
     }
   }, [searchParams]);
+
+  const fetchOrderDetails = async (orderId) => {
+    try {
+      setLoading(true);
+      // Fetch user orders and find the specific order
+      const response = await fetch(SummaryApi.userOrders.url, {
+        method: SummaryApi.userOrders.method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const order = data.data.find(order => order._id === orderId);
+        if (order) {
+          setOrderDetails(order);
+          setOrderFound(true);
+        } else {
+          toast.error('Order not found or you do not have access to this order');
+          setOrderFound(false);
+        }
+      } else {
+        toast.error(data.message || 'Failed to fetch orders');
+        setOrderFound(false);
+      }
+    } catch (error) {
+      console.error('Error fetching order:', error);
+      toast.error('Failed to fetch order details');
+      setOrderFound(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const cancelReasons = [
     'Changed my mind',
@@ -32,22 +71,57 @@ const CancelOrder = () => {
     e.preventDefault();
     if (!orderNumber.trim()) return;
     
-    setLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setOrderFound(true);
-    setLoading(false);
+    await fetchOrderDetails(orderNumber.trim());
   };
 
   const handleCancelOrder = async (e) => {
     e.preventDefault();
-    if (!cancelReason) return;
+    if (!cancelReason) {
+      toast.error('Please select a cancellation reason');
+      return;
+    }
+
+    if (!orderDetails) {
+      toast.error('Order details not found');
+      return;
+    }
+
+    // Check if order can be cancelled
+    const nonCancellableStatuses = ['shipped', 'delivered', 'cancelled'];
+    if (nonCancellableStatuses.includes(orderDetails.orderStatus?.toLowerCase())) {
+      toast.error(`Cannot cancel order that is already ${orderDetails.orderStatus}`);
+      return;
+    }
     
     setLoading(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setCancellationSuccess(true);
-    setLoading(false);
+    
+    try {
+      const response = await fetch(`${SummaryApi.updateOrderStatus.url}/${orderNumber}`, {
+        method: SummaryApi.updateOrderStatus.method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          orderStatus: 'cancelled',
+          cancellationReason: cancelReason
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCancellationSuccess(true);
+        toast.success('Order cancelled successfully');
+      } else {
+        toast.error(data.message || 'Failed to cancel order');
+      }
+    } catch (error) {
+      console.error('Error cancelling order:', error);
+      toast.error('Failed to cancel order. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (cancellationSuccess) {

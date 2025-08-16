@@ -37,7 +37,7 @@ async function updateSellerOrderStatus(request, response) {
     try {
         const currentUserId = request.userId;
         const { orderId } = request.params;
-        const { orderStatus, trackingNumber, estimatedDelivery } = request.body;
+        const { orderStatus, carrier, estimatedDelivery } = request.body;
 
         // Find the order and verify it belongs to the current seller
         const order = await orderModel.findOne({
@@ -56,12 +56,12 @@ async function updateSellerOrderStatus(request, response) {
         // Update order status and additional fields
         const updateData = { orderStatus };
         
-        if (trackingNumber) {
-            updateData.trackingNumber = trackingNumber;
+        if (carrier) {
+            updateData['trackingInfo.carrier'] = carrier;
         }
         
         if (estimatedDelivery) {
-            updateData.estimatedDelivery = new Date(estimatedDelivery);
+            updateData['trackingInfo.estimatedDelivery'] = new Date(estimatedDelivery);
         }
 
         const updatedOrder = await orderModel.findByIdAndUpdate(

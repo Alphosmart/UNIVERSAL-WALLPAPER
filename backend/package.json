@@ -7,8 +7,13 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:verbose": "jest --verbose",
+    "test:db": "node test-db-connection.js",
+    "test:system": "node testApiEndpoints.sh",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "lint": "echo 'No linter configured'",
+    "build": "echo 'Build step - copy files if needed'",
+    "migrate": "node migrate-tracking-numbers.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,6 +21,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.7.0",
     "compression": "^1.8.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",

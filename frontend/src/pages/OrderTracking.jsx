@@ -22,11 +22,11 @@ const OrderTracking = () => {
         const fetchOrderTracking = async () => {
             try {
                 setLoading(true);
-                const response = await fetch(SummaryApi.orderTracking.url.replace(':orderId', orderId), {
-                    method: SummaryApi.orderTracking.method,
+                const response = await fetch(SummaryApi.getOrderTracking.url.replace(':orderId', orderId), {
+                    method: SummaryApi.getOrderTracking.method,
+                    credentials: 'include',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Content-Type': 'application/json'
                     }
                 });
 

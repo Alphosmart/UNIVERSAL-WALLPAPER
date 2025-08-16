@@ -3,18 +3,6 @@ const { ResponseHandler } = require('../utils/responseHandler');
 
 async function authToken(req, res, next) {
     try {
-        // Development bypass for testing when database is unavailable
-        if (process.env.NODE_ENV === 'development' && req.path.includes('/admin/site-content')) {
-            req.userId = 'dev_admin_user';
-            req.user = {
-                _id: 'dev_admin_user',
-                role: 'ADMIN',
-                email: 'admin@ashamsmart.com',
-                name: 'Dev Admin'
-            };
-            return next();
-        }
-
         // Check for token in cookies first, then in Authorization header
         let token = req.cookies?.token;
         

@@ -30,7 +30,6 @@ import SellerOrders from '../pages/SellerOrders';
 import OrderTracking from '../pages/OrderTracking';
 import TrackByNumber from '../pages/TrackByNumber';
 import MyOrders from '../pages/MyOrders';
-import CartDebug from '../pages/CartDebug';
 import SearchResults from '../pages/SearchResults';
 import HelpCenter from '../pages/HelpCenter';
 import HowToOrder from '../pages/HowToOrder';
@@ -150,11 +149,6 @@ const router = createBrowserRouter([
             {
                 path: "become-seller",
                 element: <ProtectedRoute><BecomeSellerPage /></ProtectedRoute>,
-                errorElement: <ErrorPage />
-            },
-            {
-                path: "cart-debug",
-                element: <CartDebug />,
                 errorElement: <ErrorPage />
             },
             {

@@ -25,7 +25,6 @@ const AdminContactMessages = () => {
 
             if (response.ok) {
                 const data = await response.json();
-                console.log('API Response:', data); // Debug log
                 // The backend returns data in data.messages, not data.data
                 const messagesArray = Array.isArray(data.data?.messages) ? data.data.messages : 
                                      Array.isArray(data.messages) ? data.messages : 

@@ -46,7 +46,7 @@ export const AdminRoute = ({ children }) => {
   return children;
 };
 
-// SellerRoute: Only allows sellers and admins
+// SellerRoute: Only allows verified sellers and admins
 export const SellerRoute = ({ children }) => {
   const user = useSelector(state => state?.user?.user);
   const location = useLocation();
@@ -55,8 +55,9 @@ export const SellerRoute = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  if (user?.role !== 'SELLER' && user?.role !== 'ADMIN') {
-    return <Navigate to="/" replace />;
+  // Allow admins or verified sellers
+  if (user?.role !== 'ADMIN' && user?.sellerStatus !== 'verified') {
+    return <Navigate to="/become-seller" replace />;
   }
   
   return children;

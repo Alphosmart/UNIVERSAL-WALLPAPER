@@ -2,6 +2,7 @@ import './App.css';
 import { Outlet } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import ErrorBoundary from './components/ErrorBoundary';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useCallback, useState } from 'react';
@@ -58,21 +59,17 @@ function App() {
         setUserDetailsCached(true)
       } else {
         // Handle other non-200 responses
-        console.debug('Auth check failed with status:', dataResponse.status)
         setUserDetailsCached(true)
       }
     } catch (error) {
       if (error.name === 'AbortError') {
         // Retry once with shorter timeout if initial request times out
         if (retryCount === 0) {
-          console.debug('Initial auth check slow, retrying with faster timeout...')
           setTimeout(() => fetchUserDetails(1), 100)
           return
         }
-        console.debug('Network request took longer than expected - continuing with guest access')
       } else if (error.name !== 'TypeError') {
         // Don't log network errors when user is not authenticated
-        console.debug('Authentication check completed - proceeding as guest')
       }
       setUserDetailsCached(true)
     } finally {
@@ -87,7 +84,6 @@ function App() {
     // Failsafe: Don't let loading hang indefinitely
     const loadingTimeout = setTimeout(() => {
       if (loading) {
-        console.debug('Loading timeout reached - proceeding with app initialization')
         setLoading(false)
         setUserDetailsCached(true)
       }
@@ -107,7 +103,7 @@ function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <Context.Provider value={{
           fetchUserDetails,
           refreshUserDetails
@@ -126,7 +122,7 @@ function App() {
           </CartProvider>
         </ProductProvider>
       </Context.Provider>
-    </>
+    </ErrorBoundary>
   );
 }
 

@@ -60,7 +60,7 @@ const SellerOrders = () => {
     }, []);
 
     // Update order status
-    const updateOrderStatus = async (orderId, newStatus, trackingNumber = '', estimatedDelivery = '') => {
+    const updateOrderStatus = async (orderId, newStatus, carrier = '', estimatedDelivery = '') => {
         try {
             const response = await fetch(`${SummaryApi.updateSellerOrderStatus.url}/${orderId}/status`, {
                 method: SummaryApi.updateSellerOrderStatus.method,
@@ -70,7 +70,7 @@ const SellerOrders = () => {
                 },
                 body: JSON.stringify({
                     orderStatus: newStatus,
-                    trackingNumber,
+                    carrier,
                     estimatedDelivery
                 })
             });
@@ -107,8 +107,12 @@ const SellerOrders = () => {
                 return 'bg-yellow-100 text-yellow-800';
             case 'confirmed':
                 return 'bg-blue-100 text-blue-800';
+            case 'processing':
+                return 'bg-orange-100 text-orange-800';
             case 'shipped':
                 return 'bg-purple-100 text-purple-800';
+            case 'out_for_delivery':
+                return 'bg-indigo-100 text-indigo-800';
             case 'delivered':
                 return 'bg-green-100 text-green-800';
             case 'cancelled':
@@ -121,11 +125,12 @@ const SellerOrders = () => {
     // Order Detail Modal
     const OrderDetailModal = ({ order, onClose, onUpdateStatus }) => {
         const [newStatus, setNewStatus] = useState(order.orderStatus);
-        const [trackingNumber, setTrackingNumber] = useState(order.trackingNumber || '');
+        const [trackingNumber, setTrackingNumber] = useState(order.trackingInfo?.trackingNumber || '');
+        const [carrier, setCarrier] = useState(order.trackingInfo?.carrier || '');
         const [estimatedDelivery, setEstimatedDelivery] = useState('');
 
         const handleStatusUpdate = () => {
-            onUpdateStatus(order._id, newStatus, trackingNumber, estimatedDelivery);
+            onUpdateStatus(order._id, newStatus, carrier, estimatedDelivery);
         };
 
         return (
@@ -210,28 +215,45 @@ const SellerOrders = () => {
                                     >
                                         <option value="pending">Pending</option>
                                         <option value="confirmed">Confirmed</option>
+                                        <option value="processing">Processing</option>
                                         <option value="shipped">Shipped</option>
+                                        <option value="out_for_delivery">Out for Delivery</option>
                                         <option value="delivered">Delivered</option>
                                         <option value="cancelled">Cancelled</option>
                                     </select>
                                 </div>
 
-                                {(newStatus === 'shipped' || newStatus === 'delivered') && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                                            Tracking Number (Optional)
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={trackingNumber}
-                                            onChange={(e) => setTrackingNumber(e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                            placeholder="Enter tracking number"
-                                        />
-                                    </div>
+                                {(newStatus === 'processing' || newStatus === 'shipped' || newStatus === 'out_for_delivery' || newStatus === 'delivered') && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Tracking Number (Auto-Generated)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={trackingNumber}
+                                                readOnly
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 cursor-not-allowed"
+                                                placeholder="Auto-generated tracking ID"
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">Tracking ID is automatically generated and cannot be changed</p>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Carrier/Shipping Company (Optional)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={carrier}
+                                                onChange={(e) => setCarrier(e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="e.g., DHL, FedEx, Local Courier"
+                                            />
+                                        </div>
+                                    </>
                                 )}
 
-                                {newStatus === 'shipped' && (
+                                {(newStatus === 'processing' || newStatus === 'shipped' || newStatus === 'out_for_delivery') && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Estimated Delivery (Optional)
@@ -380,6 +402,9 @@ const SellerOrders = () => {
                                     Status
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Tracking
+                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Date
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -427,6 +452,16 @@ const SellerOrders = () => {
                                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(order.orderStatus)}`}>
                                             {order.orderStatus}
                                         </span>
+                                    </td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        <div className="text-sm text-gray-900">
+                                            {order.trackingInfo?.trackingNumber || 'Not assigned'}
+                                        </div>
+                                        {order.trackingInfo?.carrier && (
+                                            <div className="text-xs text-gray-500">
+                                                {order.trackingInfo.carrier}
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         {new Date(order.createdAt).toLocaleDateString()}

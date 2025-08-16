@@ -72,19 +72,48 @@ const AllProducts = () => {
     }
   };
 
-  // Filter products based on search and category
-  const filteredProducts = products.filter(product => {
+  // Filter and sort products
+  const filteredAndSortedProducts = products.filter(product => {
     const matchesSearch = product.productName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          product.brandName?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === '' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
+    const matchesStatus = statusFilter === '' || product.status === statusFilter;
+    return matchesSearch && matchesCategory && matchesStatus;
+  }).sort((a, b) => {
+    let valueA, valueB;
+    
+    switch (sortBy) {
+      case 'productName':
+        valueA = a.productName?.toLowerCase() || '';
+        valueB = b.productName?.toLowerCase() || '';
+        break;
+      case 'price':
+        valueA = a.sellingPrice || 0;
+        valueB = b.sellingPrice || 0;
+        break;
+      case 'stock':
+        valueA = a.stock || 0;
+        valueB = b.stock || 0;
+        break;
+      case 'createdAt':
+      default:
+        valueA = new Date(a.createdAt || 0);
+        valueB = new Date(b.createdAt || 0);
+        break;
+    }
+    
+    if (sortOrder === 'asc') {
+      return valueA < valueB ? -1 : valueA > valueB ? 1 : 0;
+    } else {
+      return valueA > valueB ? -1 : valueA < valueB ? 1 : 0;
+    }
   });
 
   // Pagination
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const currentProducts = filteredAndSortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / productsPerPage);
 
   if (loading) {
     return (
@@ -107,7 +136,7 @@ const AllProducts = () => {
 
       {/* Filters */}
       <div className="bg-white p-6 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Search Products
@@ -138,18 +167,66 @@ const AllProducts = () => {
               ))}
             </select>
           </div>
-          
-          <div className="flex items-end">
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setSelectedCategory('');
-                setCurrentPage(1);
-              }}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md"
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Status
+            </label>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
-              Clear Filters
-            </button>
+              <option value="">All Status</option>
+              <option value="ACTIVE">Active</option>
+              <option value="SOLD">Sold</option>
+              <option value="INACTIVE">Inactive</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Sort By
+            </label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="createdAt">Date Added</option>
+              <option value="productName">Product Name</option>
+              <option value="price">Price</option>
+              <option value="stock">Stock</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Order
+            </label>
+            <div className="flex space-x-2">
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedCategory('');
+                  setStatusFilter('');
+                  setSortBy('createdAt');
+                  setSortOrder('desc');
+                  setCurrentPage(1);
+                }}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md whitespace-nowrap"
+              >
+                Clear
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -299,9 +376,9 @@ const AllProducts = () => {
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{indexOfFirstProduct + 1}</span> to{' '}
                 <span className="font-medium">
-                  {Math.min(indexOfLastProduct, filteredProducts.length)}
+                  {Math.min(indexOfLastProduct, filteredAndSortedProducts.length)}
                 </span>{' '}
-                of <span className="font-medium">{filteredProducts.length}</span> results
+                of <span className="font-medium">{filteredAndSortedProducts.length}</span> results
               </p>
             </div>
             <div>

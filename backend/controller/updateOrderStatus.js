@@ -35,15 +35,30 @@ async function updateOrderStatusController(req, res) {
         const updateData = {};
         
         if (orderStatus) {
-            // Only seller can update order status (except cancellation)
-            if (order.seller._id.toString() === req.userId || orderStatus === 'cancelled') {
+            // Check if trying to cancel order
+            if (orderStatus === 'cancelled') {
+                // Validate cancellation is allowed
+                const nonCancellableStatuses = ['shipped', 'delivered', 'cancelled'];
+                if (nonCancellableStatuses.includes(order.orderStatus)) {
+                    return res.status(400).json({
+                        message: `Cannot cancel order that is already ${order.orderStatus}`,
+                        error: true,
+                        success: false
+                    });
+                }
+                // Both buyer and seller can cancel orders (if not shipped/delivered)
                 updateData.orderStatus = orderStatus;
             } else {
-                return res.status(403).json({
-                    message: "Only seller can update order status",
-                    error: true,
-                    success: false
-                });
+                // Only seller can update order status to other statuses
+                if (order.seller._id.toString() === req.userId) {
+                    updateData.orderStatus = orderStatus;
+                } else {
+                    return res.status(403).json({
+                        message: "Only seller can update order status",
+                        error: true,
+                        success: false
+                    });
+                }
             }
         }
 

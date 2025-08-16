@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaBox, FaClock, FaCheck, FaTimes, FaEye, FaTruck } from 'react-icons/fa';
+import { FaBox, FaClock, FaCheck, FaTimes, FaEye, FaTruck, FaShoppingCart, FaRedo, FaCog } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import SummaryApi from '../common';
 
@@ -41,16 +41,21 @@ const MyOrders = () => {
     };
 
     const getStatusIcon = (status) => {
-        switch (status) {
-            case 'PENDING':
+        const statusLower = status?.toLowerCase();
+        switch (statusLower) {
+            case 'pending':
                 return <FaClock className="text-yellow-600" />;
-            case 'CONFIRMED':
+            case 'confirmed':
                 return <FaCheck className="text-blue-600" />;
-            case 'SHIPPED':
+            case 'processing':
+                return <FaCog className="text-orange-600" />;
+            case 'shipped':
                 return <FaBox className="text-purple-600" />;
-            case 'DELIVERED':
+            case 'out_for_delivery':
+                return <FaTruck className="text-indigo-600" />;
+            case 'delivered':
                 return <FaCheck className="text-green-600" />;
-            case 'CANCELLED':
+            case 'cancelled':
                 return <FaTimes className="text-red-600" />;
             default:
                 return <FaClock className="text-gray-600" />;
@@ -58,16 +63,21 @@ const MyOrders = () => {
     };
 
     const getStatusColor = (status) => {
-        switch (status) {
-            case 'PENDING':
+        const statusLower = status?.toLowerCase();
+        switch (statusLower) {
+            case 'pending':
                 return 'bg-yellow-100 text-yellow-800';
-            case 'CONFIRMED':
+            case 'confirmed':
                 return 'bg-blue-100 text-blue-800';
-            case 'SHIPPED':
+            case 'processing':
+                return 'bg-orange-100 text-orange-800';
+            case 'shipped':
                 return 'bg-purple-100 text-purple-800';
-            case 'DELIVERED':
+            case 'out_for_delivery':
+                return 'bg-indigo-100 text-indigo-800';
+            case 'delivered':
                 return 'bg-green-100 text-green-800';
-            case 'CANCELLED':
+            case 'cancelled':
                 return 'bg-red-100 text-red-800';
             default:
                 return 'bg-gray-100 text-gray-800';
@@ -75,8 +85,68 @@ const MyOrders = () => {
     };
 
     const canCancelOrder = (status) => {
-        // Temporarily allow cancellation for more statuses to test
-        return ['PENDING', 'CONFIRMED', 'PROCESSING'].includes(status);
+        const statusLower = status?.toLowerCase();
+        return ['pending', 'confirmed'].includes(statusLower);
+    };
+
+    const canBuyAgain = (status) => {
+        const statusLower = status?.toLowerCase();
+        return ['delivered', 'cancelled'].includes(statusLower);
+    };
+
+    const canTrackOrder = (status) => {
+        const statusLower = status?.toLowerCase();
+        return ['confirmed', 'processing', 'shipped', 'out_for_delivery'].includes(statusLower);
+    };
+
+    const getStatusDisplayName = (status) => {
+        const statusLower = status?.toLowerCase();
+        switch (statusLower) {
+            case 'pending':
+                return 'Pending';
+            case 'confirmed':
+                return 'Confirmed';
+            case 'processing':
+                return 'Processing';
+            case 'shipped':
+                return 'Shipped';
+            case 'out_for_delivery':
+                return 'Out for Delivery';
+            case 'delivered':
+                return 'Delivered';
+            case 'cancelled':
+                return 'Cancelled';
+            default:
+                return status || 'Unknown';
+        }
+    };
+
+    const handleBuyAgain = async (order) => {
+        try {
+            // Add the product to cart again
+            const response = await fetch(SummaryApi.addToCart.url, {
+                method: SummaryApi.addToCart.method,
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    productId: order.product._id,
+                    quantity: order.quantity
+                })
+            });
+
+            const result = await response.json();
+            
+            if (result.success) {
+                toast.success('Product added to cart successfully!');
+            } else {
+                toast.error(result.message || 'Failed to add product to cart');
+            }
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            toast.error('Failed to add product to cart');
+        }
     };
 
     const formatPrice = (price) => {
@@ -151,12 +221,13 @@ const MyOrders = () => {
                                     </p>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${getStatusColor(order.status)}`}>
-                                        {getStatusIcon(order.status)}
-                                        {order.status}
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${getStatusColor(order.orderStatus)}`}>
+                                        {getStatusIcon(order.orderStatus)}
+                                        {getStatusDisplayName(order.orderStatus)}
                                     </span>
-                                    {/* Cancel Order Button */}
-                                    {canCancelOrder(order.status) && (
+                                    
+                                    {/* Action buttons based on order status */}
+                                    {canCancelOrder(order.orderStatus) && (
                                         <Link
                                             to={`/cancel-order?orderId=${order._id}`}
                                             className="text-red-600 hover:text-red-800 flex items-center gap-1 px-2 py-1 border border-red-600 rounded hover:bg-red-50 transition-colors"
@@ -165,6 +236,27 @@ const MyOrders = () => {
                                             Cancel
                                         </Link>
                                     )}
+                                    
+                                    {canBuyAgain(order.orderStatus) && (
+                                        <button
+                                            onClick={() => handleBuyAgain(order)}
+                                            className="text-green-600 hover:text-green-800 flex items-center gap-1 px-2 py-1 border border-green-600 rounded hover:bg-green-50 transition-colors"
+                                        >
+                                            <FaShoppingCart />
+                                            Buy Again
+                                        </button>
+                                    )}
+                                    
+                                    {canTrackOrder(order.orderStatus) && (
+                                        <Link
+                                            to={`/order-tracking/${order._id}`}
+                                            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 px-2 py-1 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
+                                        >
+                                            <FaTruck />
+                                            Track Order
+                                        </Link>
+                                    )}
+                                    
                                     <button
                                         onClick={() => viewOrderDetails(order)}
                                         className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
@@ -172,14 +264,6 @@ const MyOrders = () => {
                                         <FaEye />
                                         View Details
                                     </button>
-                                    {/* Always visible cancel button for testing */}
-                                    <Link
-                                        to={`/cancel-order?orderId=${order._id}`}
-                                        className="text-red-600 hover:text-red-800 flex items-center gap-1 px-2 py-1 border border-red-600 rounded hover:bg-red-50 transition-colors"
-                                    >
-                                        <FaTimes />
-                                        Cancel Order
-                                    </Link>
                                 </div>
                             </div>
 
@@ -223,16 +307,8 @@ const MyOrders = () => {
                                     Order Details
                                 </h2>
                                 <div className="flex items-center gap-3">
-                                    {/* Always visible cancel button for testing */}
-                                    <Link
-                                        to={`/cancel-order?orderId=${selectedOrder._id}`}
-                                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 transition-colors"
-                                    >
-                                        <FaTimes />
-                                        Cancel Order
-                                    </Link>
                                     {/* Cancel Order Button in Modal */}
-                                    {canCancelOrder(selectedOrder.status) && (
+                                    {canCancelOrder(selectedOrder.orderStatus) && (
                                         <Link
                                             to={`/cancel-order?orderId=${selectedOrder._id}`}
                                             className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2 transition-colors"
@@ -241,16 +317,29 @@ const MyOrders = () => {
                                             Cancel Order
                                         </Link>
                                     )}
+                                    
+                                    {/* Buy Again Button in Modal */}
+                                    {canBuyAgain(selectedOrder.orderStatus) && (
+                                        <button
+                                            onClick={() => handleBuyAgain(selectedOrder)}
+                                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 transition-colors"
+                                        >
+                                            <FaShoppingCart />
+                                            Buy Again
+                                        </button>
+                                    )}
+                                    
                                     {/* Track Order Button in Modal */}
-                                    {['CONFIRMED', 'SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(selectedOrder.status) && (
+                                    {canTrackOrder(selectedOrder.orderStatus) && (
                                         <Link
                                             to={`/order-tracking/${selectedOrder._id}`}
-                                            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2 transition-colors"
+                                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors"
                                         >
                                             <FaTruck />
                                             Track Order
                                         </Link>
                                     )}
+                                    
                                     <button
                                         onClick={() => setShowOrderDetail(false)}
                                         className="text-gray-600 hover:text-gray-800 text-2xl"
@@ -273,9 +362,9 @@ const MyOrders = () => {
                                                 Date: {formatDate(selectedOrder.createdAt)}
                                             </p>
                                             <div className="flex items-center gap-2 mt-2">
-                                                <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${getStatusColor(selectedOrder.status)}`}>
-                                                    {getStatusIcon(selectedOrder.status)}
-                                                    {selectedOrder.status}
+                                                <span className={`px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 ${getStatusColor(selectedOrder.orderStatus)}`}>
+                                                    {getStatusIcon(selectedOrder.orderStatus)}
+                                                    {getStatusDisplayName(selectedOrder.orderStatus)}
                                                 </span>
                                             </div>
                                         </div>
@@ -288,6 +377,31 @@ const MyOrders = () => {
                                                 Email: {selectedOrder.seller?.email || 'N/A'}
                                             </p>
                                         </div>
+                                        
+                                        {/* Tracking Information */}
+                                        {canTrackOrder(selectedOrder.orderStatus) && (
+                                            <div>
+                                                <h3 className="font-semibold text-gray-800 mb-2">Tracking Information</h3>
+                                                <p className="text-sm text-gray-600">
+                                                    Tracking Number: {selectedOrder.trackingInfo?.trackingNumber || 'Not assigned yet'}
+                                                </p>
+                                                {selectedOrder.trackingInfo?.carrier && (
+                                                    <p className="text-sm text-gray-600">
+                                                        Carrier: {selectedOrder.trackingInfo.carrier}
+                                                    </p>
+                                                )}
+                                                {selectedOrder.trackingInfo?.estimatedDelivery && (
+                                                    <p className="text-sm text-gray-600">
+                                                        Estimated Delivery: {formatDate(selectedOrder.trackingInfo.estimatedDelivery)}
+                                                    </p>
+                                                )}
+                                                {selectedOrder.trackingInfo?.currentLocation && (
+                                                    <p className="text-sm text-gray-600">
+                                                        Current Location: {selectedOrder.trackingInfo.currentLocation}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
