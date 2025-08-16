@@ -349,6 +349,36 @@ const SummaryApi = {
     resetSiteContent : {
         url : `${backendDomain}/api/admin/site-content/reset`,
         method : 'delete'
+    },
+    
+    // Shipping Company APIs
+    registerShippingCompany : {
+        url : `${backendDomain}/api/shipping-company/register`,
+        method : 'post'
+    },
+    getShippingCompanyProfile : {
+        url : `${backendDomain}/api/shipping-company/profile`,
+        method : 'get'
+    },
+    updateShippingCompanyProfile : {
+        url : `${backendDomain}/api/shipping-company/profile`,
+        method : 'put'
+    },
+    getAvailableOrders : {
+        url : `${backendDomain}/api/shipping-company/available-orders`,
+        method : 'get'
+    },
+    submitShippingQuote : {
+        url : `${backendDomain}/api/shipping-company/orders`,
+        method : 'post'
+    },
+    getShippingQuotes : {
+        url : `${backendDomain}/api/shipping-company/quotes`,
+        method : 'get'
+    },
+    getShippingCompanyStats : {
+        url : `${backendDomain}/api/shipping-company/stats`,
+        method : 'get'
     }
 }
 

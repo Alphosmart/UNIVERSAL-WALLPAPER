@@ -62,3 +62,20 @@ export const SellerRoute = ({ children }) => {
   
   return children;
 };
+
+// ShippingCompanyRoute: Only allows verified shipping companies and admins
+export const ShippingCompanyRoute = ({ children }) => {
+  const user = useSelector(state => state?.user?.user);
+  const location = useLocation();
+  
+  if (!user?._id) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  // Allow admins or verified shipping companies
+  if (user?.role !== 'ADMIN' && (user?.role !== 'SHIPPING_COMPANY' || user?.shippingCompanyStatus !== 'verified')) {
+    return <Navigate to="/shipping-company-application" replace />;
+  }
+  
+  return children;
+};
