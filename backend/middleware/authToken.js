@@ -15,7 +15,16 @@ async function authToken(req, res, next) {
             return next();
         }
 
-        const token = req.cookies?.token;
+        // Check for token in cookies first, then in Authorization header
+        let token = req.cookies?.token;
+        
+        // If no token in cookies, check Authorization header
+        if (!token) {
+            const authHeader = req.headers.authorization;
+            if (authHeader && authHeader.startsWith('Bearer ')) {
+                token = authHeader.substring(7); // Remove 'Bearer ' prefix
+            }
+        }
 
         if (!token) {
             return res.status(401).json({
@@ -58,6 +67,7 @@ async function authToken(req, res, next) {
             }
 
             req.userId = decoded?._id;
+            req.user = decoded; // Set the full user object for easy access
             next();
         });
 

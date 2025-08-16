@@ -2,6 +2,7 @@ import React, { useEffect, useState, memo, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useProducts } from '../context/ProductContext'
 import { formatCurrency } from '../helper/settingsUtils'
+import SocialFeatures from './SocialFeatures'
 
 const HorizontalCardProduct = memo(({ category, heading }) => {
     const { getProductsByCategory, loading: globalLoading, allProducts } = useProducts()
@@ -130,6 +131,10 @@ const HorizontalCardProduct = memo(({ category, heading }) => {
                                     From {product.originalCurrency}
                                 </p>
                             )}
+                            
+                            {/* Social features */}
+                            <SocialFeatures product={product} compact={true} />
+                            
                             <button className='text-xs bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-full w-fit'>
                                 Add to Cart
                             </button>

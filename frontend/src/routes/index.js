@@ -93,11 +93,6 @@ const router = createBrowserRouter([
                 errorElement: <ErrorPage />
             },
             {
-                path: "edit-product/:id",
-                element: <ProtectedRoute><EditProduct /></ProtectedRoute>,
-                errorElement: <ErrorPage />
-            },
-            {
                 path: "my-products",
                 element: <SellerProtectedRoute><MyProducts /></SellerProtectedRoute>,
                 errorElement: <ErrorPage />
@@ -261,6 +256,10 @@ const router = createBrowserRouter([
                     {
                         path: "settings",
                         element: <Settings />
+                    },
+                    {
+                        path: "edit-product/:id",
+                        element: <EditProduct />
                     }
                 ]
             }

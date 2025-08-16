@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaEdit, FaTrash, FaEye, FaPlus } from 'react-icons/fa';
 import SummaryApi from '../common';
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10);
-
-  const categories = [
+  const navigate = useNavigate();  const categories = [
     'mobile', 'laptop', 'camera', 'headphones', 'television', 
     'mouse', 'keyboard', 'speaker', 'refrigerator', 'trimmer', 
     'watch', 'airpods', 'earphones'
@@ -241,10 +244,18 @@ const AllProducts = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
-                        <button className="text-blue-600 hover:text-blue-900" title="View">
+                        <button 
+                          onClick={() => navigate(`/product/${product._id}`)}
+                          className="text-blue-600 hover:text-blue-900" 
+                          title="View"
+                        >
                           <FaEye />
                         </button>
-                        <button className="text-green-600 hover:text-green-900" title="Edit">
+                        <button 
+                          onClick={() => navigate(`/admin-panel/edit-product/${product._id}`)}
+                          className="text-green-600 hover:text-green-900" 
+                          title="Edit"
+                        >
                           <FaEdit />
                         </button>
                         <button 

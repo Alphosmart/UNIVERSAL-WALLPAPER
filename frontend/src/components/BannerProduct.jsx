@@ -159,7 +159,7 @@ const BannerProduct = memo(() => {
                         const banner = banners[index]
                         return (
                             <div 
-                                key={imageUrl} 
+                                key={banner?._id || `desktop-banner-${index}`} 
                                 className={`w-full h-full min-w-full min-h-full transition-all ${
                                     banner?.linkUrl ? 'cursor-pointer' : ''
                                 }`}
@@ -194,7 +194,7 @@ const BannerProduct = memo(() => {
                         const banner = banners[index]
                         return (
                             <div 
-                                key={imageUrl} 
+                                key={banner?._id || `mobile-banner-${index}`} 
                                 className={`w-full h-full min-w-full min-h-full transition-all ${
                                     banner?.linkUrl ? 'cursor-pointer' : ''
                                 }`}
@@ -223,15 +223,18 @@ const BannerProduct = memo(() => {
                 {/* Dots indicator */}
                 {desktopImages.length > 1 && (
                     <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                        {desktopImages.map((_, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentImage(index)}
-                                className={`w-3 h-3 rounded-full transition-colors ${
-                                    currentImage === index ? 'bg-white' : 'bg-white bg-opacity-50'
-                                }`}
-                            />
-                        ))}
+                        {desktopImages.map((_, index) => {
+                            const banner = banners[index]
+                            return (
+                                <button
+                                    key={banner?._id || `dot-indicator-${index}`}
+                                    onClick={() => setCurrentImage(index)}
+                                    className={`w-3 h-3 rounded-full transition-colors ${
+                                        currentImage === index ? 'bg-white' : 'bg-white bg-opacity-50'
+                                    }`}
+                                />
+                            )
+                        })}
                     </div>
                 )}
 

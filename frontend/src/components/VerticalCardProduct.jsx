@@ -2,6 +2,7 @@ import React, { useEffect, useState, memo, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useProducts } from '../context/ProductContext'
 import { formatCurrency } from '../helper/settingsUtils'
+import SocialFeatures from './SocialFeatures'
 
 const VerticalCardProduct = memo(({ category, heading }) => {
     const { getProductsByCategory, loading: globalLoading, allProducts } = useProducts()
@@ -135,6 +136,10 @@ const VerticalCardProduct = memo(({ category, heading }) => {
                                     Original: {product.originalCurrency} • Converted from seller's local price
                                 </p>
                             )}
+                            
+                            {/* Social features */}
+                            <SocialFeatures product={product} compact={true} />
+                            
                             <button className='text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-0.5 rounded-full'>
                                 Add to Cart
                             </button>

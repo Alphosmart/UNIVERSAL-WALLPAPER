@@ -301,6 +301,10 @@ const SummaryApi = {
         url : `${backendDomain}/api/shipping/methods`,
         method : 'get'
     },
+    getShippingInfo : {
+        url : `${backendDomain}/api/shipping/info`,
+        method : 'get'
+    },
     // Banner endpoints
     getBanners : {
         url : `${backendDomain}/api/banners`,

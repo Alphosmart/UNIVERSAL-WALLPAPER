@@ -4,6 +4,8 @@ import { FaStar, FaStarHalf, FaShoppingCart, FaHeart, FaRegHeart, FaPlus, FaMinu
 import { toast } from 'react-toastify';
 import SummaryApi from '../common';
 import { useCart } from '../context/CartContext';
+import SocialFeatures from '../components/SocialFeatures';
+import Reviews from '../components/Reviews';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -408,6 +410,16 @@ const ProductDetail = () => {
                         )}
                     </div>
                 </div>
+            </div>
+            
+            {/* Social Features Section */}
+            <div className="mt-8">
+                <SocialFeatures product={product} compact={false} />
+            </div>
+            
+            {/* Reviews Section */}
+            <div className="mt-8">
+                <Reviews productId={product._id} />
             </div>
             
             {/* Fullscreen Image Modal */}
