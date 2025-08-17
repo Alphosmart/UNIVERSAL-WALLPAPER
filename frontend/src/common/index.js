@@ -342,6 +342,10 @@ const SummaryApi = {
         url : `${backendDomain}/api/admin/site-content`,
         method : 'get'
     },
+    getPublicSiteContent : {
+        url : `${backendDomain}/api/site-content`,
+        method : 'get'
+    },
     updateSiteContent : {
         url : `${backendDomain}/api/admin/site-content`,
         method : 'put'
@@ -399,6 +403,12 @@ const SummaryApi = {
     updateShippingCompanyStatus : {
         url : `${backendDomain}/api/admin/shipping-companies`,
         method : 'put'
+    },
+    
+    // Maintenance Mode
+    maintenanceStatus : {
+        url : `${backendDomain}/api/maintenance-status`,
+        method : 'get'
     }
 }
 
