@@ -1,9 +1,46 @@
 {
   "siteSettings": {
-    "siteName": "Ashamsmart",
+    "siteName": "AshAmSmart",
     "siteDescription": "Your trusted e-commerce marketplace for quality products",
     "supportEmail": "support@ashamsmart.com",
     "maintenanceMode": false,
-    "lastUpdated": "2025-08-11T23:02:29.035Z"
+    "lastUpdated": "2025-08-17T21:12:23.725Z"
+  },
+  "errorPage": {
+    "title": "404",
+    "heading": "Oops! Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "quickLinks": [
+      {
+        "label": "Help Center",
+        "path": "/help-center"
+      },
+      {
+        "label": "Contact Us",
+        "path": "/contact-us"
+      },
+      {
+        "label": "Track Order",
+        "path": "/track-order"
+      },
+      {
+        "label": "Returns",
+        "path": "/returns-refunds"
+      }
+    ],
+    "lastUpdated": "2025-08-17T19:59:28.519Z"
+  },
+  "maintenancePage": {
+    "title": "Under Maintenance",
+    "message": "We're currently performing scheduled maintenance to improve your experience. We'll be back online shortly.",
+    "estimatedDowntime": "1-5 hours",
+    "statusMessage": "Service will resume automatically",
+    "contactEmail": "support@ashamsmart.com",
+    "progressPercentage": 45,
+    "showProgressBar": true,
+    "showContactInfo": true,
+    "backgroundColor": "from-purple-50 to-indigo-100",
+    "buttonText": "Refresh Page",
+    "lastUpdated": "2025-08-17T21:08:15.978Z"
   }
 }

@@ -110,6 +110,52 @@ const updateSiteContent = async (req, res) => {
             lastUpdated: new Date().toISOString()
         };
 
+        // Special handling for siteSettings section - also update database
+        if (section === 'siteSettings' && data.maintenanceMode !== undefined) {
+            try {
+                const settingsModel = require('../models/settingsModel');
+                
+                console.log('🔧 Updating database maintenance mode:', {
+                    maintenanceMode: data.maintenanceMode,
+                    systemId: 'main_settings'
+                });
+                
+                // Find or create settings document
+                let settings = await settingsModel.findOne({ systemId: 'main_settings' });
+                
+                if (!settings) {
+                    // Create new settings document if it doesn't exist
+                    console.log('Creating new settings document...');
+                    settings = new settingsModel({
+                        systemId: 'main_settings',
+                        general: {
+                            siteName: data.siteName || 'AshAmSmart',
+                            siteDescription: data.siteDescription || 'Your trusted e-commerce marketplace for quality products',
+                            maintenanceMode: data.maintenanceMode
+                        }
+                    });
+                } else {
+                    // Update existing settings
+                    console.log('Updating existing settings document...');
+                    settings.general = settings.general || {};
+                    settings.general.maintenanceMode = data.maintenanceMode;
+                    if (data.siteName) settings.general.siteName = data.siteName;
+                    if (data.siteDescription) settings.general.siteDescription = data.siteDescription;
+                }
+                
+                await settings.save();
+                console.log('✅ Database settings updated successfully:', {
+                    systemId: 'main_settings',
+                    maintenanceMode: data.maintenanceMode,
+                    documentId: settings._id
+                });
+                
+            } catch (dbError) {
+                console.error('❌ Error updating database settings:', dbError);
+                // Continue with file update even if database update fails
+            }
+        }
+
         // Write updated content back to file
         await fs.writeFile(contentFilePath, JSON.stringify(currentContent, null, 2), 'utf8');
 

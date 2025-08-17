@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import SummaryApi from '../common';
 
 const SiteContentManagement = () => {
+    const isLoadingData = useRef(false);
     const [contentData, setContentData] = useState({
         errorPage: {
             title: "404",
@@ -35,14 +36,29 @@ const SiteContentManagement = () => {
             siteDescription: "Your trusted e-commerce marketplace for quality products",
             supportEmail: "support@ashamsmart.com",
             maintenanceMode: false
+        },
+        maintenancePage: {
+            title: "Under Maintenance",
+            message: "We're currently performing scheduled maintenance to improve your experience. We'll be back online shortly.",
+            estimatedDowntime: "1-2 hours",
+            statusMessage: "Service will resume automatically",
+            contactEmail: "support@ashamsmart.com",
+            progressPercentage: 45,
+            showProgressBar: true,
+            showContactInfo: true,
+            backgroundColor: "from-blue-50 to-indigo-100",
+            buttonText: "Refresh Page"
         }
     });
 
     const [activeTab, setActiveTab] = useState('errorPage');
     const [isLoading, setIsLoading] = useState(false);
 
-    // Load content data from backend
+    // Load content data from backend only once
     useEffect(() => {
+        if (isLoadingData.current) return;
+        isLoadingData.current = true;
+        
         const loadContentData = async () => {
             try {
                 const response = await fetch(SummaryApi.getAllSiteContent.url, {
@@ -57,8 +73,6 @@ const SiteContentManagement = () => {
                 
                 if (data.success && data.data && Object.keys(data.data).length > 0) {
                     setContentData(prev => ({ ...prev, ...data.data }));
-                } else {
-                    // Using default content data
                 }
             } catch (error) {
                 console.error('Error loading content data:', error);
@@ -162,7 +176,8 @@ const SiteContentManagement = () => {
     const tabs = [
         { id: 'errorPage', label: '404 Error Page', icon: '⚠️' },
         { id: 'contactUs', label: 'Contact Us Page', icon: '📞' },
-        { id: 'siteSettings', label: 'Site Settings', icon: '⚙️' }
+        { id: 'siteSettings', label: 'Site Settings', icon: '⚙️' },
+        { id: 'maintenancePage', label: 'Maintenance Page', icon: '🔧' }
     ];
 
     return (
@@ -450,6 +465,165 @@ const SiteContentManagement = () => {
                                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
                                 >
                                     {isLoading ? 'Saving...' : 'Save Site Settings'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Maintenance Page Content */}
+                        {activeTab === 'maintenancePage' && (
+                            <div className="space-y-6">
+                                <h2 className="text-xl font-semibold text-gray-900">Maintenance Page Settings</h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Page Title
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contentData.maintenancePage.title}
+                                            onChange={(e) => updateContentData('maintenancePage', 'title', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Under Maintenance"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Estimated Downtime
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contentData.maintenancePage.estimatedDowntime}
+                                            onChange={(e) => updateContentData('maintenancePage', 'estimatedDowntime', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="1-2 hours"
+                                        />
+                                    </div>
+
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Main Message
+                                        </label>
+                                        <textarea
+                                            value={contentData.maintenancePage.message}
+                                            onChange={(e) => updateContentData('maintenancePage', 'message', e.target.value)}
+                                            rows={3}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="We're currently performing scheduled maintenance..."
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Status Message
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contentData.maintenancePage.statusMessage}
+                                            onChange={(e) => updateContentData('maintenancePage', 'statusMessage', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Service will resume automatically"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Contact Email
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={contentData.maintenancePage.contactEmail}
+                                            onChange={(e) => updateContentData('maintenancePage', 'contactEmail', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="support@yourcompany.com"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Progress Percentage (0-100)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            value={contentData.maintenancePage.progressPercentage}
+                                            onChange={(e) => updateContentData('maintenancePage', 'progressPercentage', parseInt(e.target.value) || 0)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="45"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Button Text
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={contentData.maintenancePage.buttonText}
+                                            onChange={(e) => updateContentData('maintenancePage', 'buttonText', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Refresh Page"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <h3 className="text-lg font-medium text-gray-900">Display Options</h3>
+                                    
+                                    <div>
+                                        <label className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={contentData.maintenancePage.showProgressBar}
+                                                onChange={(e) => updateContentData('maintenancePage', 'showProgressBar', e.target.checked)}
+                                                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                            />
+                                            <span className="ml-2 text-sm font-medium text-gray-700">
+                                                Show Progress Bar
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label className="flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={contentData.maintenancePage.showContactInfo}
+                                                onChange={(e) => updateContentData('maintenancePage', 'showContactInfo', e.target.checked)}
+                                                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                                            />
+                                            <span className="ml-2 text-sm font-medium text-gray-700">
+                                                Show Contact Information
+                                            </span>
+                                        </label>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Background Gradient
+                                        </label>
+                                        <select
+                                            value={contentData.maintenancePage.backgroundColor}
+                                            onChange={(e) => updateContentData('maintenancePage', 'backgroundColor', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="from-blue-50 to-indigo-100">Blue Gradient</option>
+                                            <option value="from-gray-50 to-gray-100">Gray Gradient</option>
+                                            <option value="from-orange-50 to-red-100">Orange Gradient</option>
+                                            <option value="from-green-50 to-emerald-100">Green Gradient</option>
+                                            <option value="from-purple-50 to-indigo-100">Purple Gradient</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => handleSave('maintenancePage')}
+                                    disabled={isLoading}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {isLoading ? 'Saving...' : 'Save Maintenance Page Settings'}
                                 </button>
                             </div>
                         )}
