@@ -9,6 +9,8 @@ const updateProfile = require('../controller/updateProfile');
 const authToken = require('../middleware/authToken');
 const userLogout = require('../controller/userLogout');
 const { checkDatabaseConnection, handleDatabaseError } = require('../middleware/databaseMiddleware');
+const { checkMaintenanceMode } = require('../middleware/maintenanceMiddleware');
+const { getMaintenanceStatus } = require('../controller/maintenanceController');
 const getProductController = require('../controller/getProduct');
 const getSingleProductController = require('../controller/getSingleProduct');
 const addProductController = require('../controller/addProduct');
@@ -27,7 +29,8 @@ const {
     updateProductStatus, 
     getDashboardStats,
     getAllShippingCompanies,
-    updateShippingCompanyStatus
+    updateShippingCompanyStatus,
+    setSellerSuspension
 } = require('../controller/adminController');
 const createAdminUser = require('../controller/createAdminUser');
 const {
@@ -151,11 +154,14 @@ const {
 router.post('/signup', checkDatabaseConnection, userSignUpController);
 router.post('/signin', checkDatabaseConnection, userSignInController);
 router.get('/user-details', checkDatabaseConnection, authToken, userDetailsController);
-// Profile routes
-router.put('/update-profile', checkDatabaseConnection, authToken, updateProfile);
-router.get('/user-preferences', checkDatabaseConnection, authToken, getUserPreferences);
-router.put('/user-preferences', checkDatabaseConnection, authToken, updateUserPreferences);
+// Profile routes - Protect during maintenance
+router.put('/update-profile', checkMaintenanceMode, checkDatabaseConnection, authToken, updateProfile);
+router.get('/user-preferences', checkMaintenanceMode, checkDatabaseConnection, authToken, getUserPreferences);
+router.put('/user-preferences', checkMaintenanceMode, checkDatabaseConnection, authToken, updateUserPreferences);
 router.get('/userLogout', userLogout);
+
+// Maintenance mode status (public endpoint)
+router.get('/maintenance-status', getMaintenanceStatus);
 
 // Password reset routes
 router.post('/forgot-password', forgotPasswordController);
@@ -163,35 +169,35 @@ router.get('/verify-reset-token', verifyResetTokenController);
 router.post('/reset-password', resetPasswordController);
 
 // Product routes
-router.get('/get-product', getProductController);
-router.get('/product/:productId', getSingleProductController);
-router.post('/add-product', authToken, addProductController);
-router.get('/user-products', authToken, getUserProductsController);
-router.put('/update-product/:productId', authToken, updateProductController);
-router.delete('/delete-product/:productId', authToken, deleteProductController);
+router.get('/get-product', checkMaintenanceMode, getProductController);
+router.get('/product/:productId', checkMaintenanceMode, getSingleProductController);
+router.post('/add-product', checkMaintenanceMode, authToken, addProductController);
+router.get('/user-products', checkMaintenanceMode, authToken, getUserProductsController);
+router.put('/update-product/:productId', checkMaintenanceMode, authToken, updateProductController);
+router.delete('/delete-product/:productId', checkMaintenanceMode, authToken, deleteProductController);
 
 // Social features routes
-router.post('/products/:productId/like', authToken, likeProduct);
-router.post('/products/:productId/rate', authToken, rateProduct);
-router.post('/products/:productId/review', authToken, addReview);
-router.get('/products/:productId/reviews', getProductReviews);
-router.post('/products/:productId/review/:reviewId/like', authToken, likeReview);
-router.post('/products/:productId/share', authToken, shareProduct);
-router.get('/products/:productId/stats', getProductStats);
+router.post('/products/:productId/like', checkMaintenanceMode, authToken, likeProduct);
+router.post('/products/:productId/rate', checkMaintenanceMode, authToken, rateProduct);
+router.post('/products/:productId/review', checkMaintenanceMode, authToken, addReview);
+router.get('/products/:productId/reviews', checkMaintenanceMode, getProductReviews);
+router.post('/products/:productId/review/:reviewId/like', checkMaintenanceMode, authToken, likeReview);
+router.post('/products/:productId/share', checkMaintenanceMode, authToken, shareProduct);
+router.get('/products/:productId/stats', checkMaintenanceMode, getProductStats);
 
 // Order/Purchase routes
-router.post('/buy-product', authToken, buyProductController);
-router.post('/buy-multiple-products', authToken, buyMultipleProductsController);
-router.get('/user-orders', authToken, getUserOrdersController);
-router.put('/update-order-status/:orderId', authToken, updateOrderStatusController);
+router.post('/buy-product', checkMaintenanceMode, authToken, buyProductController);
+router.post('/buy-multiple-products', checkMaintenanceMode, authToken, buyMultipleProductsController);
+router.get('/user-orders', checkMaintenanceMode, authToken, getUserOrdersController);
+router.put('/update-order-status/:orderId', checkMaintenanceMode, authToken, updateOrderStatusController);
 
 // Cart routes
-router.get('/cart', authToken, getUserCart);
-router.post('/cart/add', authToken, addToCart);
-router.put('/cart/update', authToken, updateCartItem);
-router.delete('/cart/remove/:productId', authToken, removeFromCart);
-router.delete('/cart/clear', authToken, clearCart);
-router.post('/cart/sync', authToken, syncCart);
+router.get('/cart', checkMaintenanceMode, authToken, getUserCart);
+router.post('/cart/add', checkMaintenanceMode, authToken, addToCart);
+router.put('/cart/update', checkMaintenanceMode, authToken, updateCartItem);
+router.delete('/cart/remove/:productId', checkMaintenanceMode, authToken, removeFromCart);
+router.delete('/cart/clear', checkMaintenanceMode, authToken, clearCart);
+router.post('/cart/sync', checkMaintenanceMode, authToken, syncCart);
 
 // Admin routes
 router.get('/admin/all-users', authToken, getAllUsers);
@@ -203,6 +209,7 @@ router.get('/admin/dashboard-stats', authToken, getDashboardStats);
 router.get('/admin/seller-applications', authToken, getSellerApplications);
 router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
 router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
+router.put('/admin/seller-suspension/:userId', authToken, setSellerSuspension);
 router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
 router.get('/admin/settings', authToken, getAdminSettings);
 router.put('/admin/settings', authToken, updateAdminSettings);
@@ -211,8 +218,8 @@ router.put('/admin/settings', authToken, updateAdminSettings);
 router.get('/admin/shipping-companies', authToken, getAllShippingCompanies);
 router.put('/admin/shipping-companies', authToken, updateShippingCompanyStatus);
 
-// Contact message routes
-router.post('/contact', submitContactMessage);
+// Contact message routes - Block during maintenance (except admin routes)
+router.post('/contact', checkMaintenanceMode, submitContactMessage);
 router.get('/admin/contact-messages', authToken, getContactMessages);
 router.get('/admin/contact-messages/:messageId', authToken, getContactMessage);
 router.put('/admin/contact-messages/:messageId/status', authToken, updateContactMessageStatus);
@@ -228,17 +235,17 @@ router.delete('/admin/backup/:backupId', authToken, deleteBackup);
 
 // Seller routes
 // Seller application routes
-router.post('/seller/apply', authToken, applyToBeSeller);
-router.get('/seller/application-status', authToken, getSellerApplicationStatus);
-router.post('/seller/upload-document', authToken, uploadVerificationDocument);
-router.post('/upload-verification-document', authToken, uploadVerificationDocument);
-router.put('/seller/update-profile', authToken, updateProfileForSeller);
-router.get('/seller/check-eligibility', authToken, checkSellerEligibility);
+router.post('/seller/apply', checkMaintenanceMode, authToken, applyToBeSeller);
+router.get('/seller/application-status', checkMaintenanceMode, authToken, getSellerApplicationStatus);
+router.post('/seller/upload-document', checkMaintenanceMode, authToken, uploadVerificationDocument);
+router.post('/upload-verification-document', checkMaintenanceMode, authToken, uploadVerificationDocument);
+router.put('/seller/update-profile', checkMaintenanceMode, authToken, updateProfileForSeller);
+router.get('/seller/check-eligibility', checkMaintenanceMode, authToken, checkSellerEligibility);
 
 // Seller payment management routes
-router.get('/seller-payment-details', authToken, getSellerPaymentDetails);
-router.put('/seller-payment-details', authToken, updateSellerPaymentDetails);
-router.post('/seller-document-upload', authToken, uploadSellerDocument);
+router.get('/seller-payment-details', checkMaintenanceMode, authToken, getSellerPaymentDetails);
+router.put('/seller-payment-details', checkMaintenanceMode, authToken, updateSellerPaymentDetails);
+router.post('/seller-document-upload', checkMaintenanceMode, authToken, uploadSellerDocument);
 
 // Seller order management routes
 router.get('/seller/orders', authToken, getSellerOrders);
@@ -253,15 +260,15 @@ router.post('/admin/shipping/zones', authToken, createShippingZone);
 router.put('/admin/shipping/zones/:zoneId', authToken, updateShippingZone);
 router.delete('/admin/shipping/zones/:zoneId', authToken, deleteShippingZone);
 
-// Public shipping endpoints
-router.post('/shipping/calculate', calculateShippingCost);
-router.get('/shipping/methods/:country', getShippingMethods);
-router.get('/shipping/info', getShippingInfo);
+// Public shipping endpoints - Protect during maintenance
+router.post('/shipping/calculate', checkMaintenanceMode, calculateShippingCost);
+router.get('/shipping/methods/:country', checkMaintenanceMode, getShippingMethods);
+router.get('/shipping/info', checkMaintenanceMode, getShippingInfo);
 
-// Banner routes (public)
+// Banner routes (public) - Allow during maintenance for basic site info
 router.get('/banners', getBanners);
 
-// Public site content route (for frontend to fetch content without auth)
+// Public site content route (for frontend to fetch content without auth) - Allow during maintenance
 router.get('/site-content', getSiteContent);
 router.get('/site-content/:section', getSiteContent);
 
@@ -279,29 +286,29 @@ router.delete('/admin/banners/:bannerId', authToken, deleteBanner);
 router.put('/admin/banners/:bannerId/toggle', authToken, toggleBannerStatus);
 router.put('/admin/banners/order', authToken, updateBannersOrder);
 
-// Payment method routes
-router.post('/payment-methods/available', getAvailablePaymentMethods);
-router.get('/seller/payment-preferences/:sellerId', getSellerPaymentPreferences);
-router.put('/seller/payment-preferences', authToken, updateSellerPaymentPreferences);
+// Payment method routes - Block during maintenance
+router.post('/payment-methods/available', checkMaintenanceMode, getAvailablePaymentMethods);
+router.get('/seller/payment-preferences/:sellerId', checkMaintenanceMode, getSellerPaymentPreferences);
+router.put('/seller/payment-preferences', checkMaintenanceMode, authToken, updateSellerPaymentPreferences);
 
 // Order tracking routes
-router.get('/orders/:orderId/tracking', authToken, getOrderTracking);
-router.get('/buyer/orders/tracking', authToken, getBuyerOrdersWithTracking);
-router.put('/seller/orders/:orderId/tracking', authToken, updateOrderTracking);
-router.get('/track/:trackingNumber', trackByTrackingNumber); // Public endpoint
+router.get('/orders/:orderId/tracking', checkMaintenanceMode, authToken, getOrderTracking);
+router.get('/buyer/orders/tracking', checkMaintenanceMode, authToken, getBuyerOrdersWithTracking);
+router.put('/seller/orders/:orderId/tracking', checkMaintenanceMode, authToken, updateOrderTracking);
+router.get('/track/:trackingNumber', checkMaintenanceMode, trackByTrackingNumber); // Public endpoint
 
 // Shipping Company Routes
-router.post('/shipping-company/register', checkDatabaseConnection, registerShippingCompany);
-router.get('/shipping-company/profile', authToken, getShippingCompanyProfile);
-router.put('/shipping-company/profile', authToken, updateShippingCompanyProfile);
-router.get('/shipping-company/available-orders', authToken, getAvailableOrders);
-router.post('/shipping-company/orders/:orderId/quote', authToken, submitShippingQuote);
-router.get('/shipping-company/quotes', authToken, getMyQuotes);
-router.get('/shipping-company/stats', authToken, getShippingCompanyStats);
+router.post('/shipping-company/register', checkMaintenanceMode, checkDatabaseConnection, registerShippingCompany);
+router.get('/shipping-company/profile', checkMaintenanceMode, authToken, getShippingCompanyProfile);
+router.put('/shipping-company/profile', checkMaintenanceMode, authToken, updateShippingCompanyProfile);
+router.get('/shipping-company/available-orders', checkMaintenanceMode, authToken, getAvailableOrders);
+router.post('/shipping-company/orders/:orderId/quote', checkMaintenanceMode, authToken, submitShippingQuote);
+router.get('/shipping-company/quotes', checkMaintenanceMode, authToken, getMyQuotes);
+router.get('/shipping-company/stats', checkMaintenanceMode, authToken, getShippingCompanyStats);
 
 // Order shipping management (for sellers)
-router.get('/orders/:orderId/shipping-quotes', authToken, getOrderShippingQuotes);
-router.post('/orders/:orderId/shipping', authToken, selectShippingQuote);
+router.get('/orders/:orderId/shipping-quotes', checkMaintenanceMode, authToken, getOrderShippingQuotes);
+router.post('/orders/:orderId/shipping', checkMaintenanceMode, authToken, selectShippingQuote);
 
 // Development route to create admin user
 router.get('/create-admin', createAdminUser);
