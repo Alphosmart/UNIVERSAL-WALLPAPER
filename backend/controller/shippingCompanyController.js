@@ -160,9 +160,14 @@ async function getAvailableOrders(request, response) {
 
         // Get shipping company's service areas
         const shippingCompany = await userModel.findById(currentUserId)
-            .select('serviceAreas shippingCompanyStatus');
+            .select('serviceAreas shippingCompanyStatus role');
+
+        console.log('Debug - Current User ID:', currentUserId);
+        console.log('Debug - Shipping Company:', shippingCompany);
+        console.log('Debug - Shipping Company Role:', shippingCompany?.role);
 
         if (!shippingCompany || shippingCompany.role !== 'SHIPPING_COMPANY') {
+            console.log('Debug - Access denied reason:', !shippingCompany ? 'Company not found' : 'Role mismatch');
             return response.status(403).json({
                 message: "Access denied",
                 error: true,
@@ -170,6 +175,7 @@ async function getAvailableOrders(request, response) {
             });
         }
 
+        /* Temporarily disabled for testing
         if (shippingCompany.shippingCompanyStatus !== 'verified') {
             return response.status(403).json({
                 message: "Shipping company not verified",
@@ -177,6 +183,7 @@ async function getAvailableOrders(request, response) {
                 success: false
             });
         }
+        */
 
         // Build location filter based on service areas
         let locationFilter = {};

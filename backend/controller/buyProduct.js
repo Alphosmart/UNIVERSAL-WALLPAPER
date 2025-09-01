@@ -32,7 +32,7 @@ async function buyProductController(req, res) {
         }
 
         // Check if product is available
-        if (product.status !== 'available') {
+        if (product.status !== 'ACTIVE') {
             return res.status(400).json({
                 message: "Product is not available for purchase",
                 error: true,

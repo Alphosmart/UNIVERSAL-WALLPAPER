@@ -473,6 +473,65 @@ async function updateShippingCompanyStatus(req, res) {
     }
 }
 
+// Set seller suspension status (admin only)
+async function setSellerSuspension(req, res) {
+    try {
+        const { userId } = req.params;
+        const { suspend } = req.body;
+
+        // Check if current user is admin
+        if (req.userId) {
+            const currentUser = await userModel.findById(req.userId);
+            if (!currentUser || currentUser.role !== 'ADMIN') {
+                return res.status(403).json({
+                    message: "Access denied. Admin privileges required.",
+                    error: true,
+                    success: false
+                });
+            }
+        } else {
+            return res.status(401).json({
+                message: "Please login to access this resource",
+                error: true,
+                success: false
+            });
+        }
+
+        // Find the user to suspend/unsuspend
+        const userToUpdate = await userModel.findById(userId);
+        if (!userToUpdate) {
+            return res.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Update seller status
+        const newStatus = suspend ? 'suspended' : 'verified';
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { sellerStatus: newStatus },
+            { new: true }
+        ).select('-password');
+
+        const action = suspend ? 'suspended' : 'unsuspended';
+        res.json({
+            message: `Seller ${action} successfully`,
+            data: updatedUser,
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || err,
+            error: true,
+            success: false
+        });
+    }
+}
+
 module.exports = {
     getAllUsers,
     updateUserRole,
@@ -481,5 +540,6 @@ module.exports = {
     updateProductStatus,
     getDashboardStats,
     getAllShippingCompanies,
-    updateShippingCompanyStatus
+    updateShippingCompanyStatus,
+    setSellerSuspension
 };

@@ -40,7 +40,12 @@ app.use(compression())
 
 // CORS configuration
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: [
+        process.env.FRONTEND_URL || 'http://localhost:3000',
+        'http://localhost:3001',
+        'http://192.168.1.100:3000',
+        'http://192.168.1.100:3001'
+    ],
     credentials: true
 }))
 

@@ -234,7 +234,7 @@ async function uploadVerificationDocument(req, res) {
 async function getSellerApplications(req, res) {
     try {
         const applications = await userModel.find({
-            sellerStatus: { $in: ['pending_verification', 'verified', 'rejected'] }
+            sellerStatus: { $in: ['pending_verification', 'verified', 'rejected', 'suspended'] }
         }).select('-password');
 
         // Transform data to match frontend expectations
