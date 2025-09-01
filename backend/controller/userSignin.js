@@ -17,7 +17,9 @@ const userSignInController = catchAsync(async (req, res) => {
 
     // Find user in database
     const user = await User.findOne({ email });
+    
     if (!user) {
+        console.log('❌ User not found for email:', email);
         throw new AuthenticationError('Invalid email or password');
     }
 

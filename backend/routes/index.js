@@ -29,8 +29,7 @@ const {
     updateProductStatus, 
     getDashboardStats,
     getAllShippingCompanies,
-    updateShippingCompanyStatus,
-    setSellerSuspension
+    updateShippingCompanyStatus
 } = require('../controller/adminController');
 const createAdminUser = require('../controller/createAdminUser');
 const {
@@ -209,7 +208,6 @@ router.get('/admin/dashboard-stats', authToken, getDashboardStats);
 router.get('/admin/seller-applications', authToken, getSellerApplications);
 router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
 router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
-router.put('/admin/seller-suspension/:userId', authToken, setSellerSuspension);
 router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
 router.get('/admin/settings', authToken, getAdminSettings);
 router.put('/admin/settings', authToken, updateAdminSettings);
