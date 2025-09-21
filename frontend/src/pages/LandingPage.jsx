@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { trackLandingPageInteraction, trackShopButtonClick, trackNewsletterSignup, trackUserEngagement } from '../utils/analytics';
 import { 
   FaPlay, 
   FaStar, 
@@ -19,7 +20,19 @@ import {
 } from 'react-icons/fa';
 
 const LandingPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('wallpapers');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [email, setEmail] = useState('');
+
+  const handleNewsletterSubmit = (e) => {
+    e.preventDefault();
+    if (email.trim()) {
+      trackNewsletterSignup('landing_page');
+      // Here you would typically send the email to your backend
+      console.log('Newsletter signup:', email);
+      setEmail('');
+      alert('Thank you for subscribing!');
+    }
+  };
 
   const testimonials = [
     {
@@ -152,6 +165,7 @@ const LandingPage = () => {
       {/* Floating Shop Button */}
       <Link 
         to="/search" 
+        onClick={() => trackShopButtonClick('floating_button', '/search')}
         className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-full font-semibold shadow-2xl hover:shadow-3xl transition-all transform hover:scale-110 z-50 flex items-center gap-2"
       >
         🛒 Shop Now
@@ -177,11 +191,15 @@ const LandingPage = () => {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
                   to="/search" 
+                  onClick={() => trackShopButtonClick('hero_section', '/search')}
                   className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-all transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg"
                 >
                   🛍️ Shop Now <FaArrowRight />
                 </Link>
-                <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all flex items-center justify-center gap-2">
+                <button 
+                  onClick={() => trackLandingPageInteraction('watch_demo', 'hero_section')}
+                  className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all flex items-center justify-center gap-2"
+                >
                   <FaPlay /> Watch Demo
                 </button>
               </div>
@@ -476,16 +494,22 @@ const LandingPage = () => {
           </p>
           
           <div className="max-w-md mx-auto">
-            <div className="flex gap-4">
+            <form onSubmit={handleNewsletterSubmit} className="flex gap-4">
               <input 
                 type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
                 className="flex-1 px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                required
               />
-              <button className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors">
+              <button 
+                type="submit"
+                className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-yellow-300 transition-colors"
+              >
                 Subscribe
               </button>
-            </div>
+            </form>
             <p className="text-sm mt-4 opacity-80">
               No spam, unsubscribe at any time. Your privacy is protected.
             </p>
@@ -504,12 +528,14 @@ const LandingPage = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               to="/search" 
+              onClick={() => trackShopButtonClick('final_cta', '/search')}
               className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:from-green-600 hover:to-blue-700 transition-all transform hover:scale-105 inline-flex items-center gap-3 shadow-2xl"
             >
               🛍️ Start Shopping Now <FaArrowRight />
             </Link>
             <Link 
               to="/contact-us" 
+              onClick={() => trackLandingPageInteraction('get_consultation', 'final_cta')}
               className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-600 hover:text-white transition-colors"
             >
               Get Consultation

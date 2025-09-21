@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import MaintenanceGuard from './components/MaintenanceGuard';
 import SecurityProvider from './components/SecurityProvider';
+import PageTracker from './components/PageTracker';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useCallback, useState, useRef } from 'react';
@@ -142,6 +143,7 @@ function App() {
           }}>
             <ProductProvider>
               <CartProvider>
+                <PageTracker />
                 <ToastContainer 
                   position='top-center'
                 />

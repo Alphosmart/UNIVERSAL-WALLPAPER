@@ -6,12 +6,15 @@ import router from "./routes/index";
 import { store } from './store/store';
 import { Provider } from 'react-redux';
 import ErrorBoundary from './components/ErrorBoundary';
+import { AnalyticsProvider } from './components/AnalyticsProvider';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <ErrorBoundary>
     <Provider store={store}>
-      <RouterProvider router={router} />
+      <AnalyticsProvider>
+        <RouterProvider router={router} />
+      </AnalyticsProvider>
     </Provider>
   </ErrorBoundary>
 );
