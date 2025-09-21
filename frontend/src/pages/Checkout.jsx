@@ -3,12 +3,8 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useCart } from '../context/CartContext';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { 
-    FaLock, 
     FaShieldAlt, 
-    FaCreditCard, 
     FaArrowLeft,
     FaSpinner,
     FaCheckCircle
@@ -16,139 +12,8 @@ import {
 import SummaryApi from '../common';
 import CountryStateSelector from '../components/CountryStateSelector';
 import PaymentMethodSelector from '../components/PaymentMethodSelector';
-import { SecurityBadgeGroup, TrustIndicators } from '../components/SecurityBadge';
-
-// Load Stripe with your publishable key from environment variables
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_demo_key');
-
-const CardForm = ({ onPaymentSuccess, orderData, totalAmount }) => {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [paymentError, setPaymentError] = useState(null);
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        
-        if (!stripe || !elements) {
-            return;
-        }
-
-        setIsProcessing(true);
-        setPaymentError(null);
-
-        const card = elements.getElement(CardElement);
-
-        try {
-            // Create payment method
-            const { error, paymentMethod } = await stripe.createPaymentMethod({
-                type: 'card',
-                card: card,
-                billing_details: {
-                    name: orderData.customerInfo.fullName,
-                    email: orderData.customerInfo.email,
-                    address: {
-                        line1: orderData.shippingAddress.street,
-                        city: orderData.shippingAddress.city,
-                        state: orderData.shippingAddress.state,
-                        postal_code: orderData.shippingAddress.zipCode,
-                        country: orderData.shippingAddress.country,
-                    },
-                },
-            });
-
-            if (error) {
-                throw new Error(error.message);
-            }
-
-            // For demo purposes, we'll simulate a successful payment
-            // In production, you'd create a payment intent on your backend
-            setTimeout(() => {
-                onPaymentSuccess({
-                    paymentMethodId: paymentMethod.id,
-                    paymentIntentId: 'pi_demo_' + Date.now(),
-                    status: 'succeeded'
-                });
-            }, 2000);
-
-        } catch (error) {
-            setPaymentError(error.message);
-            toast.error('Payment failed: ' + error.message);
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="bg-gray-50 p-4 rounded-lg">
-                <div className="flex items-center gap-2 mb-4">
-                    <FaCreditCard className="text-blue-600" />
-                    <h3 className="font-semibold text-gray-800">Payment Information</h3>
-                </div>
-                
-                <div className="bg-white p-4 rounded border">
-                    <CardElement
-                        options={{
-                            style: {
-                                base: {
-                                    fontSize: '16px',
-                                    color: '#424770',
-                                    '::placeholder': {
-                                        color: '#aab7c4',
-                                    },
-                                },
-                                invalid: {
-                                    color: '#9e2146',
-                                },
-                            },
-                        }}
-                    />
-                </div>
-                
-                {paymentError && (
-                    <div className="mt-3 text-red-600 text-sm">
-                        {paymentError}
-                    </div>
-                )}
-            </div>
-
-            <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="flex items-center gap-2 text-blue-800 mb-3">
-                    <FaShieldAlt />
-                    <span className="text-sm">Your payment information is secure and encrypted</span>
-                </div>
-                <SecurityBadgeGroup 
-                    badges={['ssl', 'certified', 'secure']} 
-                    size="small" 
-                    layout="horizontal" 
-                />
-            </div>
-
-            <button
-                type="submit"
-                disabled={!stripe || isProcessing}
-                className={`w-full py-4 rounded-lg font-semibold text-white flex items-center justify-center gap-2 ${
-                    isProcessing 
-                        ? 'bg-gray-400 cursor-not-allowed' 
-                        : 'bg-green-600 hover:bg-green-700 transition-colors'
-                }`}
-            >
-                {isProcessing ? (
-                    <>
-                        <FaSpinner className="animate-spin" />
-                        Processing Payment...
-                    </>
-                ) : (
-                    <>
-                        <FaLock />
-                        Complete Payment ${totalAmount.toFixed(2)}
-                    </>
-                )}
-            </button>
-        </form>
-    );
-};
+import PaymentForm from '../components/PaymentForm';
+import { TrustIndicators } from '../components/SecurityBadge';
 
 const Checkout = () => {
     const { cartItems, clearCart, getCartTotal, isInitialized, isLoading } = useCart();
@@ -709,17 +574,16 @@ const Checkout = () => {
                                 </h2>
                                 
                                 {selectedPaymentMethod === 'stripe' && (
-                                    <Elements stripe={stripePromise}>
-                                        <CardForm
-                                            onPaymentSuccess={handlePaymentSuccess}
-                                            orderData={{
-                                                customerInfo,
-                                                shippingAddress,
-                                                orderNotes
-                                            }}
-                                            totalAmount={finalTotal}
-                                        />
-                                    </Elements>
+                                    <PaymentForm
+                                        paymentMethod="stripe"
+                                        onPaymentSuccess={handlePaymentSuccess}
+                                        orderData={{
+                                            buyerDetails: customerInfo,
+                                            shippingAddress,
+                                            orderNotes
+                                        }}
+                                        totalAmount={finalTotal}
+                                    />
                                 )}
 
                                 {selectedPaymentMethod === 'paypal' && (
