@@ -120,6 +120,28 @@ const SummaryApi = {
         url : `${backendDomain}/api/admin/backup`,
         method : 'delete'
     },
+    
+    // Staff Management APIs
+    getAllStaff : {
+        url : `${backendDomain}/api/admin/staff`,
+        method : 'get'
+    },
+    getAllUsers : {
+        url : `${backendDomain}/api/admin/all-users`,
+        method : 'get'
+    },
+    promoteToAdmin : {
+        url : `${backendDomain}/api/admin/promote-to-admin`,
+        method : 'post'
+    },
+    grantPermissions : {
+        url : `${backendDomain}/api/admin/grant-permissions`,
+        method : 'put'
+    },
+    getUploadStats : {
+        url : `${backendDomain}/api/admin/staff/upload-stats`,
+        method : 'get'
+    },
     // Cart APIs
     getCart : {
         url : `${backendDomain}/api/cart`,
@@ -355,60 +377,86 @@ const SummaryApi = {
         method : 'delete'
     },
     
-    // Shipping Company APIs
-    registerShippingCompany : {
-        url : `${backendDomain}/api/shipping-company/register`,
-        method : 'post'
-    },
-    getShippingCompanyProfile : {
-        url : `${backendDomain}/api/shipping-company/profile`,
-        method : 'get'
-    },
-    updateShippingCompanyProfile : {
-        url : `${backendDomain}/api/shipping-company/profile`,
-        method : 'put'
-    },
-    getAvailableOrders : {
-        url : `${backendDomain}/api/shipping-company/available-orders`,
-        method : 'get'
-    },
-    submitShippingQuote : {
-        url : `${backendDomain}/api/shipping-company/orders`,
-        method : 'post'
-    },
-    getShippingQuotes : {
-        url : `${backendDomain}/api/shipping-company/quotes`,
-        method : 'get'
-    },
-    getShippingCompanyStats : {
-        url : `${backendDomain}/api/shipping-company/stats`,
-        method : 'get'
-    },
+    // Shipping Company APIs - REMOVED (single company model)
+    // registerShippingCompany : {
+    //     url : `${backendDomain}/api/shipping-company/register`,
+    //     method : 'post'
+    // },
+    // getShippingCompanyProfile : {
+    //     url : `${backendDomain}/api/shipping-company/profile`,
+    //     method : 'get'
+    // },
+    // updateShippingCompanyProfile : {
+    //     url : `${backendDomain}/api/shipping-company/profile`,
+    //     method : 'put'
+    // },
+    // getAvailableOrders : {
+    //     url : `${backendDomain}/api/shipping-company/available-orders`,
+    //     method : 'get'
+    // },
+    // submitShippingQuote : {
+    //     url : `${backendDomain}/api/shipping-company/orders`,
+    //     method : 'post'
+    // },
+    // getShippingQuotes : {
+    //     url : `${backendDomain}/api/shipping-company/quotes`,
+    //     method : 'get'
+    // },
+    // getShippingCompanyStats : {
+    //     url : `${backendDomain}/api/shipping-company/stats`,
+    //     method : 'get'
+    // },
     
-    // Order Shipping APIs
-    getOrderShippingQuotes : {
-        url : `${backendDomain}/api/orders`,
-        method : 'get'
-    },
-    selectShippingQuote : {
-        url : `${backendDomain}/api/orders`,
-        method : 'post'
-    },
+    // Order Shipping APIs - REMOVED (single company model)
+    // getOrderShippingQuotes : {
+    //     url : `${backendDomain}/api/orders`,
+    //     method : 'get'
+    // },
+    // selectShippingQuote : {
+    //     url : `${backendDomain}/api/orders`,
+    //     method : 'post'
+    // },
     
-    // Admin Shipping Company Management
-    getAllShippingCompanies : {
-        url : `${backendDomain}/api/admin/shipping-companies`,
-        method : 'get'
-    },
-    updateShippingCompanyStatus : {
-        url : `${backendDomain}/api/admin/shipping-companies`,
-        method : 'put'
-    },
+    // Admin Shipping Company Management - REMOVED (single company model)
+    // getAllShippingCompanies : {
+    //     url : `${backendDomain}/api/admin/shipping-companies`,
+    //     method : 'get'
+    // },
+    // updateShippingCompanyStatus : {
+    //     url : `${backendDomain}/api/admin/shipping-companies`,
+    //     method : 'put'
+    // },
     
     // Maintenance Mode
     maintenanceStatus : {
         url : `${backendDomain}/api/maintenance-status`,
         method : 'get'
+    },
+    
+    // Email Template Management
+    getAllEmailTemplates : {
+        url : `${backendDomain}/api/admin/email/templates`,
+        method : 'get'
+    },
+    getEmailTemplate : {
+        url : `${backendDomain}/api/admin/email/templates/:templateType`,
+        method : 'get'
+    },
+    saveEmailTemplate : {
+        url : `${backendDomain}/api/admin/email/templates`,
+        method : 'post'
+    },
+    deleteEmailTemplate : {
+        url : `${backendDomain}/api/admin/email/templates/:templateType`,
+        method : 'delete'
+    },
+    toggleEmailTemplate : {
+        url : `${backendDomain}/api/admin/email/templates/:templateType/toggle`,
+        method : 'patch'
+    },
+    previewEmailTemplate : {
+        url : `${backendDomain}/api/admin/email/templates/preview`,
+        method : 'post'
     }
 }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FaShippingFast, FaSearch, FaMapMarkerAlt, FaClock, FaCheckCircle, FaTruck, FaBox, FaHome } from 'react-icons/fa';
+import { FaShippingFast, FaSearch, FaMapMarkerAlt, FaClock, FaTruck, FaBox, FaHome } from 'react-icons/fa';
 
 const TrackOrder = () => {
   const [trackingNumber, setTrackingNumber] = useState('');

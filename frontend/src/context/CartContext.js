@@ -331,49 +331,36 @@ export const CartProvider = ({ children }) => {
 
     // Load cart from localStorage on mount and sync with server if user is logged in
     useEffect(() => {
-        // If we already have local data, we're basically initialized but may need server sync
-        if (cartState.isInitialized && cartState.items.length > 0) {
-            // Still sync with server if user is authenticated
-            if (user && user._id) {
-                const performServerSync = async () => {
-                    cartLog('🔄 Syncing existing cart with server...');
-                    try {
-                        const serverItems = await syncCartWithServer(cartState.items);
-                        if (JSON.stringify(serverItems) !== JSON.stringify(cartState.items)) {
-                            dispatch({ type: CART_ACTIONS.SYNC_WITH_SERVER, payload: serverItems });
-                        }
-                    } catch (error) {
-                        console.error('Server sync failed, keeping local cart:', error);
-                    }
-                };
-                performServerSync();
-            }
-            return;
-        }
-
-        // If no local data, we need to initialize properly
+        // Only run this effect on initialization or when user authentication changes
         if (!cartState.isInitialized) {
             cartLog('🚀 CartProvider initializing from scratch...');
             dispatch({ type: CART_ACTIONS.SET_LOADING, payload: true });
-        }
-        
-        const loadCart = async () => {
-            const savedItems = loadCartFromStorage();
             
-            if (user && user._id) {
-                // User appears logged in - verify auth and sync with server
-                cartLog('👤 User appears logged in, verifying authentication...');
-                const isAuthenticated = checkAuthStatus(user);
+            const loadCart = async () => {
+                const savedItems = loadCartFromStorage();
                 
-                if (isAuthenticated) {
-                    cartLog('✅ Authentication verified, syncing cart with server...');
-                    try {
-                        const serverItems = await syncCartWithServer(savedItems);
-                        dispatch({ type: CART_ACTIONS.LOAD_CART, payload: serverItems });
-                        // Clear localStorage after successful sync
-                        localStorage.removeItem(CART_STORAGE_KEY);
-                    } catch (error) {
-                        console.error('Failed to sync with server, using local cart:', error);
+                if (user && user._id) {
+                    // User appears logged in - verify auth and sync with server
+                    cartLog('👤 User appears logged in, verifying authentication...');
+                    const isAuthenticated = checkAuthStatus(user);
+                    
+                    if (isAuthenticated) {
+                        cartLog('✅ Authentication verified, syncing cart with server...');
+                        try {
+                            const serverItems = await syncCartWithServer(savedItems);
+                            dispatch({ type: CART_ACTIONS.LOAD_CART, payload: serverItems });
+                            // Clear localStorage after successful sync
+                            localStorage.removeItem(CART_STORAGE_KEY);
+                        } catch (error) {
+                            console.error('Failed to sync with server, using local cart:', error);
+                            if (savedItems.length > 0) {
+                                dispatch({ type: CART_ACTIONS.LOAD_CART, payload: savedItems });
+                            } else {
+                                dispatch({ type: CART_ACTIONS.SET_INITIALIZED });
+                            }
+                        }
+                    } else {
+                        cartLog('🔓 Authentication failed, using local cart...');
                         if (savedItems.length > 0) {
                             dispatch({ type: CART_ACTIONS.LOAD_CART, payload: savedItems });
                         } else {
@@ -381,28 +368,21 @@ export const CartProvider = ({ children }) => {
                         }
                     }
                 } else {
-                    cartLog('🔓 Authentication failed, using local cart...');
+                    // User not logged in - use localStorage
+                    cartLog('🔓 User not logged in, using local cart...');
                     if (savedItems.length > 0) {
                         dispatch({ type: CART_ACTIONS.LOAD_CART, payload: savedItems });
                     } else {
                         dispatch({ type: CART_ACTIONS.SET_INITIALIZED });
                     }
                 }
-            } else {
-                // User not logged in - use localStorage
-                cartLog('🔓 User not logged in, using local cart...');
-                if (savedItems.length > 0) {
-                    dispatch({ type: CART_ACTIONS.LOAD_CART, payload: savedItems });
-                } else {
-                    dispatch({ type: CART_ACTIONS.SET_INITIALIZED });
-                }
-            }
-        };
+            };
 
-        loadCart();
-    }, [cartState.isInitialized, cartState.items, user]);
+            loadCart();
+        }
+    }, [cartState.isInitialized, user]);
 
-    // Handle user login/logout - re-sync cart when user changes
+    // Separate effect for syncing existing cart when user logs in
     useEffect(() => {
         // Only trigger if cart is already initialized and user state changed
         if (!cartState.isInitialized) {

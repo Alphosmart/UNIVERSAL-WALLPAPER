@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye, FaShippingFast, FaCheck, FaBox, FaClock, FaSearch, FaFilter, FaTruck } from 'react-icons/fa';
+import { FaEye, FaCheck, FaBox, FaClock, FaSearch, FaFilter } from 'react-icons/fa';
 import SummaryApi from '../common';
 import { toast } from 'react-toastify';
-import ShippingQuoteSelector from '../components/ShippingQuoteSelector';
+// Shipping functionality removed - single company model
+// import ShippingQuoteSelector from '../components/ShippingQuoteSelector';
 
 const SellerOrders = () => {
     const [orders, setOrders] = useState([]);
@@ -12,8 +13,9 @@ const SellerOrders = () => {
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [statusFilter, setStatusFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
-    const [showShippingModal, setShowShippingModal] = useState(false);
-    const [shippingOrder, setShippingOrder] = useState(null);
+    // Shipping functionality removed - single company model
+    // const [showShippingModal, setShowShippingModal] = useState(false);
+    // const [shippingOrder, setShippingOrder] = useState(null);
 
     // Fetch seller orders
     const fetchOrders = async () => {
@@ -94,19 +96,19 @@ const SellerOrders = () => {
         }
     };
 
-    // Handle shipping selection
-    const handleSelectShipping = (order) => {
-        setShippingOrder(order);
-        setShowShippingModal(true);
-    };
+    // Shipping functionality removed - single company model
+    // const handleSelectShipping = (order) => {
+    //     setShippingOrder(order);
+    //     setShowShippingModal(true);
+    // };
 
-    const onShippingSelected = (selectedQuote) => {
-        // Refresh orders to get updated shipping information
-        fetchOrders();
-        fetchOrderStats();
-        setShowShippingModal(false);
-        setShippingOrder(null);
-    };
+    // const onShippingSelected = (selectedQuote) => {
+    //     // Refresh orders to get updated shipping information
+    //     fetchOrders();
+    //     fetchOrderStats();
+    //     setShowShippingModal(false);
+    //     setShippingOrder(null);
+    // };
 
     // Filter orders based on status and search term
     const filteredOrders = orders.filter(order => {
@@ -142,7 +144,7 @@ const SellerOrders = () => {
     // Order Detail Modal
     const OrderDetailModal = ({ order, onClose, onUpdateStatus }) => {
         const [newStatus, setNewStatus] = useState(order.orderStatus);
-        const [trackingNumber, setTrackingNumber] = useState(order.trackingInfo?.trackingNumber || '');
+        const trackingNumber = order.trackingInfo?.trackingNumber || '';
         const [carrier, setCarrier] = useState(order.trackingInfo?.carrier || '');
         const [estimatedDelivery, setEstimatedDelivery] = useState('');
 
@@ -346,7 +348,7 @@ const SellerOrders = () => {
                                 {stats.ordersByStatus?.shipped?.count || 0}
                             </p>
                         </div>
-                        <FaShippingFast className="text-purple-600 text-2xl" />
+                        <FaBox className="text-purple-600 text-2xl" />
                     </div>
                 </div>
 
@@ -495,15 +497,7 @@ const SellerOrders = () => {
                                                 <FaEye />
                                                 <span>View</span>
                                             </button>
-                                            {(order.orderStatus === 'confirmed' || order.orderStatus === 'processing') && !order.shippingCompany && (
-                                                <button
-                                                    onClick={() => handleSelectShipping(order)}
-                                                    className="text-green-600 hover:text-green-900 flex items-center space-x-1"
-                                                >
-                                                    <FaTruck />
-                                                    <span>Ship</span>
-                                                </button>
-                                            )}
+                                            {/* Shipping functionality removed - single company model */}
                                         </div>
                                     </td>
                                 </tr>
@@ -535,17 +529,7 @@ const SellerOrders = () => {
                 />
             )}
 
-            {/* Shipping Quote Selector Modal */}
-            {showShippingModal && shippingOrder && (
-                <ShippingQuoteSelector
-                    order={shippingOrder}
-                    onSelectShipping={onShippingSelected}
-                    onClose={() => {
-                        setShowShippingModal(false);
-                        setShippingOrder(null);
-                    }}
-                />
-            )}
+            {/* Shipping functionality removed - single company model */}
         </div>
     );
 };

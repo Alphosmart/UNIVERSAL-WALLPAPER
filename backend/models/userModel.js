@@ -35,9 +35,52 @@ const userSchema = new mongoose.Schema({
     },
     role : {
         type : String,
-        enum : ['GENERAL', 'ADMIN', 'SHIPPING_COMPANY'],
+        enum : ['GENERAL', 'STAFF', 'ADMIN'], // Added 'STAFF' role for company staff members
         default : 'GENERAL'
     },
+    
+    // Staff permissions and tracking
+    permissions: {
+        canUploadProducts: {
+            type: Boolean,
+            default: false
+        },
+        canEditProducts: {
+            type: Boolean,
+            default: false
+        },
+        canDeleteProducts: {
+            type: Boolean,
+            default: false
+        },
+        canManageOrders: {
+            type: Boolean,
+            default: false
+        },
+        grantedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'user'
+        },
+        grantedAt: {
+            type: Date
+        }
+    },
+    
+    // Staff upload tracking
+    uploadStats: {
+        totalProductsUploaded: {
+            type: Number,
+            default: 0
+        },
+        lastUploadDate: {
+            type: Date
+        },
+        productsThisMonth: {
+            type: Number,
+            default: 0
+        }
+    },
+    
     // Seller-related fields
     sellerStatus: {
         type: String,
@@ -94,128 +137,12 @@ const userSchema = new mongoose.Schema({
             type: Number,
             default: 25.00
         }
-    },
+    }
     
-    // Shipping Company fields
-    shippingCompanyStatus: {
-        type: String,
-        enum: ['none', 'pending_verification', 'verified', 'rejected', 'suspended'],
-        default: 'none'
-    },
-    companyInfo: {
-        companyName: String,
-        registrationNumber: String,
-        licenseNumber: String,
-        website: String,
-        description: String,
-        establishedYear: Number,
-        companySize: {
-            type: String,
-            enum: ['1-10', '11-50', '51-200', '201-500', '500+']
-        }
-    },
-    serviceAreas: [{
-        country: String,
-        states: [String],
-        cities: [String],
-        zipCodes: [String]
-    }],
-    shippingServices: [{
-        serviceName: String,
-        serviceType: {
-            type: String,
-            enum: ['standard', 'express', 'overnight', 'same_day', 'international']
-        },
-        deliveryTime: String, // e.g., "2-3 days", "24 hours"
-        basePrice: Number,
-        pricePerKm: Number,
-        pricePerKg: Number,
-        maxWeight: Number,
-        maxDimensions: {
-            length: Number,
-            width: Number,
-            height: Number
-        }
-    }],
-    vehicles: [{
-        vehicleType: {
-            type: String,
-            enum: ['bike', 'car', 'van', 'truck', 'drone']
-        },
-        licensePlate: String,
-        capacity: {
-            weight: Number,
-            volume: Number
-        },
-        isActive: {
-            type: Boolean,
-            default: true
-        }
-    }],
-    operatingHours: {
-        monday: { start: String, end: String, isOpen: Boolean },
-        tuesday: { start: String, end: String, isOpen: Boolean },
-        wednesday: { start: String, end: String, isOpen: Boolean },
-        thursday: { start: String, end: String, isOpen: Boolean },
-        friday: { start: String, end: String, isOpen: Boolean },
-        saturday: { start: String, end: String, isOpen: Boolean },
-        sunday: { start: String, end: String, isOpen: Boolean }
-    },
-    ratings: {
-        averageRating: {
-            type: Number,
-            default: 0,
-            min: 0,
-            max: 5
-        },
-        totalReviews: {
-            type: Number,
-            default: 0
-        },
-        deliverySpeed: {
-            type: Number,
-            default: 0
-        },
-        reliability: {
-            type: Number,
-            default: 0
-        },
-        customerService: {
-            type: Number,
-            default: 0
-        }
-    },
-    shippingStats: {
-        totalDeliveries: {
-            type: Number,
-            default: 0
-        },
-        successfulDeliveries: {
-            type: Number,
-            default: 0
-        },
-        onTimeDeliveries: {
-            type: Number,
-            default: 0
-        },
-        averageDeliveryTime: Number, // in hours
-        totalRevenue: {
-            type: Number,
-            default: 0
-        }
-    },
-    shippingVerificationDocuments: [{
-        type: {
-            type: String,
-            enum: ['business_license', 'tax_id', 'identity_proof', 'address_proof', 'vehicle_registration', 'insurance_certificate', 'driver_license']
-        },
-        url: String,
-        uploadedAt: Date,
-        verified: {
-            type: Boolean,
-            default: false
-        }
-    }]
+    // Shipping Company fields removed - single company model
+    // All shipping company related fields have been removed as the platform
+    // now operates with a single company seller model
+    
 }, {
     timestamps : true
 })

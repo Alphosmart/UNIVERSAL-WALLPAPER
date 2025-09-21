@@ -132,7 +132,7 @@ const validateProductCreation = [
     body('category')
         .notEmpty()
         .withMessage('Category is required')
-        .isIn(['airpodes', 'camera', 'earphones', 'mobile', 'mouse', 'printers', 'processor', 'refrigerator', 'speakers', 'trimmers', 'TV', 'watches'])
+        .isIn(['wallpapers', 'wall-paint', 'ceiling-paint', 'wood-stain', 'primer', 'brushes-rollers', 'decorative-panels', 'wall-decals', 'murals', 'tiles', 'flooring', 'curtains', 'blinds', 'lighting', 'mirrors'])
         .withMessage('Invalid category selected'),
     
     body('price')

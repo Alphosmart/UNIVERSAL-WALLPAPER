@@ -46,7 +46,7 @@ export const AdminRoute = ({ children }) => {
   return children;
 };
 
-// SellerRoute: Only allows verified sellers and admins
+// SellerRoute: Only allows verified sellers, staff with upload permissions, and admins
 export const SellerRoute = ({ children }) => {
   const user = useSelector(state => state?.user?.user);
   const location = useLocation();
@@ -55,27 +55,31 @@ export const SellerRoute = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
-  // Allow admins or verified sellers
-  if (user?.role !== 'ADMIN' && user?.sellerStatus !== 'verified') {
-    return <Navigate to="/become-seller" replace />;
+  // Allow admins, verified sellers, or staff with upload permissions
+  const hasAccess = user?.role === 'ADMIN' || 
+                   user?.sellerStatus === 'verified' ||
+                   (user?.role === 'STAFF' && user?.permissions?.canUploadProducts);
+
+  if (!hasAccess) {
+    return <Navigate to="/" replace />;
   }
   
   return children;
 };
 
-// ShippingCompanyRoute: Only allows verified shipping companies and admins
-export const ShippingCompanyRoute = ({ children }) => {
-  const user = useSelector(state => state?.user?.user);
-  const location = useLocation();
+// ShippingCompanyRoute removed - single company model
+// export const ShippingCompanyRoute = ({ children }) => {
+//   const user = useSelector(state => state?.user?.user);
+//   const location = useLocation();
   
-  if (!user?._id) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
+//   if (!user?._id) {
+//     return <Navigate to="/login" state={{ from: location }} replace />;
+//   }
   
-  // Allow admins or verified shipping companies
-  if (user?.role !== 'ADMIN' && (user?.role !== 'SHIPPING_COMPANY' || user?.shippingCompanyStatus !== 'verified')) {
-    return <Navigate to="/shipping-company-application" replace />;
-  }
+//   // Allow admins or verified shipping companies
+//   if (user?.role !== 'ADMIN' && (user?.role !== 'SHIPPING_COMPANY' || user?.shippingCompanyStatus !== 'verified')) {
+//     return <Navigate to="/shipping-company-application" replace />;
+//   }
   
-  return children;
-};
+//   return children;
+// };

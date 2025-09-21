@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const jwt = require('jsonwebtoken');
 const { ResponseHandler, catchAsync } = require('../utils/responseHandler');
@@ -40,8 +40,8 @@ const userSignInController = catchAsync(async (req, res) => {
     // Set secure cookie
     const tokenOptions = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: false, // Set to false for localhost development
+        sameSite: 'lax', // Changed from 'strict' to 'lax' for cross-origin localhost
         maxAge: 8 * 60 * 60 * 1000 // 8 hours
     };
 

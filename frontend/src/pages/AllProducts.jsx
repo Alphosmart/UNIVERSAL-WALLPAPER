@@ -14,10 +14,12 @@ const AllProducts = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10);
-  const navigate = useNavigate();  const categories = [
-    'mobile', 'laptop', 'camera', 'headphones', 'television', 
-    'mouse', 'keyboard', 'speaker', 'refrigerator', 'trimmer', 
-    'watch', 'airpods', 'earphones'
+  const navigate = useNavigate();
+
+  const categories = [
+    'wallpapers', 'wall-paint', 'ceiling-paint', 'wood-stain', 'primer', 
+    'brushes-rollers', 'decorative-panels', 'wall-decals', 'murals', 
+    'tiles', 'flooring', 'curtains', 'blinds', 'lighting', 'mirrors'
   ];
 
   useEffect(() => {

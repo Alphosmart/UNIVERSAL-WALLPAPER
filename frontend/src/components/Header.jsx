@@ -3,7 +3,7 @@ import Logo from './Logo';
 import { GrSearch } from 'react-icons/gr';
 import {FaRegCircleUser} from 'react-icons/fa6';
 import {FaShoppingCart} from "react-icons/fa";
-import { FaChevronDown, FaUser, FaEnvelope, FaSignOutAlt, FaQuestionCircle, FaShippingFast, FaCreditCard, FaUndo, FaComments } from 'react-icons/fa';
+import { FaChevronDown, FaUser, FaEnvelope, FaSignOutAlt, FaQuestionCircle, FaCreditCard, FaUndo, FaComments } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import SummaryApi from '../common';
@@ -13,6 +13,7 @@ import { useCart } from '../context/CartContext';
 
 const Header = memo(() => {
   const user = useSelector(state => state?.user?.user)
+  console.log('🔍 Header rendered. User:', user?._id ? `${user.name} (${user._id})` : 'Not logged in');
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [menuDisplay, setMenuDisplay] = useState(false)
@@ -95,7 +96,11 @@ const Header = memo(() => {
   const sellerMenuItems = useMemo(() => {
     if (!user) return null
     
-    if (user.sellerStatus === 'verified') {
+    // Show product management options for staff with upload permissions or verified sellers
+    const canManageProducts = (user.role === 'STAFF' && user.permissions?.canUploadProducts) || 
+                             user.sellerStatus === 'verified';
+    
+    if (canManageProducts) {
       return (
         <>
           <Link 
@@ -104,7 +109,15 @@ const Header = memo(() => {
             onClick={closeMenu}
           >
             <span className='text-sm'>📊</span>
-            Seller Dashboard
+            Product Dashboard
+          </Link>
+          <Link 
+            to={'/add-product'} 
+            className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
+            onClick={closeMenu}
+          >
+            <span className='text-sm'>➕</span>
+            Add Product
           </Link>
           <Link 
             to={'/my-products'} 
@@ -114,105 +127,47 @@ const Header = memo(() => {
             <span className='text-sm'>📦</span>
             My Products
           </Link>
-          <Link 
-            to={'/seller-orders'} 
-            className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-            onClick={closeMenu}
-          >
-            <span className='text-sm'>📋</span>
-            My Orders
-          </Link>
-          <Link 
-            to={'/seller-account-settings'} 
-            className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-            onClick={closeMenu}
-          >
-            <span className='text-sm'>💳</span>
-            Payment Settings
-          </Link>
+          {user.sellerStatus === 'verified' && (
+            <>
+              <Link 
+                to={'/seller-orders'} 
+                className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
+                onClick={closeMenu}
+              >
+                <span className='text-sm'>📋</span>
+                My Orders
+              </Link>
+              {user.role === 'ADMIN' && (
+                <Link 
+                  to={'/seller-account-settings'} 
+                  className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
+                  onClick={closeMenu}
+                >
+                  <span className='text-sm'>💳</span>
+                  Payment Settings
+                </Link>
+              )}
+            </>
+          )}
         </>
       )
     }
     
     if (user.sellerStatus === 'pending_verification') {
       return (
-        <Link 
-          to={'/become-seller'} 
-          className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-yellow-600 transition-colors' 
-          onClick={closeMenu}
+        <div className='flex items-center gap-3 px-4 py-2 text-yellow-600 transition-colors' 
         >
           <span className='text-sm'>⏳</span>
-          Seller Application
-        </Link>
+          <span className='text-sm'>Seller Application Pending</span>
+        </div>
       )
     }
     
-    return (
-      <Link 
-        to={'/become-seller'} 
-        className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-green-600 transition-colors' 
-        onClick={closeMenu}
-      >
-        <span className='text-sm'>🏪</span>
-        Become a Seller
-      </Link>
-    )
+    // Seller applications disabled - single company model
+    return null
   }, [user, closeMenu])
 
-  // Shipping Company Menu Items
-  const shippingCompanyMenuItems = useMemo(() => {
-    if (!user?._id || user?.role !== 'SHIPPING_COMPANY') {
-      return null
-    }
-
-    if (user.shippingCompanyStatus === 'verified') {
-      return (
-        <>
-          <Link 
-            to={'/shipping-company/dashboard'} 
-            className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-            onClick={closeMenu}
-          >
-            <span className='text-sm'>🚚</span>
-            Shipping Dashboard
-          </Link>
-          <Link 
-            to={'/shipping-company/profile'} 
-            className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-            onClick={closeMenu}
-          >
-            <span className='text-sm'>🏢</span>
-            Company Profile
-          </Link>
-        </>
-      )
-    }
-    
-    if (user.shippingCompanyStatus === 'pending_verification') {
-      return (
-        <Link 
-          to={'/shipping-company/profile'} 
-          className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-yellow-600 transition-colors' 
-          onClick={closeMenu}
-        >
-          <span className='text-sm'>⏳</span>
-          Verification Pending
-        </Link>
-      )
-    }
-
-    // For any other shipping company status (rejected, etc.), show profile
-    return (
-      <Link 
-        to={'/shipping-company/profile'} 
-        className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-600 transition-colors' 
-        onClick={closeMenu}
-      >
-        <span className='text-sm'>🏢</span>
-        Company Profile
-      </Link>
-    )
-  }, [user, closeMenu])
+  // Shipping Company functionality removed - single company model
 
   return (
     <header className='h-16 shadow-md bg-white fixed w-full z-40'>
@@ -318,21 +273,13 @@ const Header = memo(() => {
                       <>
                         <hr className='my-2 border-gray-100' />
                         <div className='px-4 py-1'>
-                          <span className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Seller</span>
+                          <span className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Product Management</span>
                         </div>
                         {sellerMenuItems}
                       </>
                     )}
                     
-                    {shippingCompanyMenuItems && (
-                      <>
-                        <hr className='my-2 border-gray-100' />
-                        <div className='px-4 py-1'>
-                          <span className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Shipping</span>
-                        </div>
-                        {shippingCompanyMenuItems}
-                      </>
-                    )}
+                    {/* Shipping company menu removed - single company model */}
                   </nav>
 
                   {/* Logout Button */}
@@ -403,14 +350,15 @@ const Header = memo(() => {
                     <FaCreditCard className='text-sm text-purple-500' />
                     Payment Options
                   </Link>
-                  <Link 
+                  {/* TEMPORARILY DISABLED SHIPPING LINK */}
+                  {/* <Link 
                     to={'/shipping-info'} 
                     className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
                     onClick={closeHelpMenu}
                   >
                     <FaShippingFast className='text-sm text-orange-500' />
                     Shipping & Delivery
-                  </Link>
+                  </Link> */}
                   
                   {/* Business Partnership Section */}
                   <hr className='my-2 border-gray-100' />
@@ -418,47 +366,7 @@ const Header = memo(() => {
                     <span className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Partnerships</span>
                   </div>
                   
-                  {/* Conditional Shipping Partner Options */}
-                  {user?.role === 'SHIPPING_COMPANY' ? (
-                    user?.shippingCompanyStatus === 'verified' ? (
-                      <>
-                        <Link 
-                          to={'/shipping-company/dashboard'} 
-                          className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-                          onClick={closeHelpMenu}
-                        >
-                          <span className='text-sm'>🚚</span>
-                          Shipping Dashboard
-                        </Link>
-                        <Link 
-                          to={'/shipping-company/profile'} 
-                          className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-                          onClick={closeHelpMenu}
-                        >
-                          <span className='text-sm'>🏢</span>
-                          Company Profile
-                        </Link>
-                      </>
-                    ) : (
-                      <Link 
-                        to={'/shipping-company/profile'} 
-                        className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-yellow-600 transition-colors' 
-                        onClick={closeHelpMenu}
-                      >
-                        <span className='text-sm'>⏳</span>
-                        Verification Pending
-                      </Link>
-                    )
-                  ) : (
-                    <Link 
-                      to={'/shipping-company/register'} 
-                      className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-                      onClick={closeHelpMenu}
-                    >
-                      <span className='text-sm'>🚚</span>
-                      Become a Shipping Partner
-                    </Link>
-                  )}
+                  {/* Shipping company functionality removed - single company model */}
                   
                   <Link 
                     to={'/returns-exchanges'} 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { FaQuestionCircle, FaShoppingCart, FaCreditCard, FaShippingFast, FaTimes, FaUndo, FaComments, FaSearch } from 'react-icons/fa';
+import { FaQuestionCircle, FaShoppingCart, FaCreditCard, FaShippingFast, FaUndo, FaComments, FaSearch } from 'react-icons/fa';
 
 const HelpCenter = () => {
   const helpTopics = [

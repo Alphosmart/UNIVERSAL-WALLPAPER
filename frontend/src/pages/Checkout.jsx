@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -177,30 +177,52 @@ const Checkout = () => {
     const tax = totalAmount * 0.08; // 8% tax (will be made dynamic later)
     const finalTotal = totalAmount + shippingCost + tax;
 
+    // Use a ref to avoid re-running effect when cartItems changes
+    const cartItemsRef = useRef(cartItems);
+    cartItemsRef.current = cartItems;
+
     useEffect(() => {
         // Don't redirect while cart is still loading/initializing
         if (isLoading || !isInitialized) {
             return;
         }
 
-        // Redirect if cart is empty or user not logged in
+        // Redirect if user not logged in
         if (!user?._id) {
             toast.error('Please login to checkout');
             navigate('/login');
             return;
         }
 
-        if (cartItems.length === 0) {
-            toast.error('Your cart is empty');
-            navigate('/cart');
-            return;
+        // Only check for empty cart after initialization is complete
+        // Add a small delay to avoid race conditions with cart sync
+        if (isInitialized && cartItemsRef.current.length === 0) {
+            // Use setTimeout to prevent immediate navigation during cart sync
+            const timer = setTimeout(() => {
+                // Double-check cart is still empty after delay
+                if (cartItemsRef.current.length === 0) {
+                    toast.error('Your cart is empty');
+                    navigate('/cart');
+                }
+            }, 1000); // 1 second delay
+            
+            return () => clearTimeout(timer);
         }
-    }, [user, cartItems, navigate, isLoading, isInitialized]);
+    }, [user, navigate, isLoading, isInitialized]);
 
-    // Calculate shipping when country changes
+    // Separate effect to handle cart items changes without navigation
+    useEffect(() => {
+        if (isInitialized && cartItems.length === 0) {
+            // Cart became empty after page load - this might be a sync issue
+            console.warn('Cart became empty during checkout process');
+        }
+    }, [cartItems.length, isInitialized]);
+
+    // Calculate shipping when country changes (using ref to avoid cartItems dependency)
     useEffect(() => {
         const calculateShippingForCountry = async () => {
-            if (!shippingAddress.country || cartItems.length === 0) {
+            const currentCartItems = cartItemsRef.current;
+            if (!shippingAddress.country || currentCartItems.length === 0) {
                 setShippingCost(0);
                 return;
             }
@@ -214,8 +236,8 @@ const Checkout = () => {
                     body: JSON.stringify({
                         country: shippingAddress.country,
                         totalAmount: totalAmount,
-                        items: cartItems,
-                        totalWeight: cartItems.reduce((sum, item) => sum + (item.weight || 1) * item.quantity, 0)
+                        items: currentCartItems,
+                        totalWeight: currentCartItems.reduce((sum, item) => sum + (item.weight || 1) * item.quantity, 0)
                     })
                 });
 
@@ -233,8 +255,11 @@ const Checkout = () => {
             }
         };
 
-        calculateShippingForCountry();
-    }, [shippingAddress.country, totalAmount, cartItems]);
+        // Only calculate shipping if we have a stable cart (not during sync)
+        if (isInitialized && !isLoading) {
+            calculateShippingForCountry();
+        }
+    }, [shippingAddress.country, totalAmount, isInitialized, isLoading]);
 
     const formatPrice = (price) => {
         return new Intl.NumberFormat('en-US', {
@@ -266,6 +291,13 @@ const Checkout = () => {
             }
             setCurrentStep(4);
         }
+    };
+
+    // Prevent form submission on Enter key press
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        // Don't do anything - let button clicks handle navigation
+        return false;
     };
 
     const handleStepBack = () => {
@@ -472,6 +504,7 @@ const Checkout = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Form */}
                     <div className="lg:col-span-2">
+                        <form onSubmit={handleFormSubmit}>
                         {currentStep === 1 && (
                             <div className="bg-white rounded-lg shadow-md p-6">
                                 <h2 className="text-xl font-semibold mb-6">Customer Information</h2>
@@ -518,6 +551,7 @@ const Checkout = () => {
                                 </div>
 
                                 <button
+                                    type="button"
                                     onClick={handleStepNext}
                                     className="w-full mt-6 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
                                 >
@@ -611,12 +645,14 @@ const Checkout = () => {
 
                                 <div className="flex gap-4 mt-6">
                                     <button
+                                        type="button"
                                         onClick={handleStepBack}
                                         className="flex-1 bg-gray-100 text-gray-800 py-3 rounded-lg hover:bg-gray-200 transition-colors"
                                     >
                                         Back
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={handleStepNext}
                                         className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
                                     >
@@ -637,6 +673,7 @@ const Checkout = () => {
 
                                 <div className="flex gap-4">
                                     <button
+                                        type="button"
                                         onClick={handleStepBack}
                                         className="bg-gray-100 text-gray-800 py-3 px-6 rounded-lg hover:bg-gray-200 transition-colors"
                                     >
@@ -644,6 +681,7 @@ const Checkout = () => {
                                         Back to Shipping
                                     </button>
                                     <button
+                                        type="button"
                                         onClick={handleStepNext}
                                         disabled={!selectedPaymentMethod}
                                         className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -793,6 +831,7 @@ const Checkout = () => {
                                 )}
 
                                 <button
+                                    type="button"
                                     onClick={handleStepBack}
                                     className="w-full mt-4 bg-gray-100 text-gray-800 py-3 rounded-lg hover:bg-gray-200 transition-colors"
                                 >
@@ -800,6 +839,7 @@ const Checkout = () => {
                                 </button>
                             </div>
                         )}
+                        </form>
                     </div>
 
                     {/* Order Summary */}

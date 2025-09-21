@@ -89,6 +89,50 @@ const productSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    
+    // Upload tracking - who actually uploaded this product
+    uploadedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    uploadedByInfo: {
+        name: String,
+        email: String,
+        role: String, // ADMIN, STAFF, etc.
+        uploadedAt: {
+            type: Date,
+            default: Date.now
+        }
+    },
+    
+    // Edit tracking
+    lastEditedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    lastEditedAt: {
+        type: Date
+    },
+    editHistory: [{
+        editedBy: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User'
+        },
+        editedByInfo: {
+            name: String,
+            email: String,
+            role: String
+        },
+        editedAt: {
+            type: Date,
+            default: Date.now
+        },
+        changes: {
+            type: mongoose.Schema.Types.Mixed // Allow any object structure for tracking changes
+        }
+    }],
+    
     sellerInfo: {
         name: String,
         email: String,

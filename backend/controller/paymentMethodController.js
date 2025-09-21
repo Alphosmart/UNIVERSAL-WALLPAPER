@@ -52,11 +52,27 @@ const getAvailablePaymentMethods = async (req, res) => {
     }
 };
 
-// Get seller payment preferences
+// Get seller payment preferences - Admin only
 const getSellerPaymentPreferences = async (req, res) => {
     try {
         const { sellerId } = req.params;
-        console.log('Getting seller payment preferences for:', sellerId);
+        const currentUserId = req.userId; // From auth middleware if available
+        
+        console.log('Getting seller payment preferences for:', sellerId, 'by user:', currentUserId);
+
+        // If auth token is used, check if the current user is an admin
+        if (currentUserId) {
+            const userModel = require('../models/userModel');
+            const currentUser = await userModel.findById(currentUserId);
+            
+            if (!currentUser || currentUser.role !== 'ADMIN') {
+                return res.status(403).json({
+                    message: "Access denied. Only administrators can access payment preferences.",
+                    error: true,
+                    success: false
+                });
+            }
+        }
 
         // Simple test response
         res.status(200).json({
@@ -79,13 +95,25 @@ const getSellerPaymentPreferences = async (req, res) => {
     }
 };
 
-// Update seller payment preferences
+// Update seller payment preferences - Admin only
 const updateSellerPaymentPreferences = async (req, res) => {
     try {
-        const { acceptedPaymentMethods } = req.body;
+        const { acceptedPaymentMethods, sellerId } = req.body;
         const userId = req.userId; // From auth middleware
         
-        console.log('Updating seller payment preferences:', { userId, acceptedPaymentMethods });
+        console.log('Updating seller payment preferences:', { userId, acceptedPaymentMethods, sellerId });
+
+        // Check if the current user is an admin
+        const userModel = require('../models/userModel');
+        const currentUser = await userModel.findById(userId);
+        
+        if (!currentUser || currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                message: "Access denied. Only administrators can update payment preferences.",
+                error: true,
+                success: false
+            });
+        }
 
         // Simple test response
         res.status(200).json({
@@ -93,7 +121,8 @@ const updateSellerPaymentPreferences = async (req, res) => {
             error: false,
             success: true,
             data: {
-                acceptedPaymentMethods
+                acceptedPaymentMethods,
+                sellerId: sellerId || userId
             }
         });
 

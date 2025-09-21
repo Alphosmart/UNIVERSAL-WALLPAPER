@@ -9,33 +9,43 @@ const SellerProtectedRoute = ({ children, requireVerified = true }) => {
 
     useEffect(() => {
         if (!user) {
-            toast.error("Please login to access seller features");
+            toast.error("Please login to access product management features");
             navigate('/login');
             return;
         }
 
-        if (requireVerified && user.sellerStatus !== 'verified') {
+        // Allow verified sellers, staff with upload permissions, or admins
+        const hasAccess = user.sellerStatus === 'verified' || 
+                         (user.role === 'STAFF' && user.permissions?.canUploadProducts) ||
+                         user.role === 'ADMIN';
+
+        if (requireVerified && !hasAccess) {
             let message = "";
             let redirectPath = "";
 
-            switch (user.sellerStatus) {
-                case 'not_seller':
-                case null:
-                case undefined:
-                    message = "You need to register as a seller to access this feature.";
-                    redirectPath = '/become-seller';
-                    break;
-                case 'pending_verification':
-                    message = "Your seller application is pending approval. You cannot access seller features until approved.";
-                    redirectPath = '/seller-dashboard';
-                    break;
-                case 'rejected':
-                    message = "Your seller application was rejected. Please contact support or reapply.";
-                    redirectPath = '/become-seller';
-                    break;
-                default:
-                    message = "You are not authorized to access seller features.";
-                    redirectPath = '/become-seller';
+            if (user.role === 'STAFF') {
+                message = "You don't have permission to upload products. Please contact an administrator.";
+                redirectPath = '/';
+            } else {
+                switch (user.sellerStatus) {
+                    case 'not_seller':
+                    case null:
+                    case undefined:
+                        message = "Seller registration is not available. This application uses a single company model.";
+                        redirectPath = '/';
+                        break;
+                    case 'pending_verification':
+                        message = "Your seller application is pending approval. You cannot access seller features until approved.";
+                        redirectPath = '/seller-dashboard';
+                        break;
+                    case 'rejected':
+                        message = "Your seller application was rejected. Please contact support.";
+                        redirectPath = '/';
+                        break;
+                    default:
+                        message = "You are not authorized to access product management features.";
+                        redirectPath = '/';
+                }
             }
 
             toast.error(message);
@@ -48,8 +58,12 @@ const SellerProtectedRoute = ({ children, requireVerified = true }) => {
         }
     }, [user, navigate, requireVerified]);
 
-    // Don't render children if user is not verified seller (when verification required)
-    if (requireVerified && (!user || user.sellerStatus !== 'verified')) {
+    // Don't render children if user doesn't have access (when verification required)
+    const hasAccess = user?.sellerStatus === 'verified' || 
+                     (user?.role === 'STAFF' && user?.permissions?.canUploadProducts) ||
+                     user?.role === 'ADMIN';
+
+    if (requireVerified && (!user || !hasAccess)) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
@@ -59,21 +73,15 @@ const SellerProtectedRoute = ({ children, requireVerified = true }) => {
                         </svg>
                     </div>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
-                        Seller Verification Required
+                        Access Restricted
                     </h3>
                     <p className="text-gray-600 mb-4">
-                        You need to be a verified seller to access this feature.
+                        This application uses a single company seller model. Only authorized sellers can access this feature.
                     </p>
                     <div className="space-y-2">
                         <button
-                            onClick={() => navigate('/become-seller')}
-                            className="w-full bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors"
-                        >
-                            Register as Seller
-                        </button>
-                        <button
                             onClick={() => navigate('/')}
-                            className="w-full bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400 transition-colors"
+                            className="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
                         >
                             Go Home
                         </button>

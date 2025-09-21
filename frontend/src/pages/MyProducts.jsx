@@ -12,9 +12,22 @@ const MyProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    const fetchUserProducts = useCallback(async () => {
+    // Check admin access
+    useEffect(() => {
         if (!user?._id) {
             navigate('/login');
+            return;
+        }
+        
+        if (user.role !== 'ADMIN') {
+            toast.error("Only administrators can manage company products");
+            navigate('/');
+            return;
+        }
+    }, [user, navigate]);
+
+    const fetchUserProducts = useCallback(async () => {
+        if (!user?._id || user.role !== 'ADMIN') {
             return;
         }
 
@@ -31,14 +44,17 @@ const MyProducts = () => {
                 setProducts(responseData.data);
             } else {
                 toast.error(responseData.message);
+                if (response.status === 403) {
+                    navigate('/');
+                }
             }
         } catch (error) {
             console.error("Error fetching products:", error);
-            toast.error("Failed to fetch your products");
+            toast.error("Failed to fetch company products");
         } finally {
             setLoading(false);
         }
-    }, [user?._id, navigate]);
+    }, [user?._id, user?.role, navigate]);
 
     const handleDeleteProduct = async (productId) => {
         if (window.confirm("Are you sure you want to delete this product?")) {
@@ -129,7 +145,7 @@ const MyProducts = () => {
         <div className='bg-white pb-4'>
             <div className='container mx-auto p-4'>
                 <div className='flex justify-between items-center mb-6'>
-                    <h2 className='text-2xl font-bold text-slate-700'>My Products</h2>
+                    <h2 className='text-2xl font-bold text-slate-700'>Company Products</h2>
                     <Link 
                         to='/add-product'
                         className='bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors'
@@ -143,13 +159,13 @@ const MyProducts = () => {
                     <div className='text-center py-12'>
                         <div className='text-slate-400 mb-4'>
                             <IoMdAdd className='text-6xl mx-auto mb-4' />
-                            <h3 className='text-xl font-semibold mb-2'>No products yet</h3>
-                            <p className='text-gray-600 mb-4'>Start selling by adding your first product</p>
+                            <h3 className='text-xl font-semibold mb-2'>No products in store yet</h3>
+                            <p className='text-gray-600 mb-4'>Add products to the company store</p>
                             <Link 
                                 to='/add-product'
                                 className='bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg inline-block transition-colors'
                             >
-                                Add Your First Product
+                                Add First Product
                             </Link>
                         </div>
                     </div>
