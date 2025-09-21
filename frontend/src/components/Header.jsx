@@ -1,6 +1,6 @@
 import React, { useState, memo, useCallback, useMemo, useRef, useEffect } from 'react';
 import Logo from './Logo';
-import { GrSearch } from 'react-icons/gr';
+import SmartSearchBar from './SmartSearchBar';
 import {FaRegCircleUser} from 'react-icons/fa6';
 import {FaShoppingCart} from "react-icons/fa";
 import { FaChevronDown, FaUser, FaEnvelope, FaSignOutAlt, FaQuestionCircle, FaCreditCard, FaUndo, FaComments } from 'react-icons/fa';
@@ -18,7 +18,6 @@ const Header = memo(() => {
   const navigate = useNavigate()
   const [menuDisplay, setMenuDisplay] = useState(false)
   const [helpMenuDisplay, setHelpMenuDisplay] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const { getCartItemsCount } = useCart()
   const dropdownRef = useRef(null)
   const helpDropdownRef = useRef(null)
@@ -60,13 +59,11 @@ const Header = memo(() => {
     }
   }, [dispatch, navigate])
 
-  const handleSearch = useCallback((e) => {
-    e.preventDefault()
-    if(searchQuery.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery('')
+  const handleSearch = useCallback((query) => {
+    if(query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`)
     }
-  }, [searchQuery, navigate])
+  }, [navigate])
 
   const toggleMenu = useCallback(() => {
     setMenuDisplay(prev => !prev)
@@ -178,18 +175,13 @@ const Header = memo(() => {
           </Link>
         </div>
 
-        <form onSubmit={handleSearch} className='hidden lg:flex items-center w-full justify-between max-w-sm border rounded-full focus-within:shadow pl-2'>
-          <input 
-            type="text" 
-            placeholder='Search products, brands...' 
-            className='w-full outline-none py-2' 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+        <div className='hidden lg:block w-full max-w-sm'>
+          <SmartSearchBar 
+            onSearch={handleSearch}
+            placeholder="Search products, brands..."
+            showSuggestions={true}
           />
-          <button type="submit" className='text-lg min-w-[50px] h-8 bg-red-600 flex items-center justify-center rounded-r-full text-white hover:bg-red-700 transition-colors'>
-            <GrSearch/>
-          </button>
-        </form>
+        </div>
 
         {/* Main Navigation */}
         <nav className='hidden lg:flex items-center gap-6 text-gray-700'>

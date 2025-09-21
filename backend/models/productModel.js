@@ -168,6 +168,36 @@ const productSchema = new mongoose.Schema({
     timestamps: true
 });
 
+// Text search index for better search performance
+productSchema.index({ 
+    productName: 'text', 
+    brandName: 'text', 
+    category: 'text', 
+    description: 'text',
+    tags: 'text'
+}, {
+    weights: {
+        productName: 10,
+        brandName: 8,
+        category: 6,
+        tags: 4,
+        description: 2
+    },
+    name: 'product_text_index'
+});
+
+// Compound indexes for common queries
+productSchema.index({ category: 1, status: 1 });
+productSchema.index({ status: 1, createdAt: -1 });
+productSchema.index({ 'pricing.sellingPrice.amount': 1, status: 1 });
+productSchema.index({ 'pricing.originalPrice.amount': 1, status: 1 });
+productSchema.index({ userId: 1, status: 1 });
+
+// Analytics indexes
+productSchema.index({ 'analytics.views': -1 });
+productSchema.index({ 'analytics.purchases': -1 });
+productSchema.index({ 'reviews.averageRating': -1 });
+
 const productModel = mongoose.model('Product', productSchema);
 
 module.exports = productModel;

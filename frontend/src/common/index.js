@@ -457,7 +457,27 @@ const SummaryApi = {
     previewEmailTemplate : {
         url : `${backendDomain}/api/admin/email/templates/preview`,
         method : 'post'
+    },
+    // Advanced Search APIs
+    smartSearch : {
+        url : `${backendDomain}/api/search/smart`,
+        method : 'get'
+    },
+    searchSuggestions : {
+        url : `${backendDomain}/api/search/suggestions`,
+        method : 'get'
+    },
+    popularSearches : {
+        url : `${backendDomain}/api/search/popular`,
+        method : 'get'
+    },
+    searchFilters : {
+        url : `${backendDomain}/api/search/filters`,
+        method : 'get'
     }
 }
+
+// Add baseURL for convenience
+SummaryApi.baseURL = backendDomain;
 
 export default SummaryApi

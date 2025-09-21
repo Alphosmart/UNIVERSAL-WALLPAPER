@@ -50,6 +50,12 @@ const {
     resetPasswordController
 } = require('../controller/forgotPassword');
 const {
+    smartSearch,
+    getSearchSuggestions,
+    getPopularSearches,
+    getSearchFilters
+} = require('../controller/smartSearchController');
+const {
     getUserCart,
     addToCart,
     updateCartItem,
@@ -340,5 +346,11 @@ router.get('/create-admin', createAdminUser);
 
 // Email Template Management Routes
 router.use('/admin/email', emailTemplateRoutes);
+
+// Advanced Search Routes
+router.get('/search/smart', checkMaintenanceMode, smartSearch);
+router.get('/search/suggestions', checkMaintenanceMode, getSearchSuggestions);
+router.get('/search/popular', checkMaintenanceMode, getPopularSearches);
+router.get('/search/filters', checkMaintenanceMode, getSearchFilters);
 
 module.exports = router;

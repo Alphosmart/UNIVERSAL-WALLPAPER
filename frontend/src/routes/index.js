@@ -31,7 +31,7 @@ import SellerOrders from '../pages/SellerOrders';
 import OrderTracking from '../pages/OrderTracking';
 import TrackByNumber from '../pages/TrackByNumber';
 import MyOrders from '../pages/MyOrders';
-import SearchResults from '../pages/SearchResults';
+import EnhancedSearchResults from '../pages/EnhancedSearchResults';
 import HelpCenter from '../pages/HelpCenter';
 import HowToOrder from '../pages/HowToOrder';
 import PaymentOptions from '../pages/PaymentOptions';
@@ -172,7 +172,7 @@ const router = createBrowserRouter([
             // },
             {
                 path: "search",
-                element: <SearchResults />,
+                element: <EnhancedSearchResults />,
                 errorElement: <ErrorPage />
             },
             {
