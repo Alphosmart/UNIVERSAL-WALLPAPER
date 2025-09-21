@@ -39,6 +39,12 @@ import TrackOrder from '../pages/TrackOrder';
 import CancelOrder from '../pages/CancelOrder';
 import ReturnsRefunds from '../pages/ReturnsRefunds';
 import ContactUs from '../pages/ContactUs';
+import AboutUs from '../pages/AboutUs';
+import LandingPage from '../pages/LandingPage';
+import PrivacyPolicy from '../pages/PrivacyPolicy';
+import TermsOfService from '../pages/TermsOfService';
+import ReturnRefundPolicy from '../pages/ReturnRefundPolicy';
+import CookiePolicy from '../pages/CookiePolicy';
 // import ShippingInfo from '../pages/ShippingInfo'; // Removed - single company model
 import AdminContactMessages from '../pages/AdminContactMessages';
 import StaffManagement from '../pages/StaffManagement';
@@ -61,6 +67,11 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '',
+                element: <LandingPage />,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: 'home',
                 element: <Home />,
                 errorElement: <ErrorPage />
             },
@@ -192,6 +203,31 @@ const router = createBrowserRouter([
             {
                 path: "contact-us",
                 element: <ContactUs />,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "about-us",
+                element: <AboutUs />,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "privacy-policy",
+                element: <PrivacyPolicy />,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "terms-of-service",
+                element: <TermsOfService />,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "return-refund-policy",
+                element: <ReturnRefundPolicy />,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "cookie-policy",
+                element: <CookiePolicy />,
                 errorElement: <ErrorPage />
             },
             // {

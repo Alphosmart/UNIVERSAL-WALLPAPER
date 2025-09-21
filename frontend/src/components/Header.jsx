@@ -191,6 +191,19 @@ const Header = memo(() => {
           </button>
         </form>
 
+        {/* Main Navigation */}
+        <nav className='hidden lg:flex items-center gap-6 text-gray-700'>
+          <Link to='/search' className='bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all font-medium'>
+            🛒 Shop
+          </Link>
+          <Link to='/about-us' className='hover:text-blue-600 transition-colors font-medium'>
+            About
+          </Link>
+          <Link to='/contact-us' className='hover:text-blue-600 transition-colors font-medium'>
+            Contact
+          </Link>
+        </nav>
+
         <div className='flex items-center gap-7'>
           
           {user?._id && (

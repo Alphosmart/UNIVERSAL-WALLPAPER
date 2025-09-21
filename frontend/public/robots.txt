@@ -1,3 +1,33 @@
-# https://www.robotstxt.org/robotstxt.html
+# Universal Wallpaper - Robots.txt
 User-agent: *
-Disallow:
+Allow: /
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /seller-dashboard/
+Disallow: /api/
+Disallow: /private/
+Disallow: /cart/
+Disallow: /checkout/
+Disallow: /my-orders/
+Disallow: /profile/
+
+# Allow important pages
+Allow: /
+Allow: /products/
+Allow: /categories/
+Allow: /about/
+Allow: /contact/
+Allow: /help/
+Allow: /privacy-policy/
+Allow: /terms-of-service/
+Allow: /shipping-policy/
+Allow: /return-policy/
+
+# Sitemaps
+Sitemap: https://universalwallpaper.com/sitemap.xml
+Sitemap: https://universalwallpaper.com/sitemap-products.xml
+Sitemap: https://universalwallpaper.com/sitemap-categories.xml
+
+# Crawl delay
+Crawl-delay: 1

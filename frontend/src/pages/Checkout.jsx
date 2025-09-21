@@ -16,6 +16,7 @@ import {
 import SummaryApi from '../common';
 import CountryStateSelector from '../components/CountryStateSelector';
 import PaymentMethodSelector from '../components/PaymentMethodSelector';
+import { SecurityBadgeGroup, TrustIndicators } from '../components/SecurityBadge';
 
 // Load Stripe with your publishable key from environment variables
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY || 'pk_test_demo_key');
@@ -113,10 +114,15 @@ const CardForm = ({ onPaymentSuccess, orderData, totalAmount }) => {
             </div>
 
             <div className="bg-blue-50 p-4 rounded-lg">
-                <div className="flex items-center gap-2 text-blue-800">
+                <div className="flex items-center gap-2 text-blue-800 mb-3">
                     <FaShieldAlt />
                     <span className="text-sm">Your payment information is secure and encrypted</span>
                 </div>
+                <SecurityBadgeGroup 
+                    badges={['ssl', 'certified', 'secure']} 
+                    size="small" 
+                    layout="horizontal" 
+                />
             </div>
 
             <button
@@ -891,12 +897,15 @@ const Checkout = () => {
                             </div>
 
                             {/* Security Info */}
-                            <div className="bg-green-50 p-3 rounded-lg">
+                            <div className="bg-green-50 p-3 rounded-lg mb-4">
                                 <div className="flex items-center gap-2 text-green-800 text-sm">
                                     <FaShieldAlt />
                                     <span>SSL encrypted checkout</span>
                                 </div>
                             </div>
+
+                            {/* Trust Indicators */}
+                            <TrustIndicators className="mb-4" />
                         </div>
                     </div>
                 </div>

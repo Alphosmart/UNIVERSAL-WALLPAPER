@@ -1,16 +1,19 @@
 import React from 'react';
-import logoSvg from '../assets/ashamsmart logo RGB.svg';
+import { FaTruck } from 'react-icons/fa';
 
-const logo = ({ w, h }) => {
+const Logo = ({ w = 120, h = 40, showText = true, className = "" }) => {
   return (
-    <img 
-      src={logoSvg} 
-      alt="AshAmSmart Logo" 
-      width={w} 
-      height={h}
-      className="object-contain"
-    />
+    <div className={`flex items-center space-x-2 ${className}`}>
+      <div className='bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg'>
+        <FaTruck className='text-white text-xl' />
+      </div>
+      {showText && (
+        <div className='text-xl font-bold text-gray-800'>
+          Universal Wallpaper
+        </div>
+      )}
+    </div>
   );
 };
 
-export default logo;
+export default Logo;
