@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import SummaryApi from '../common';
 import { useCart } from '../context/CartContext';
 import SocialFeatures from '../components/SocialFeatures';
-import Reviews from '../components/Reviews';
+import EnhancedReviews from '../components/EnhancedReviews';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -417,9 +417,9 @@ const ProductDetail = () => {
                 <SocialFeatures product={product} compact={false} />
             </div>
             
-            {/* Reviews Section */}
+            {/* Enhanced Reviews Section */}
             <div className="mt-8">
-                <Reviews productId={product._id} />
+                <EnhancedReviews productId={product._id} />
             </div>
             
             {/* Fullscreen Image Modal */}

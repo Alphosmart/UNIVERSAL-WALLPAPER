@@ -20,6 +20,46 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  title: {
+    type: String,
+    maxLength: 100
+  },
+  photos: [{
+    url: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+      maxLength: 200
+    },
+    cloudinaryId: String
+  }],
+  verified: {
+    type: Boolean,
+    default: false
+  },
+  helpfulVotes: {
+    helpful: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
+    notHelpful: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }]
+  },
+  reported: [{
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    reason: String,
+    date: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   createdAt: {
     type: Date,
     default: Date.now

@@ -193,6 +193,13 @@ router.post('/products/:productId/review/:reviewId/like', checkMaintenanceMode, 
 router.post('/products/:productId/share', checkMaintenanceMode, authToken, shareProduct);
 router.get('/products/:productId/stats', checkMaintenanceMode, getProductStats);
 
+// Enhanced review routes
+router.post('/products/:productId/enhanced-review', checkMaintenanceMode, authToken, addEnhancedReview);
+router.get('/products/:productId/enhanced-reviews', checkMaintenanceMode, getEnhancedReviews);
+router.post('/products/:productId/review/:reviewId/helpful', checkMaintenanceMode, authToken, markReviewHelpful);
+router.post('/products/:productId/review/:reviewId/report', checkMaintenanceMode, authToken, reportReview);
+router.get('/products/:productId/review-statistics', checkMaintenanceMode, getReviewStatistics);
+
 // Order/Purchase routes
 router.post('/buy-product', checkMaintenanceMode, authToken, buyProductController);
 router.post('/buy-multiple-products', checkMaintenanceMode, authToken, buyMultipleProductsController);
