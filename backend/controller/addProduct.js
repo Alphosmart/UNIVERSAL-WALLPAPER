@@ -80,53 +80,39 @@ async function addProductController(req, res) {
                 });
             }
 
-            // Get seller information
-            const seller = await User.findById(req.userId);
-            if (!seller) {
+            // Get current user information
+            const currentUser = await User.findById(req.userId);
+            if (!currentUser) {
                 return res.status(404).json({
-                    message: "Seller not found",
+                    message: "User not found",
                     error: true,
                     success: false
                 });
             }
 
-            // Check if user is a verified seller
-            if (seller.sellerStatus !== 'verified') {
-                let message = "";
-                let redirectTo = "";
-                
-                switch (seller.sellerStatus) {
-                    case 'not_seller':
-                    case null:
-                    case undefined:
-                        message = "You need to register as a seller before you can add products. Please complete your seller registration first.";
-                        redirectTo = "/become-seller";
-                        break;
-                    case 'pending_verification':
-                        message = "Your seller application is pending approval. You cannot add products until your application is approved by our admin team.";
-                        redirectTo = "/seller-dashboard";
-                        break;
-                    case 'rejected':
-                        message = "Your seller application was rejected. Please contact support or reapply to become a seller.";
-                        redirectTo = "/become-seller";
-                        break;
-                    default:
-                        message = "You are not authorized to add products. Please ensure you are a verified seller.";
-                        redirectTo = "/become-seller";
-                }
-                
+            // Check if user has admin privileges or staff product upload permissions
+            const canUpload = currentUser.role === 'ADMIN' || 
+                             (currentUser.role === 'STAFF' && currentUser.permissions?.canUploadProducts);
+            
+            if (!canUpload) {
                 return res.status(403).json({
-                    message: message,
+                    message: "Insufficient permissions. Only administrators and authorized staff can add products to the store",
                     error: true,
-                    success: false,
-                    sellerStatus: seller.sellerStatus,
-                    redirectTo: redirectTo,
-                    requiresRegistration: seller.sellerStatus === 'none'
+                    success: false
                 });
             }
 
-            // Determine seller's currency (from request, user profile, or default to NGN)
-            const sellerCurrency = currency || seller.currency || 'NGN';
+            // Use current user as the seller (either admin or verified seller)
+            let sellerId = currentUser._id;
+            
+            // For admin users, check if they want to use a specific seller account
+            if (currentUser.role === 'ADMIN') {
+                // Admin can optionally specify a seller, otherwise use their own account
+                sellerId = req.body.sellerId || currentUser._id;
+            }
+
+            // Determine currency (from request or user default)
+            const sellerCurrency = currency || currentUser.preferences?.currency || 'NGN';
             
             // Validate currency
             if (!CurrencyService.isCurrencySupported(sellerCurrency)) {
@@ -178,13 +164,23 @@ async function addProductController(req, res) {
                 price: parseFloat(price),
                 sellingPrice: parseFloat(sellingPrice),
                 
-                seller: req.userId,
+                seller: sellerId, // Assign to the current seller (admin or verified seller)
                 sellerInfo: {
-                    name: seller.name,
-                    email: seller.email,
+                    name: currentUser.name,
+                    email: currentUser.email,
                     currency: sellerCurrency,
-                    location: seller.address?.country || location
+                    location: currentUser.address?.country || location
                 },
+                
+                // Upload tracking information
+                uploadedBy: req.userId,
+                uploadedByInfo: {
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    role: currentUser.role,
+                    uploadedAt: new Date()
+                },
+                
                 stock: parseInt(stock) || 1,
                 condition: condition || 'new',
                 location,
@@ -196,6 +192,12 @@ async function addProductController(req, res) {
             newProduct.pricing.convertedPrices = cachedPrices;
             
             const savedProduct = await newProduct.save();
+
+            // Update user's upload statistics
+            await User.findByIdAndUpdate(req.userId, {
+                $inc: { 'uploadStats.totalProducts': 1 },
+                'uploadStats.lastUpload': new Date()
+            });
 
             res.status(201).json({
                 message: "Product added successfully",

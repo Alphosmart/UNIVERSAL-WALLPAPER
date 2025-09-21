@@ -113,15 +113,41 @@ const AdminSellerApplications = () => {
         if (modalType === 'approve') {
             updateApplicationStatus(selectedApplication._id, 'verified');
         } else if (modalType === 'reject') {
-            if (!rejectionReason.trim()) {
-                setError('Please provide a rejection reason');
-                return;
-            }
-            updateApplicationStatus(selectedApplication._id, 'rejected', rejectionReason);
+        if (!rejectionReason.trim()) {
+            setError('Please provide a rejection reason');
+            return;
         }
-    };
+        updateApplicationStatus(selectedApplication._id, 'rejected', rejectionReason);
+    }
+};
 
-    // Get status badge styling
+// Handle seller suspension/unsuspension
+const setSellerSuspension = async (sellerId, suspend) => {
+    const action = suspend ? 'suspend' : 'unsuspend';
+    if (window.confirm(`Are you sure you want to ${action} this seller?`)) {
+        try {
+            const response = await fetch(`http://localhost:8080/api/admin/seller-suspension/${sellerId}`, {
+                method: 'PUT',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ suspend })
+            });
+
+            if (response.ok) {
+                fetchApplications();
+                setError('');
+                alert(`Seller ${action}ed successfully`);
+            } else {
+                setError(`Failed to ${action} seller`);
+            }
+        } catch (error) {
+            console.error(`Error ${action}ing seller:`, error);
+            setError(`Error ${action}ing seller: ${error.message}`);
+        }
+    }
+};    // Get status badge styling
     const getStatusBadgeClass = (status) => {
         switch (status) {
             case 'pending_verification':
@@ -130,6 +156,8 @@ const AdminSellerApplications = () => {
                 return 'bg-green-100 text-green-800 border-green-200';
             case 'rejected':
                 return 'bg-red-100 text-red-800 border-red-200';
+            case 'suspended':
+                return 'bg-orange-100 text-orange-800 border-orange-200';
             default:
                 return 'bg-gray-100 text-gray-800 border-gray-200';
         }
@@ -144,6 +172,8 @@ const AdminSellerApplications = () => {
                 return 'Approved';
             case 'rejected':
                 return 'Rejected';
+            case 'suspended':
+                return 'Suspended';
             default:
                 return status;
         }
@@ -181,8 +211,8 @@ const AdminSellerApplications = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">Seller Applications</h1>
-                    <p className="text-gray-600 mt-2">Manage seller applications and approvals</p>
+                    <h1 className="text-3xl font-bold text-gray-900">Seller Management</h1>
+                    <p className="text-gray-600 mt-2">Manage seller applications, approvals, and suspensions</p>
                 </div>
 
                 {/* Error Message */}
@@ -208,6 +238,7 @@ const AdminSellerApplications = () => {
                                 <option value="pending_verification">Pending</option>
                                 <option value="verified">Approved</option>
                                 <option value="rejected">Rejected</option>
+                                <option value="suspended">Suspended</option>
                             </select>
                         </div>
 
@@ -225,7 +256,7 @@ const AdminSellerApplications = () => {
                 </div>
 
                 {/* Statistics */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                     <div className="bg-white rounded-lg shadow p-6">
                         <h3 className="text-lg font-semibold text-gray-900">Total Applications</h3>
                         <p className="text-3xl font-bold text-blue-600">{applications.length}</p>
@@ -246,6 +277,12 @@ const AdminSellerApplications = () => {
                         <h3 className="text-lg font-semibold text-gray-900">Rejected</h3>
                         <p className="text-3xl font-bold text-red-600">
                             {applications.filter(app => app.sellerStatus === 'rejected').length}
+                        </p>
+                    </div>
+                    <div className="bg-white rounded-lg shadow p-6">
+                        <h3 className="text-lg font-semibold text-gray-900">Suspended</h3>
+                        <p className="text-3xl font-bold text-orange-600">
+                            {applications.filter(app => app.sellerStatus === 'suspended').length}
                         </p>
                     </div>
                 </div>
@@ -334,6 +371,21 @@ const AdminSellerApplications = () => {
                                                                 Reject
                                                             </button>
                                                         </>
+                                                    )}
+                                                    {application.sellerStatus !== 'suspended' ? (
+                                                        <button
+                                                            onClick={() => setSellerSuspension(application._id, true)}
+                                                            className="bg-yellow-600 hover:bg-yellow-700 text-white px-3 py-1 rounded-md text-xs font-medium transition-colors"
+                                                        >
+                                                            Suspend
+                                                        </button>
+                                                    ) : (
+                                                        <button
+                                                            onClick={() => setSellerSuspension(application._id, false)}
+                                                            className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-xs font-medium transition-colors"
+                                                        >
+                                                            Unsuspend
+                                                        </button>
                                                     )}
                                                     <button
                                                         onClick={() => setSelectedApplication(application)}

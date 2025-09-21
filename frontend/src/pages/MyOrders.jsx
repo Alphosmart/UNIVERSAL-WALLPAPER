@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaBox, FaClock, FaCheck, FaTimes, FaEye, FaTruck, FaShoppingCart, FaRedo, FaCog } from 'react-icons/fa';
+import { FaBox, FaClock, FaCheck, FaTimes, FaEye, FaTruck, FaShoppingCart, FaCog } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import SummaryApi from '../common';
 

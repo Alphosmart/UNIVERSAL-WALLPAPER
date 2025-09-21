@@ -234,7 +234,7 @@ async function uploadVerificationDocument(req, res) {
 async function getSellerApplications(req, res) {
     try {
         const applications = await userModel.find({
-            sellerStatus: { $in: ['pending_verification', 'verified', 'rejected'] }
+            sellerStatus: { $in: ['pending_verification', 'verified', 'rejected', 'suspended'] }
         }).select('-password');
 
         // Transform data to match frontend expectations
@@ -548,12 +548,12 @@ async function checkSellerEligibility(req, res) {
     }
 }
 
-// Get seller payment details
+// Get seller payment details - Admin only
 async function getSellerPaymentDetails(req, res) {
     try {
         const userId = req.userId;
         
-        // Find user and check if they are a verified seller
+        // Find user and check if they are an admin
         const user = await userModel.findById(userId);
         if (!user) {
             return res.status(404).json({
@@ -563,16 +563,34 @@ async function getSellerPaymentDetails(req, res) {
             });
         }
 
-        if (user.sellerStatus !== 'verified') {
+        if (user.role !== 'ADMIN') {
             return res.status(403).json({
-                message: "Access denied. You must be a verified seller to access payment details.",
+                message: "Access denied. Only administrators can access payment details.",
                 error: true,
                 success: false
             });
         }
 
         // Return payment details with default structure if not set
-        const paymentDetails = user.paymentDetails || {
+        // Admin can access payment details for a specific seller via sellerId query param
+        // or get all sellers' payment details
+        const { sellerId } = req.query;
+        
+        let targetUser = user; // Default to admin's own details
+        
+        if (sellerId) {
+            // Admin is requesting payment details for a specific seller
+            targetUser = await userModel.findById(sellerId);
+            if (!targetUser) {
+                return res.status(404).json({
+                    message: "Seller not found",
+                    error: true,
+                    success: false
+                });
+            }
+        }
+
+        const paymentDetails = targetUser.paymentDetails || {
             bankAccount: {
                 accountNumber: '',
                 routingNumber: '',
@@ -588,7 +606,7 @@ async function getSellerPaymentDetails(req, res) {
             }
         };
 
-        const sellerSettings = user.sellerSettings || {
+        const sellerSettings = targetUser.sellerSettings || {
             payoutSchedule: 'weekly',
             minimumPayout: 25.00
         };
@@ -598,7 +616,10 @@ async function getSellerPaymentDetails(req, res) {
             data: {
                 paymentDetails,
                 sellerSettings,
-                documents: user.verificationDocuments || []
+                documents: targetUser.verificationDocuments || [],
+                sellerId: targetUser._id,
+                sellerName: targetUser.name,
+                sellerEmail: targetUser.email
             },
             success: true,
             error: false
@@ -614,13 +635,13 @@ async function getSellerPaymentDetails(req, res) {
     }
 }
 
-// Update seller payment details
+// Update seller payment details - Admin only
 async function updateSellerPaymentDetails(req, res) {
     try {
         const userId = req.userId;
-        const { paymentDetails, sellerSettings } = req.body;
+        const { paymentDetails, sellerSettings, sellerId } = req.body;
 
-        // Find user and check if they are a verified seller
+        // Find user and check if they are an admin
         const user = await userModel.findById(userId);
         if (!user) {
             return res.status(404).json({
@@ -630,12 +651,28 @@ async function updateSellerPaymentDetails(req, res) {
             });
         }
 
-        if (user.sellerStatus !== 'verified') {
+        if (user.role !== 'ADMIN') {
             return res.status(403).json({
-                message: "Access denied. You must be a verified seller to update payment details.",
+                message: "Access denied. Only administrators can update payment details.",
                 error: true,
                 success: false
             });
+        }
+
+        // Determine which user's payment details to update
+        let targetUserId = userId; // Default to admin's own details
+        if (sellerId) {
+            targetUserId = sellerId;
+            
+            // Verify the target user exists
+            const targetUser = await userModel.findById(sellerId);
+            if (!targetUser) {
+                return res.status(404).json({
+                    message: "Target seller not found",
+                    error: true,
+                    success: false
+                });
+            }
         }
 
         // Update payment details
@@ -648,7 +685,7 @@ async function updateSellerPaymentDetails(req, res) {
         }
 
         const updatedUser = await userModel.findByIdAndUpdate(
-            userId,
+            targetUserId,
             updateData,
             { new: true }
         );

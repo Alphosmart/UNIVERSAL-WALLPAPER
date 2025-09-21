@@ -10,6 +10,7 @@ import Context from '../context';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [data, setData] = useState({
     email : "",
     password : ""
@@ -36,6 +37,8 @@ const Login = () => {
   const handleSubmit = async(e) => {
     e.preventDefault()
     
+    console.log('🔑 Login attempt starting...')
+    
     const dataResponse = await fetch(SummaryApi.signIn.url, {
       method: SummaryApi.signIn.method,
       credentials: 'include',
@@ -46,15 +49,30 @@ const Login = () => {
     })
 
     const dataApi = await dataResponse.json()
+    console.log('🔑 Login response:', dataApi)
 
     if(dataApi.success){
       toast.success(dataApi.message)
       
-      // Use optimized refresh method instead of duplicate fetch
-      await refreshUserDetails()
+      console.log('🔑 Login successful, fetching user details directly...')
+      setIsLoggingIn(true)
       
-      // Redirect to the page user was trying to access, or home
-      navigate(from, { replace: true })
+      // Add small delay to ensure cookie is set before fetching user details
+      setTimeout(async () => {
+        try {
+          // Use context to refresh user details which will handle Redux updates properly
+          await refreshUserDetails()
+          console.log('🔑 User details refreshed via context')
+          
+          // Navigate immediately after refresh is complete
+          console.log('🔑 Navigating to:', from)
+          setIsLoggingIn(false)
+          navigate(from, { replace: true })
+        } catch (error) {
+          console.error('🔑 Error refreshing user details:', error)
+          setIsLoggingIn(false)
+        }
+      }, 100)
     }
 
     if(dataApi.error){
@@ -124,7 +142,12 @@ const Login = () => {
 
             </div>
 
-            <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 w-full max-w-[150px] rounded-full hover:scale-110 transition-all mx-auto block mt-4">Login</button>
+            <button 
+              className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 w-full max-w-[150px] rounded-full hover:scale-110 transition-all mx-auto block mt-4 disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed"
+              disabled={isLoggingIn}
+            >
+              {isLoggingIn ? 'Logging in...' : 'Login'}
+            </button>
           </form>
 
           <p className="my-5">Don't have account ? <Link to={"/sign-up"} className="text-red-600 hover:text-red-700 hover:underline">Sign up</Link></p>

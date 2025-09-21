@@ -341,10 +341,23 @@ async function getDashboardStats(req, res) {
     }
 }
 
-// Get all shipping companies (admin only)
-async function getAllShippingCompanies(req, res) {
+// Shipping company functions removed - single company model
+// getAllShippingCompanies and updateShippingCompanyStatus functions
+// have been removed as the platform now operates with a single company model
+
+// Get all shipping companies (admin only) - REMOVED
+// async function getAllShippingCompanies(req, res) { ... }
+
+// Update shipping company status (admin only) - REMOVED
+// async function updateShippingCompanyStatus(req, res) { ... }
+
+// Set seller suspension status (admin only)
+async function setSellerSuspension(req, res) {
     try {
-        // Check if user is admin
+        const { userId } = req.params;
+        const { suspend } = req.body;
+
+        // Check if current user is admin
         if (req.userId) {
             const currentUser = await userModel.findById(req.userId);
             if (!currentUser || currentUser.role !== 'ADMIN') {
@@ -362,27 +375,28 @@ async function getAllShippingCompanies(req, res) {
             });
         }
 
-        const { status, search } = req.query;
-        let query = { role: 'SHIPPING_COMPANY' };
-
-        // Filter by status if provided
-        if (status && status !== 'all') {
-            query.shippingCompanyStatus = status;
+        // Find the user to suspend/unsuspend
+        const userToUpdate = await userModel.findById(userId);
+        if (!userToUpdate) {
+            return res.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            });
         }
 
-        // Search by company name or contact email
-        if (search) {
-            query.$or = [
-                { 'companyInfo.companyName': { $regex: search, $options: 'i' } },
-                { email: { $regex: search, $options: 'i' } }
-            ];
-        }
+        // Update seller status
+        const newStatus = suspend ? 'suspended' : 'verified';
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { sellerStatus: newStatus },
+            { new: true }
+        ).select('-password');
 
-        const shippingCompanies = await userModel.find(query).select('-password').sort({ createdAt: -1 });
-
+        const action = suspend ? 'suspended' : 'unsuspended';
         res.json({
-            message: "Shipping companies fetched successfully",
-            data: shippingCompanies,
+            message: `Seller ${action} successfully`,
+            data: updatedUser,
             success: true,
             error: false
         });
@@ -396,70 +410,275 @@ async function getAllShippingCompanies(req, res) {
     }
 }
 
-// Update shipping company status (admin only)
-async function updateShippingCompanyStatus(req, res) {
+// Promote user to admin role (super admin only)
+async function promoteToAdmin(req, res) {
     try {
-        const { companyId, status, rejectionReason } = req.body;
-
-        // Check if user is admin
-        if (req.userId) {
-            const currentUser = await userModel.findById(req.userId);
-            if (!currentUser || currentUser.role !== 'ADMIN') {
-                return res.status(403).json({
-                    message: "Access denied. Admin privileges required.",
-                    error: true,
-                    success: false
-                });
-            }
-        } else {
-            return res.status(401).json({
-                message: "Please login to access this resource",
+        const { userId } = req.body;
+        
+        // Check if current user is admin
+        const currentUser = await userModel.findById(req.userId);
+        if (!currentUser || currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                message: "Access denied. Admin privileges required.",
                 error: true,
                 success: false
             });
         }
 
-        // Validate status
-        const validStatuses = ['pending_verification', 'verified', 'rejected', 'suspended'];
-        if (!validStatuses.includes(status)) {
-            return res.status(400).json({
-                message: "Invalid status. Must be one of: " + validStatuses.join(', '),
-                error: true,
-                success: false
-            });
-        }
-
-        // Find the shipping company
-        const shippingCompany = await userModel.findOne({ _id: companyId, role: 'SHIPPING_COMPANY' });
-        if (!shippingCompany) {
+        // Find target user
+        const targetUser = await userModel.findById(userId);
+        if (!targetUser) {
             return res.status(404).json({
-                message: "Shipping company not found",
+                message: "User not found",
                 error: true,
                 success: false
             });
         }
 
-        // Update the status and add admin action timestamp
-        const updateData = {
-            shippingCompanyStatus: status,
-            adminActionDate: new Date(),
-            adminId: req.userId
-        };
-
-        // Add rejection reason if status is rejected
-        if (status === 'rejected' && rejectionReason) {
-            updateData.rejectionReason = rejectionReason;
-        }
-
-        const updatedCompany = await userModel.findByIdAndUpdate(
-            companyId,
-            updateData,
+        // Update user role to admin
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { 
+                role: 'ADMIN',
+                'permissions.canUploadProducts': true,
+                'permissions.canEditProducts': true,
+                'permissions.canDeleteProducts': true,
+                'permissions.canManageOrders': true,
+                'permissions.grantedBy': req.userId,
+                'permissions.grantedAt': new Date()
+            },
             { new: true }
         ).select('-password');
 
         res.json({
-            message: `Shipping company status updated to ${status} successfully`,
-            data: updatedCompany,
+            message: `User ${targetUser.name} promoted to Admin successfully`,
+            data: updatedUser,
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || err,
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Grant product upload permissions to staff
+async function grantProductPermissions(req, res) {
+    try {
+        const { userId, permissions } = req.body;
+        
+        // Check if current user is admin
+        const currentUser = await userModel.findById(req.userId);
+        if (!currentUser || currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                message: "Access denied. Admin privileges required.",
+                error: true,
+                success: false
+            });
+        }
+
+        // Find target user
+        const targetUser = await userModel.findById(userId);
+        if (!targetUser) {
+            return res.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Prepare permission updates
+        const permissionUpdates = {
+            'permissions.grantedBy': req.userId,
+            'permissions.grantedAt': new Date()
+        };
+
+        // Set specific permissions
+        if (permissions.canUploadProducts !== undefined) {
+            permissionUpdates['permissions.canUploadProducts'] = permissions.canUploadProducts;
+        }
+        if (permissions.canEditProducts !== undefined) {
+            permissionUpdates['permissions.canEditProducts'] = permissions.canEditProducts;
+        }
+        if (permissions.canDeleteProducts !== undefined) {
+            permissionUpdates['permissions.canDeleteProducts'] = permissions.canDeleteProducts;
+        }
+        if (permissions.canManageOrders !== undefined) {
+            permissionUpdates['permissions.canManageOrders'] = permissions.canManageOrders;
+        }
+
+        // If user is being granted any permissions, promote to STAFF role
+        const hasAnyPermission = Object.values(permissions).some(perm => perm === true);
+        if (hasAnyPermission && targetUser.role === 'GENERAL') {
+            permissionUpdates.role = 'STAFF';
+        }
+
+        // Update user permissions
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            permissionUpdates,
+            { new: true }
+        ).select('-password');
+
+        res.json({
+            message: `Permissions updated for ${targetUser.name} successfully`,
+            data: updatedUser,
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || err,
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Get all staff members with their permissions
+async function getAllStaff(req, res) {
+    try {
+        // Check if current user is admin
+        const currentUser = await userModel.findById(req.userId);
+        if (!currentUser || currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                message: "Access denied. Admin privileges required.",
+                error: true,
+                success: false
+            });
+        }
+
+        // Get all staff and admin users
+        const staff = await userModel.find({
+            role: { $in: ['STAFF', 'ADMIN'] }
+        }).select('-password').sort({ createdAt: -1 });
+
+        res.json({
+            message: "Staff members fetched successfully",
+            data: staff,
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || err,
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Get staff upload statistics
+async function getStaffUploadStats(req, res) {
+    try {
+        // Check if current user is admin
+        const currentUser = await userModel.findById(req.userId);
+        if (!currentUser || currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                message: "Access denied. Admin privileges required.",
+                error: true,
+                success: false
+            });
+        }
+
+        const Product = require('../models/productModel');
+        
+        // Get upload statistics by staff
+        const uploadStats = await Product.aggregate([
+            {
+                $group: {
+                    _id: '$uploadedBy',
+                    totalUploads: { $sum: 1 },
+                    latestUpload: { $max: '$uploadedByInfo.uploadedAt' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'uploader'
+                }
+            },
+            {
+                $unwind: '$uploader'
+            },
+            {
+                $project: {
+                    _id: 1,
+                    name: '$uploader.name',
+                    email: '$uploader.email',
+                    role: '$uploader.role',
+                    totalUploads: 1,
+                    latestUpload: 1
+                }
+            },
+            {
+                $sort: { totalUploads: -1 }
+            }
+        ]);
+
+        res.json({
+            message: "Upload statistics fetched successfully",
+            data: uploadStats,
+            success: true,
+            error: false
+        });
+
+    } catch (err) {
+        res.status(400).json({
+            message: err.message || err,
+            error: true,
+            success: false
+        });
+    }
+}
+
+// Promote user to verified seller for product management (admin only)
+async function promoteToVerifiedSeller(req, res) {
+    try {
+        const { userId } = req.body;
+        
+        // Check if current user is admin
+        const currentUser = await userModel.findById(req.userId);
+        if (!currentUser || currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                message: "Access denied. Admin privileges required.",
+                error: true,
+                success: false
+            });
+        }
+
+        // Find target user
+        const targetUser = await userModel.findById(userId);
+        if (!targetUser) {
+            return res.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Update user to verified seller status
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { 
+                sellerStatus: 'verified',
+                verifiedAt: new Date(),
+                businessType: 'Company Employee' // Mark as internal company seller
+            },
+            { new: true }
+        ).select('-password');
+
+        res.json({
+            message: `${targetUser.name} has been granted verified seller status for product management`,
+            data: updatedUser,
             success: true,
             error: false
         });
@@ -480,6 +699,12 @@ module.exports = {
     deleteProductAdmin,
     updateProductStatus,
     getDashboardStats,
-    getAllShippingCompanies,
-    updateShippingCompanyStatus
+    // getAllShippingCompanies, // Removed - single company model
+    // updateShippingCompanyStatus, // Removed - single company model
+    setSellerSuspension,
+    promoteToAdmin,
+    grantProductPermissions,
+    getAllStaff,
+    getStaffUploadStats,
+    promoteToVerifiedSeller
 };

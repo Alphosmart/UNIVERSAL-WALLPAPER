@@ -87,6 +87,13 @@ const AddProduct = () => {
             return;
         }
 
+        // Check if user is admin (only admins can add products in single company model)
+        if (user.role !== 'ADMIN') {
+            toast.error("Only administrators can add products to the company store");
+            navigate('/admin-panel');
+            return;
+        }
+
         if (!data.productName || !data.category || !data.price || !data.sellingPrice) {
             toast.error("Please fill in all required fields");
             return;
@@ -127,26 +134,7 @@ const AddProduct = () => {
                 });
                 navigate('/my-products');
             } else {
-                // Handle seller verification errors
-                if (response.status === 403 && responseData.redirectTo) {
-                    toast.error(responseData.message);
-                    
-                    // Show additional guidance based on seller status
-                    setTimeout(() => {
-                        if (responseData.requiresRegistration) {
-                            toast.info("Redirecting to seller registration...");
-                            navigate('/become-seller');
-                        } else if (responseData.redirectTo === 'seller-status') {
-                            toast.info("Check your seller application status in your profile.");
-                            navigate('/seller-dashboard');
-                        } else if (responseData.redirectTo === 'seller-support') {
-                            toast.info("Please contact support for assistance.");
-                            navigate('/contact-support');
-                        }
-                    }, 2000);
-                } else {
-                    toast.error(responseData.message);
-                }
+                toast.error(responseData.message);
             }
         } catch (error) {
             console.error("Error adding product:", error);
@@ -161,9 +149,9 @@ const AddProduct = () => {
     };
 
     const categories = [
-        "airpodes", "camera", "earphones", "mobile", "mouse", 
-        "printers", "processor", "refrigerator", "speakers", 
-        "trimmers", "TV", "watches", "clothing", "books", "furniture"
+        "wallpapers", "wall-paint", "ceiling-paint", "wood-stain", "primer", 
+        "brushes-rollers", "decorative-panels", "wall-decals", "murals", 
+        "tiles", "flooring", "curtains", "blinds", "lighting", "mirrors"
     ];
 
     const conditions = [

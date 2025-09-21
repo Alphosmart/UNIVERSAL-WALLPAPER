@@ -28,9 +28,14 @@ const {
     deleteProductAdmin, 
     updateProductStatus, 
     getDashboardStats,
-    getAllShippingCompanies,
-    updateShippingCompanyStatus,
-    setSellerSuspension
+    // getAllShippingCompanies, // Removed - single company model
+    // updateShippingCompanyStatus, // Removed - single company model
+    setSellerSuspension,
+    promoteToAdmin,
+    grantProductPermissions,
+    getAllStaff,
+    getStaffUploadStats,
+    promoteToVerifiedSeller
 } = require('../controller/adminController');
 const createAdminUser = require('../controller/createAdminUser');
 const {
@@ -71,17 +76,18 @@ const {
     updateSellerOrderStatus,
     getSellerOrderStats
 } = require('../controller/sellerOrdersController');
-const {
-    registerShippingCompany,
-    getShippingCompanyProfile,
-    updateShippingCompanyProfile,
-    getAvailableOrders,
-    submitShippingQuote,
-    getMyQuotes,
-    getShippingCompanyStats,
-    getOrderShippingQuotes,
-    selectShippingQuote
-} = require('../controller/shippingCompanyController');
+// Shipping company functionality removed - single company model
+// const {
+//     registerShippingCompany,
+//     getShippingCompanyProfile,
+//     updateShippingCompanyProfile,
+//     getAvailableOrders,
+//     submitShippingQuote,
+//     getMyQuotes,
+//     getShippingCompanyStats,
+//     getOrderShippingQuotes,
+//     selectShippingQuote
+// } = require('../controller/shippingCompanyController');
 const {
     getAdminSettings,
     updateAdminSettings
@@ -98,16 +104,18 @@ const {
     deleteBackup,
     getBackupStatistics
 } = require('../controller/backupController');
-const {
-    getShippingSettings,
-    updateGlobalShippingSettings,
-    createShippingZone,
-    updateShippingZone,
-    deleteShippingZone,
-    calculateShippingCost,
-    getShippingMethods,
-    getShippingInfo
-} = require('../controller/shippingController');
+const emailTemplateRoutes = require('./emailTemplateRoutes');
+// Shipping controller functionality removed - single company model
+// const {
+//     getShippingSettings,
+//     updateGlobalShippingSettings,
+//     createShippingZone,
+//     updateShippingZone,
+//     deleteShippingZone,
+//     calculateShippingCost,
+//     getShippingMethods,
+//     getShippingInfo
+// } = require('../controller/shippingController');
 const {
     getBanners,
     getAllBannersAdmin,
@@ -206,17 +214,25 @@ router.get('/admin/all-products', authToken, getAllProductsAdmin);
 router.delete('/admin/delete-product/:productId', authToken, deleteProductAdmin);
 router.put('/admin/update-product-status/:productId', authToken, updateProductStatus);
 router.get('/admin/dashboard-stats', authToken, getDashboardStats);
-router.get('/admin/seller-applications', authToken, getSellerApplications);
-router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
-router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
 router.put('/admin/seller-suspension/:userId', authToken, setSellerSuspension);
-router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
+
+// Staff management routes
+router.post('/admin/promote-to-admin', authToken, promoteToAdmin);
+router.put('/admin/grant-permissions', authToken, grantProductPermissions);
+router.get('/admin/staff', authToken, getAllStaff);
+router.get('/admin/staff/upload-stats', authToken, getStaffUploadStats);
+router.post('/admin/promote-to-seller', authToken, promoteToVerifiedSeller);
+// Admin seller application routes - DISABLED: Single company seller model  
+// router.get('/admin/seller-applications', authToken, getSellerApplications);
+// router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
+// router.put('/admin/update-seller-status/:userId', authToken, updateSellerStatus);
+// router.put('/admin/review-seller-application/:userId', authToken, reviewSellerApplication);
 router.get('/admin/settings', authToken, getAdminSettings);
 router.put('/admin/settings', authToken, updateAdminSettings);
 
-// Admin shipping company routes
-router.get('/admin/shipping-companies', authToken, getAllShippingCompanies);
-router.put('/admin/shipping-companies', authToken, updateShippingCompanyStatus);
+// Admin shipping company routes - REMOVED (single company model)
+// router.get('/admin/shipping-companies', authToken, getAllShippingCompanies);
+// router.put('/admin/shipping-companies', authToken, updateShippingCompanyStatus);
 
 // Contact message routes - Block during maintenance (except admin routes)
 router.post('/contact', checkMaintenanceMode, submitContactMessage);
@@ -234,15 +250,15 @@ router.post('/admin/backup/:backupId/restore', authToken, restoreFromBackup);
 router.delete('/admin/backup/:backupId', authToken, deleteBackup);
 
 // Seller routes
-// Seller application routes
-router.post('/seller/apply', checkMaintenanceMode, authToken, applyToBeSeller);
-router.get('/seller/application-status', checkMaintenanceMode, authToken, getSellerApplicationStatus);
-router.post('/seller/upload-document', checkMaintenanceMode, authToken, uploadVerificationDocument);
-router.post('/upload-verification-document', checkMaintenanceMode, authToken, uploadVerificationDocument);
-router.put('/seller/update-profile', checkMaintenanceMode, authToken, updateProfileForSeller);
-router.get('/seller/check-eligibility', checkMaintenanceMode, authToken, checkSellerEligibility);
+// Seller application routes - DISABLED: Single company seller model
+// router.post('/seller/apply', checkMaintenanceMode, authToken, applyToBeSeller);
+// router.get('/seller/application-status', checkMaintenanceMode, authToken, getSellerApplicationStatus);
+// router.post('/seller/upload-document', checkMaintenanceMode, authToken, uploadVerificationDocument);
+// router.post('/upload-verification-document', checkMaintenanceMode, authToken, uploadVerificationDocument);
+// router.put('/seller/update-profile', checkMaintenanceMode, authToken, updateProfileForSeller);
+// router.get('/seller/check-eligibility', checkMaintenanceMode, authToken, checkSellerEligibility);
 
-// Seller payment management routes
+// Seller payment management routes - Admin only
 router.get('/seller-payment-details', checkMaintenanceMode, authToken, getSellerPaymentDetails);
 router.put('/seller-payment-details', checkMaintenanceMode, authToken, updateSellerPaymentDetails);
 router.post('/seller-document-upload', checkMaintenanceMode, authToken, uploadSellerDocument);
@@ -253,17 +269,18 @@ router.get('/seller/order-stats', authToken, getSellerOrderStats);
 router.put('/seller/orders/:orderId/status', authToken, updateSellerOrderStatus);
 
 // Shipping routes
+// Shipping routes removed - single company model
 // Admin shipping management
-router.get('/admin/shipping/settings', authToken, getShippingSettings);
-router.put('/admin/shipping/global', authToken, updateGlobalShippingSettings);
-router.post('/admin/shipping/zones', authToken, createShippingZone);
-router.put('/admin/shipping/zones/:zoneId', authToken, updateShippingZone);
-router.delete('/admin/shipping/zones/:zoneId', authToken, deleteShippingZone);
+// router.get('/admin/shipping/settings', authToken, getShippingSettings);
+// router.put('/admin/shipping/global', authToken, updateGlobalShippingSettings);
+// router.post('/admin/shipping/zones', authToken, createShippingZone);
+// router.put('/admin/shipping/zones/:zoneId', authToken, updateShippingZone);
+// router.delete('/admin/shipping/zones/:zoneId', authToken, deleteShippingZone);
 
 // Public shipping endpoints - Protect during maintenance
-router.post('/shipping/calculate', checkMaintenanceMode, calculateShippingCost);
-router.get('/shipping/methods/:country', checkMaintenanceMode, getShippingMethods);
-router.get('/shipping/info', checkMaintenanceMode, getShippingInfo);
+// router.post('/shipping/calculate', checkMaintenanceMode, calculateShippingCost);
+// router.get('/shipping/methods/:country', checkMaintenanceMode, getShippingMethods);
+// router.get('/shipping/info', checkMaintenanceMode, getShippingInfo);
 
 // Banner routes (public) - Allow during maintenance for basic site info
 router.get('/banners', getBanners);
@@ -286,9 +303,9 @@ router.delete('/admin/banners/:bannerId', authToken, deleteBanner);
 router.put('/admin/banners/:bannerId/toggle', authToken, toggleBannerStatus);
 router.put('/admin/banners/order', authToken, updateBannersOrder);
 
-// Payment method routes - Block during maintenance
+// Payment method routes - Block during maintenance - Admin only for payment preferences
 router.post('/payment-methods/available', checkMaintenanceMode, getAvailablePaymentMethods);
-router.get('/seller/payment-preferences/:sellerId', checkMaintenanceMode, getSellerPaymentPreferences);
+router.get('/seller/payment-preferences/:sellerId', checkMaintenanceMode, authToken, getSellerPaymentPreferences);
 router.put('/seller/payment-preferences', checkMaintenanceMode, authToken, updateSellerPaymentPreferences);
 
 // Order tracking routes
@@ -297,21 +314,24 @@ router.get('/buyer/orders/tracking', checkMaintenanceMode, authToken, getBuyerOr
 router.put('/seller/orders/:orderId/tracking', checkMaintenanceMode, authToken, updateOrderTracking);
 router.get('/track/:trackingNumber', checkMaintenanceMode, trackByTrackingNumber); // Public endpoint
 
-// Shipping Company Routes
-router.post('/shipping-company/register', checkMaintenanceMode, checkDatabaseConnection, registerShippingCompany);
-router.get('/shipping-company/profile', checkMaintenanceMode, authToken, getShippingCompanyProfile);
-router.put('/shipping-company/profile', checkMaintenanceMode, authToken, updateShippingCompanyProfile);
-router.get('/shipping-company/available-orders', checkMaintenanceMode, authToken, getAvailableOrders);
-router.post('/shipping-company/orders/:orderId/quote', checkMaintenanceMode, authToken, submitShippingQuote);
-router.get('/shipping-company/quotes', checkMaintenanceMode, authToken, getMyQuotes);
-router.get('/shipping-company/stats', checkMaintenanceMode, authToken, getShippingCompanyStats);
+// Shipping Company Routes - REMOVED (single company model)
+// router.post('/shipping-company/register', checkMaintenanceMode, checkDatabaseConnection, registerShippingCompany);
+// router.get('/shipping-company/profile', checkMaintenanceMode, authToken, getShippingCompanyProfile);
+// router.put('/shipping-company/profile', checkMaintenanceMode, authToken, updateShippingCompanyProfile);
+// router.get('/shipping-company/available-orders', checkMaintenanceMode, authToken, getAvailableOrders);
+// router.post('/shipping-company/orders/:orderId/quote', checkMaintenanceMode, authToken, submitShippingQuote);
+// router.get('/shipping-company/quotes', checkMaintenanceMode, authToken, getMyQuotes);
+// router.get('/shipping-company/stats', checkMaintenanceMode, authToken, getShippingCompanyStats);
 
-// Order shipping management (for sellers)
-router.get('/orders/:orderId/shipping-quotes', checkMaintenanceMode, authToken, getOrderShippingQuotes);
-router.post('/orders/:orderId/shipping', checkMaintenanceMode, authToken, selectShippingQuote);
+// Order shipping management (for sellers) - REMOVED (single company model)
+// router.get('/orders/:orderId/shipping-quotes', checkMaintenanceMode, authToken, getOrderShippingQuotes);
+// router.post('/orders/:orderId/shipping', checkMaintenanceMode, authToken, selectShippingQuote);
 
 // Development route to create admin user
 router.get('/create-admin', createAdminUser);
 // router.post('/reset-admin-password', resetAdminPassword);
 
-module.exports = router
+// Email Template Management Routes
+router.use('/admin/email', emailTemplateRoutes);
+
+module.exports = router;

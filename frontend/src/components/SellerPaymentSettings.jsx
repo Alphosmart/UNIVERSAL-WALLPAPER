@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { 
     FaCreditCard, 
@@ -9,11 +10,13 @@ import {
     FaCheck,
     FaTimes,
     FaSave,
-    FaSpinner
+    FaSpinner,
+    FaExclamationTriangle
 } from 'react-icons/fa';
 import SummaryApi from '../common';
 
 const SellerPaymentSettings = () => {
+    const user = useSelector(state => state?.user?.user);
     const [paymentPreferences, setPaymentPreferences] = useState([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -63,8 +66,31 @@ const SellerPaymentSettings = () => {
     ];
 
     useEffect(() => {
-        fetchPaymentPreferences();
-    }, []);
+        // Only fetch if user is admin
+        if (user?.role === 'ADMIN') {
+            fetchPaymentPreferences();
+        }
+    }, [user]);
+
+    // Check if user is admin - show this after hooks
+    if (user?.role !== 'ADMIN') {
+        return (
+            <div className="container mx-auto px-4 py-8">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                    <div className="flex items-center">
+                        <FaExclamationTriangle className="text-red-600 text-2xl mr-4" />
+                        <div>
+                            <h1 className="text-xl font-bold text-red-800 mb-2">Access Denied</h1>
+                            <p className="text-red-700">
+                                Only administrators can access payment settings. 
+                                Please contact an administrator if you need to manage payment details.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     const fetchPaymentPreferences = async () => {
         try {

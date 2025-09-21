@@ -4,7 +4,7 @@ import { useSiteContent } from '../hooks/useSiteContent';
 
 const ErrorPage = () => {
   const error = useRouteError();
-  const { content: errorPageContent, loading } = useSiteContent('errorPage');
+  const { content: errorPageContent } = useSiteContent('errorPage');
   
   // Only log actual errors, not normal routing
   if (error && error.status !== 404) {

@@ -13,7 +13,7 @@ const Settings = () => {
   const [settings, setSettings] = useState({
     general: {
       siteName: 'AshAmSmart',
-      siteDescription: 'Your trusted e-commerce marketplace for quality products',
+      siteDescription: 'Your trusted interior decoration specialist for wallpapers, paints, and home decor products',
       maintenanceMode: false,
       allowRegistration: true,
       defaultLanguage: 'en',
@@ -39,7 +39,6 @@ const Settings = () => {
     payment: {
       enablePayPal: true,
       enableStripe: true,
-      commissionRate: 3.0,
       minimumPayout: 25.0,
       payoutSchedule: 'weekly'
     },
@@ -520,7 +519,7 @@ const Settings = () => {
     <div className="space-y-6">
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
         <h3 className="text-lg font-medium text-green-800 mb-2">Payment Configuration</h3>
-        <p className="text-sm text-green-700">Configure payment methods and commission settings</p>
+        <p className="text-sm text-green-700">Configure payment methods and business settings</p>
       </div>
 
       <div className="space-y-6">
@@ -552,22 +551,7 @@ const Settings = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Commission Rate (%)
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              value={settings.payment.commissionRate}
-              onChange={(e) => handleSettingChange('payment', 'commissionRate', parseFloat(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="0"
-              max="20"
-            />
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Minimum Payout ($)
@@ -600,9 +584,8 @@ const Settings = () => {
         </div>
 
         <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold text-gray-800 mb-2">Current Commission Structure</h3>
+          <h3 className="font-semibold text-gray-800 mb-2">Current Payment Configuration</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <p>Platform Commission: <span className="font-semibold text-green-600">{settings.payment.commissionRate}%</span></p>
             <p>Minimum Payout: <span className="font-semibold text-green-600">${settings.payment.minimumPayout}</span></p>
             <p>Payout Schedule: <span className="font-semibold text-green-600">{settings.payment.payoutSchedule}</span></p>
             <p>Payment Methods: <span className="font-semibold text-green-600">

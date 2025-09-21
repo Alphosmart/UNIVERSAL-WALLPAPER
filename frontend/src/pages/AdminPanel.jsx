@@ -1,68 +1,13 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaUsers, FaBoxOpen, FaChartBar, FaCog, FaUserCheck, FaShippingFast, FaImage, FaEnvelope } from 'react-icons/fa';
+import { Outlet, Link } from 'react-router-dom';
+import { FaHome, FaUsers, FaBoxOpen, FaChartBar, FaCog, FaImage, FaEnvelope, FaUserCog } from 'react-icons/fa';
+// FaShippingFast removed - single company model
 
 const AdminPanel = () => {
   const user = useSelector(state => state?.user?.user);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user is logged in
-    if (!user?._id) {
-      console.log('No user logged in, redirecting to login');
-      navigate('/login');
-      return;
-    }
-    
-    // Check if user has admin role
-    if (user?.role !== 'ADMIN') {
-      console.log('User is not admin, redirecting to home');
-      navigate('/');
-      return;
-    }
-  }, [user, navigate]);
-
-  // Show debug info if user is logged in but not admin
-  if (user?._id && user?.role !== 'ADMIN') {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full">
-          <div className="text-center bg-red-50 p-8 rounded-lg border border-red-200 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Admin Access Required</h2>
-            <p className="text-gray-600 mb-4">You are logged in as: <strong>{user.name}</strong></p>
-            <p className="text-gray-600 mb-4">Email: <strong>{user.email}</strong></p>
-            <p className="text-gray-600 mb-4">Current Role: <strong>{user.role || 'GENERAL'}</strong></p>
-            <p className="text-red-600 mb-4">This area requires ADMIN privileges</p>
-            <div className="space-x-4 mb-6">
-              <Link to="/" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-block">
-                Go to Homepage
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show loading or redirect if not logged in
-  if (!user?._id) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="max-w-4xl w-full">
-          <div className="text-center bg-blue-50 p-8 rounded-lg border border-blue-200 mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Login Required</h2>
-            <p className="text-gray-600 mb-4">You need to be logged in to access the admin panel.</p>
-            <div className="space-x-4 mb-6">
-              <Link to="/login" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 inline-block">
-                Go to Login
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // AdminRoute already handles authentication, so we can render directly
 
   const adminMenuItems = [
     {
@@ -81,6 +26,11 @@ const AdminPanel = () => {
       icon: <FaUsers />
     },
     {
+      label: 'Staff Management',
+      path: '/admin-panel/staff-management',
+      icon: <FaUserCog />
+    },
+    {
       label: 'Contact Messages',
       path: '/admin-panel/contact-messages',
       icon: <FaEnvelope />
@@ -90,16 +40,17 @@ const AdminPanel = () => {
       path: '/admin-panel/banners',
       icon: <FaImage />
     },
-    {
-      label: 'Seller Applications',
-      path: '/admin-panel/seller-applications',
-      icon: <FaUserCheck />
-    },
-    {
-      label: 'Shipping Companies',
-      path: '/admin-panel/shipping-companies',
-      icon: <FaShippingFast />
-    },
+    // {
+    //   label: 'Seller Applications',
+    //   path: '/admin-panel/seller-applications',
+    //   icon: <FaUserCheck />
+    // },
+    // Shipping Companies removed - single company model
+    // {
+    //   label: 'Shipping Companies',
+    //   path: '/admin-panel/shipping-companies',
+    //   icon: <FaShippingFast />
+    // },
     {
       label: 'Analytics',
       path: '/admin-panel/analytics',
@@ -110,10 +61,16 @@ const AdminPanel = () => {
       path: '/admin-panel/site-content',
       icon: <FaCog />
     },
+    // Shipping Settings removed - single company model
+    // {
+    //   label: 'Shipping Settings',
+    //   path: '/admin-panel/shipping-settings',
+    //   icon: <FaShippingFast />
+    // },
     {
-      label: 'Shipping Settings',
-      path: '/admin-panel/shipping-settings',
-      icon: <FaShippingFast />
+      label: 'Email Templates',
+      path: '/admin-panel/email-templates',
+      icon: <FaEnvelope />
     },
     {
       label: 'Settings',

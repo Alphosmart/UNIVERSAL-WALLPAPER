@@ -1,7 +1,7 @@
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
 const User = require("../models/userModel");
-// const { sendOrderConfirmationEmail } = require("../utils/emailService");
+const { sendEmail } = require("../services/emailService");
 
 async function buyProductController(req, res) {
     try {
@@ -32,7 +32,7 @@ async function buyProductController(req, res) {
         }
 
         // Check if product is available
-        if (product.status !== 'available') {
+        if (product.status !== 'ACTIVE') {
             return res.status(400).json({
                 message: "Product is not available for purchase",
                 error: true,
@@ -114,8 +114,18 @@ async function buyProductController(req, res) {
 
         // Send order confirmation email with tracking ID
         try {
-            // await sendOrderConfirmationEmail(populatedOrder);
-            console.log("Order created with tracking ID:", populatedOrder.trackingInfo?.trackingNumber);
+            await sendEmail(buyer.email, 'orderConfirmation', {
+                customerName: buyer.name,
+                orderId: populatedOrder._id.toString().slice(-8),
+                trackingNumber: populatedOrder.trackingInfo?.trackingNumber,
+                totalAmount: populatedOrder.totalAmount,
+                productName: populatedOrder.productDetails.productName,
+                brandName: populatedOrder.productDetails.brandName,
+                quantity: populatedOrder.quantity,
+                orderDate: new Date().toLocaleDateString(),
+                estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toLocaleDateString()
+            });
+            console.log("Order confirmation email sent successfully with tracking ID:", populatedOrder.trackingInfo?.trackingNumber);
         } catch (emailError) {
             console.log("Error sending confirmation email:", emailError.message);
             // Don't fail the order if email fails

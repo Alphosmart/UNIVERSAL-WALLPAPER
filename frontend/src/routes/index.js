@@ -18,14 +18,14 @@ import ProductDetail from '../pages/ProductDetail';
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
 import SellerAccountSettings from '../pages/SellerAccountSettings';
-import BecomeSellerPage from '../pages/BecomeSellerPage';
-import AdminSellerApplications from '../pages/AdminSellerApplications';
-import AdminShippingCompanies from '../pages/AdminShippingCompanies';
+// import BecomeSellerPage from '../pages/BecomeSellerPage';
+// import AdminSellerApplications from '../pages/AdminSellerApplications';
+// import AdminShippingCompanies from '../pages/AdminShippingCompanies';
 import SellerDashboard from '../pages/SellerDashboard';
 import Analytics from '../pages/Analytics';
 import Settings from '../pages/Settings';
 import SiteContentManagement from '../pages/SiteContentManagement';
-import ShippingSettings from '../pages/ShippingSettings';
+// import ShippingSettings from '../pages/ShippingSettings';
 import BannerManagement from '../pages/BannerManagement';
 import SellerOrders from '../pages/SellerOrders';
 import OrderTracking from '../pages/OrderTracking';
@@ -39,13 +39,17 @@ import TrackOrder from '../pages/TrackOrder';
 import CancelOrder from '../pages/CancelOrder';
 import ReturnsRefunds from '../pages/ReturnsRefunds';
 import ContactUs from '../pages/ContactUs';
-import ShippingInfo from '../pages/ShippingInfo';
+// import ShippingInfo from '../pages/ShippingInfo'; // Removed - single company model
 import AdminContactMessages from '../pages/AdminContactMessages';
+import StaffManagement from '../pages/StaffManagement';
+import EmailTemplateManager from '../components/EmailTemplateManager';
 import DevLogin from '../pages/DevLogin';
-import ShippingCompanyRegistration from '../pages/ShippingCompanyRegistration';
-import ShippingCompanyDashboard from '../pages/ShippingCompanyDashboard';
-import ShippingCompanyProfile from '../pages/ShippingCompanyProfile';
-import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute, ShippingCompanyRoute } from '../components/AuthGuard';
+// Shipping company components removed - single company model
+// import ShippingCompanyRegistration from '../pages/ShippingCompanyRegistration';
+// import ShippingCompanyDashboard from '../pages/ShippingCompanyDashboard';
+// import ShippingCompanyProfile from '../pages/ShippingCompanyProfile';
+// import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute, ShippingCompanyRoute } from '../components/AuthGuard';
+import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute } from '../components/AuthGuard';
 import SellerProtectedRoute from '../components/SellerProtectedRoute';
 
 
@@ -150,11 +154,11 @@ const router = createBrowserRouter([
                 element: <ProtectedRoute><MyOrders /></ProtectedRoute>,
                 errorElement: <ErrorPage />
             },
-            {
-                path: "become-seller",
-                element: <ProtectedRoute><BecomeSellerPage /></ProtectedRoute>,
-                errorElement: <ErrorPage />
-            },
+            // {
+            //     path: "become-seller",
+            //     element: <ProtectedRoute><BecomeSellerPage /></ProtectedRoute>,
+            //     errorElement: <ErrorPage />
+            // },
             {
                 path: "search",
                 element: <SearchResults />,
@@ -190,26 +194,26 @@ const router = createBrowserRouter([
                 element: <ContactUs />,
                 errorElement: <ErrorPage />
             },
-            {
-                path: "shipping-info",
-                element: <ShippingInfo />,
-                errorElement: <ErrorPage />
-            },
-            {
-                path: "shipping-company/register",
-                element: <ShippingCompanyRegistration />,
-                errorElement: <ErrorPage />
-            },
-            {
-                path: "shipping-company/dashboard",
-                element: <ShippingCompanyRoute><ShippingCompanyDashboard /></ShippingCompanyRoute>,
-                errorElement: <ErrorPage />
-            },
-            {
-                path: "shipping-company/profile",
-                element: <ShippingCompanyRoute><ShippingCompanyProfile /></ShippingCompanyRoute>,
-                errorElement: <ErrorPage />
-            },
+            // {
+            //     path: "shipping-info",
+            //     element: <ShippingInfo />,
+            //     errorElement: <ErrorPage />
+            // },
+            // {
+            //     path: "shipping-company/register",
+            //     element: <ShippingCompanyRegistration />,
+            //     errorElement: <ErrorPage />
+            // },
+            // {
+            //     path: "shipping-company/dashboard",
+            //     element: <ShippingCompanyRoute><ShippingCompanyDashboard /></ShippingCompanyRoute>,
+            //     errorElement: <ErrorPage />
+            // },
+            // {
+            //     path: "shipping-company/profile",
+            //     element: <ShippingCompanyRoute><ShippingCompanyProfile /></ShippingCompanyRoute>,
+            //     errorElement: <ErrorPage />
+            // },
             {
                 path: "returns-refunds",
                 element: <ReturnsRefunds />,
@@ -243,6 +247,10 @@ const router = createBrowserRouter([
                         element: <AllUsers />
                     },
                     {
+                        path: "staff-management",
+                        element: <StaffManagement />
+                    },
+                    {
                         path: "contact-messages",
                         element: <AdminContactMessages />
                     },
@@ -250,14 +258,14 @@ const router = createBrowserRouter([
                         path: "banners",
                         element: <BannerManagement />
                     },
-                    {
-                        path: "seller-applications",
-                        element: <AdminSellerApplications />
-                    },
-                    {
-                        path: "shipping-companies",
-                        element: <AdminShippingCompanies />
-                    },
+                    // {
+                    //     path: "seller-applications",
+                    //     element: <AdminSellerApplications />
+                    // },
+                    // {
+                    //     path: "shipping-companies",
+                    //     element: <AdminShippingCompanies />
+                    // },
                     {
                         path: "analytics",
                         element: <Analytics />
@@ -266,9 +274,13 @@ const router = createBrowserRouter([
                         path: "site-content",
                         element: <SiteContentManagement />
                     },
+                    // {
+                    //     path: "shipping-settings",
+                    //     element: <ShippingSettings />
+                    // },
                     {
-                        path: "shipping-settings",
-                        element: <ShippingSettings />
+                        path: "email-templates",
+                        element: <EmailTemplateManager />
                     },
                     {
                         path: "settings",

@@ -1,4 +1,5 @@
 const Product = require("../models/productModel");
+const User = require("../models/userModel");
 const CurrencyService = require("../services/currencyService");
 
 async function getUserProductsController(req, res) {
@@ -6,8 +7,41 @@ async function getUserProductsController(req, res) {
         const userId = req.userId;
         const { status, category, currency } = req.query;
 
-        // Build filter object
-        let filter = { seller: userId };
+        // Get current user
+        const currentUser = await User.findById(userId);
+        if (!currentUser) {
+            return res.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // In single company model, only admins can access product management
+        if (currentUser.role !== 'ADMIN') {
+            return res.status(403).json({
+                message: "Only administrators can manage company products",
+                error: true,
+                success: false
+            });
+        }
+
+        // Get the company seller (single verified seller)
+        const companySeller = await User.findOne({ 
+            sellerStatus: 'verified',
+            role: 'ADMIN'
+        });
+
+        if (!companySeller) {
+            return res.status(500).json({
+                message: "Company seller not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Build filter object - get all company products
+        let filter = { seller: companySeller._id };
         
         if (status) {
             filter.status = status;
@@ -17,12 +51,12 @@ async function getUserProductsController(req, res) {
             filter.category = category;
         }
 
-        // Get user's products
+        // Get company products
         const products = await Product.find(filter)
             .sort({ createdAt: -1 })
             .populate('seller', 'name email');
 
-        // Convert prices if currency is specified (for seller viewing in different currency)
+        // Convert prices if currency is specified
         let processedProducts = products;
         if (currency) {
             processedProducts = products.map(product => {
@@ -38,7 +72,7 @@ async function getUserProductsController(req, res) {
         }
 
         res.status(200).json({
-            message: "User products retrieved successfully",
+            message: "Company products retrieved successfully",
             data: processedProducts,
             count: processedProducts.length,
             currency: currency || null,
@@ -49,7 +83,7 @@ async function getUserProductsController(req, res) {
     } catch (err) {
         console.log("Error in getUserProducts:", err.message);
         res.status(500).json({
-            message: "Failed to get user products: " + err.message,
+            message: "Failed to get company products: " + err.message,
             error: true,
             success: false
         });

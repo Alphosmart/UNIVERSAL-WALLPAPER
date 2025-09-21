@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import SummaryApi from '../common';
 
 const ProductContext = createContext();
@@ -12,10 +13,12 @@ export const useProducts = () => {
 };
 
 export const ProductProvider = ({ children }) => {
+  const user = useSelector(state => state?.user?.user);
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastFetch, setLastFetch] = useState(null);
   const [error, setError] = useState(null);
+  const allProductsRef = useRef([]);
   const [currentCurrency, setCurrentCurrency] = useState('NGN');
 
   // Cache products for 5 minutes
@@ -24,6 +27,16 @@ export const ProductProvider = ({ children }) => {
   // Load user's preferred currency on mount
   useEffect(() => {
     const loadUserCurrency = async () => {
+      // Only fetch user preferences if user is authenticated
+      if (!user || !user._id) {
+        // Fallback to localStorage or default for unauthenticated users
+        const savedCurrency = localStorage.getItem('userCurrency');
+        if (savedCurrency) {
+          setCurrentCurrency(savedCurrency);
+        }
+        return;
+      }
+
       try {
         const response = await fetch(SummaryApi.getUserPreferences.url, {
           method: SummaryApi.getUserPreferences.method,
@@ -34,6 +47,12 @@ export const ProductProvider = ({ children }) => {
           const data = await response.json();
           if (data.success && data.data?.currency) {
             setCurrentCurrency(data.data.currency);
+          }
+        } else if (response.status === 401) {
+          // User is no longer authenticated, fallback to localStorage
+          const savedCurrency = localStorage.getItem('userCurrency');
+          if (savedCurrency) {
+            setCurrentCurrency(savedCurrency);
           }
         }
       } catch (error) {
@@ -47,16 +66,16 @@ export const ProductProvider = ({ children }) => {
     };
     
     loadUserCurrency();
-  }, []);
+  }, [user]);
 
   const fetchAllProducts = useCallback(async (forceRefresh = false, currency = null) => {
     // Get user's preferred currency
     const userCurrency = currency || currentCurrency;
     
     // Check if we have recent data and don't need to refetch
-    if (!forceRefresh && allProducts.length > 0 && lastFetch && 
+    if (!forceRefresh && allProductsRef.current.length > 0 && lastFetch && 
         (Date.now() - lastFetch < CACHE_DURATION)) {
-      return allProducts;
+      return allProductsRef.current;
     }
 
     try {
@@ -81,6 +100,7 @@ export const ProductProvider = ({ children }) => {
 
       if (dataResponse.success) {
         setAllProducts(dataResponse.data);
+        allProductsRef.current = dataResponse.data;
         setLastFetch(Date.now());
         if (dataResponse.currency) {
           setCurrentCurrency(dataResponse.currency);
@@ -97,28 +117,28 @@ export const ProductProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [allProducts, lastFetch, CACHE_DURATION, currentCurrency]);
+  }, [lastFetch, CACHE_DURATION, currentCurrency]); // Removed allProducts to prevent infinite loop
 
   const getProductsByCategory = useCallback((category) => {
     if (!category || category === 'all') {
-      return allProducts;
+      return allProductsRef.current;
     }
     
-    return allProducts.filter(product => 
+    return allProductsRef.current.filter(product => 
       product.category?.toLowerCase() === category?.toLowerCase()
     );
-  }, [allProducts]);
+  }, []); // No dependencies needed since we use ref
 
   const getProductById = useCallback((id) => {
-    return allProducts.find(product => product._id === id);
-  }, [allProducts]);
+    return allProductsRef.current.find(product => product._id === id);
+  }, []); // No dependencies needed since we use ref
 
   // Auto-fetch on mount and when currency changes
   useEffect(() => {
-    if (allProducts.length === 0) {
+    if (allProductsRef.current.length === 0) {
       fetchAllProducts();
     }
-  }, [fetchAllProducts, allProducts.length]);
+  }, [fetchAllProducts]);
 
   const changeCurrency = useCallback(async (newCurrency) => {
     if (newCurrency !== currentCurrency) {

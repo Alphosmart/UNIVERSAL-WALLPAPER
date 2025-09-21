@@ -39,8 +39,8 @@
     "progressPercentage": 45,
     "showProgressBar": true,
     "showContactInfo": true,
-    "backgroundColor": "from-purple-50 to-indigo-100",
+    "backgroundColor": "from-gray-50 to-gray-100",
     "buttonText": "Refresh Page",
-    "lastUpdated": "2025-08-17T21:08:15.978Z"
+    "lastUpdated": "2025-09-01T12:36:54.890Z"
   }
 }

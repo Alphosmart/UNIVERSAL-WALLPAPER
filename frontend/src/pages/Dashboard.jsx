@@ -58,9 +58,9 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-        <p className="text-gray-600 mt-2">Welcome to the admin dashboard. Here's an overview of your platform.</p>
+            <div>
+        <h1 className="text-3xl font-bold text-gray-800">Interior Decoration Dashboard</h1>
+        <p className="text-gray-600 mt-2">Welcome to your interior decoration business admin dashboard. Here's an overview of your wallpapers, paints, and decor products.</p>
       </div>
 
       {/* Stats Cards */}

@@ -178,20 +178,20 @@ const Analytics = () => {
 
     // Generate category performance data
     const generateCategoryData = (stats) => {
-        const categories = ['Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Books', 'Beauty'];
+        const categories = ['Wallpapers', 'Wall Paint', 'Decorative Panels', 'Tiles', 'Flooring', 'Lighting'];
         return categories.map(category => ({
             name: category,
-            sales: Math.floor(Math.random() * 30000) + 5000,
-            products: Math.floor(Math.random() * 100) + 20
+            sales: Math.floor(Math.random() * 15000) + 2000,
+            products: Math.floor(Math.random() * 50) + 10
         }));
     };
 
     // Generate top sellers data
     const generateTopSellersData = (stats) => {
         const sellerNames = [
-            'TechStore Pro', 'Fashion Hub', 'Home Essentials', 'Sports World', 
-            'Electronics Plus', 'Garden Centre', 'Book Corner', 'Beauty Spot',
-            'Mobile Zone', 'Gaming Central'
+            'Interior Pro', 'Decor Hub', 'Paint Masters', 'Wall Art Studio', 
+            'Design Centre', 'Home Accents', 'Color Works', 'Tile Gallery',
+            'Lighting Zone', 'Floor Central'
         ];
         
         return sellerNames.slice(0, 8).map((name, index) => ({
@@ -209,22 +209,22 @@ const Analytics = () => {
     // Generate top products data
     const generateTopProductsData = (stats) => {
         const products = [
-            { name: 'iPhone 15 Pro Max', category: 'Electronics', image: '/api/placeholder/80/80' },
-            { name: 'Samsung Galaxy S24', category: 'Electronics', image: '/api/placeholder/80/80' },
-            { name: 'MacBook Air M3', category: 'Electronics', image: '/api/placeholder/80/80' },
-            { name: 'Nike Air Max 270', category: 'Footwear', image: '/api/placeholder/80/80' },
-            { name: 'Sony WH-1000XM5', category: 'Electronics', image: '/api/placeholder/80/80' },
-            { name: 'iPad Pro 12.9"', category: 'Electronics', image: '/api/placeholder/80/80' }
+            { name: 'Premium Vinyl Wallpaper', category: 'Wallpapers', image: '/api/placeholder/80/80' },
+            { name: 'Eggshell Wall Paint', category: 'Wall Paint', image: '/api/placeholder/80/80' },
+            { name: '3D Decorative Panels', category: 'Decorative Panels', image: '/api/placeholder/80/80' },
+            { name: 'Ceramic Floor Tiles', category: 'Tiles', image: '/api/placeholder/80/80' },
+            { name: 'LED Pendant Lights', category: 'Lighting', image: '/api/placeholder/80/80' },
+            { name: 'Luxury Vinyl Flooring', category: 'Flooring', image: '/api/placeholder/80/80' }
         ];
 
         return products.slice(0, 6).map((product, index) => ({
             id: index + 1,
             ...product,
-            totalSales: Math.floor(Math.random() * 5000) + 1000,
-            revenue: Math.floor(Math.random() * 500000) + 100000,
+            totalSales: Math.floor(Math.random() * 2000) + 500,
+            revenue: Math.floor(Math.random() * 50000) + 10000,
             averageRating: (Math.random() * 1.5 + 3.5).toFixed(1),
-            reviewsCount: Math.floor(Math.random() * 1000) + 100,
-            price: Math.floor(Math.random() * 1000) + 50,
+            reviewsCount: Math.floor(Math.random() * 200) + 50,
+            price: Math.floor(Math.random() * 200) + 20,
             inStock: Math.floor(Math.random() * 100) + 10
         })).sort((a, b) => b.totalSales - a.totalSales);
     };
@@ -232,10 +232,10 @@ const Analytics = () => {
     // Calculate revenue metrics
     const calculateRevenueMetrics = (stats) => {
         return {
-            totalRevenue: 245680,
-            monthlyGrowth: 12.5,
-            averageOrderValue: 85.32,
-            conversionRate: 3.2
+            totalRevenue: 125680,
+            monthlyGrowth: 15.8,
+            averageOrderValue: 65.50,
+            conversionRate: 4.1
         };
     };
 
