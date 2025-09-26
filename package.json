@@ -1,0 +1,32 @@
+{
+  "name": "universal-wallpaper",
+  "version": "1.0.0",
+  "description": "Universal Wallpaper - E-commerce Platform",
+  "main": "backend/index.js",
+  "scripts": {
+    "start": "node backend/index.js",
+    "dev": "cd backend && npm run dev",
+    "install-backend": "cd backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "build": "npm run install-backend && npm run install-frontend",
+    "postinstall": "npm run install-backend"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Alphosmart/UNIVERSAL-WALLPAPER.git"
+  },
+  "author": "Alphosmart",
+  "license": "ISC",
+  "keywords": [
+    "ecommerce",
+    "wallpaper",
+    "marketplace",
+    "react",
+    "node",
+    "express",
+    "mongodb"
+  ]
+}
