@@ -72,6 +72,22 @@ app.get('/test', (req, res) => {
     res.json({ message: 'Server is working' })
 })
 
+// Root route for Render health checks and basic info
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Universal Wallpaper API',
+        status: 'OK',
+        version: '1.0.0',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        endpoints: {
+            health: '/health',
+            api: '/api',
+            test: '/test'
+        }
+    })
+})
+
 // Add original routes
 const router = require('./routes/index')
 const { handleDatabaseError } = require('./middleware/databaseMiddleware')
