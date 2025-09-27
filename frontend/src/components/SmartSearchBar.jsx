@@ -184,7 +184,9 @@ const SmartSearchBar = ({
                 />
                 
                 {/* Search Icon */}
-                <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 pointer-events-none">
+                    <FaSearch className="text-blue-500" size={16} />
+                </div>
                 
                 {/* Clear Button */}
                 {searchTerm && (
