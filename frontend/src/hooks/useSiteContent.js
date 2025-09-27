@@ -96,9 +96,27 @@ const getDefaultContent = (section) => {
             }
         },
         header: {
+            announcementBanners: [
+                {
+                    text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+                    link: "/products",
+                    backgroundColor: "#3B82F6",
+                    textColor: "#FFFFFF",
+                    isActive: true
+                }
+            ],
             logo: {
                 text: "Universal Wallpaper",
                 tagline: "Transform Your Space"
+            },
+            navigation: {
+                items: [
+                    { label: "Home", path: "/", dropdown: null, isActive: true },
+                    { label: "Products", path: "/products", dropdown: null, isActive: true },
+                    { label: "Categories", path: "/categories", dropdown: null, isActive: true },
+                    { label: "About", path: "/about-us", dropdown: null, isActive: true },
+                    { label: "Contact", path: "/contact-us", dropdown: null, isActive: true }
+                ]
             },
             searchPlaceholder: "Search for wallpapers, styles, colors..."
         },

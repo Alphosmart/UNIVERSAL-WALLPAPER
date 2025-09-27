@@ -118,12 +118,12 @@ const getSiteContent = async (req, res) => {
                         { days: "Sunday", time: "Closed" }
                     ]
                 },
-                socialMedia: {
-                    facebook: "https://facebook.com/universalwallpaper",
-                    instagram: "https://instagram.com/universalwallpaper",
-                    twitter: "https://twitter.com/universalwallpaper",
-                    pinterest: "https://pinterest.com/universalwallpaper"
-                },
+                socialMedia: [
+                    { platform: "Facebook", url: "https://facebook.com/universalwallpaper", icon: "FaFacebook", color: "#1877F2" },
+                    { platform: "Instagram", url: "https://instagram.com/universalwallpaper", icon: "FaInstagram", color: "#E4405F" },
+                    { platform: "Twitter", url: "https://twitter.com/universalwallpaper", icon: "FaTwitter", color: "#1DA1F2" },
+                    { platform: "Pinterest", url: "https://pinterest.com/universalwallpaper", icon: "FaPinterest", color: "#BD081C" }
+                ],
                 quickLinks: {
                     shop: [
                         { label: "All Products", path: "/products" },
@@ -146,39 +146,92 @@ const getSiteContent = async (req, res) => {
                 },
                 paymentMethods: {
                     title: "We Accept",
-                    methods: ["Visa", "Mastercard", "American Express", "PayPal", "Stripe"]
+                    methods: [
+                        { name: "Visa", icon: "visa" },
+                        { name: "Mastercard", icon: "mastercard" },
+                        { name: "American Express", icon: "amex" },
+                        { name: "PayPal", icon: "paypal" },
+                        { name: "Stripe", icon: "stripe" }
+                    ]
                 },
                 certifications: {
                     title: "Trusted & Secure",
-                    items: ["SSL Secured", "PCI Compliant", "Money Back Guarantee", "24/7 Support"]
+                    items: [
+                        { text: "SSL Secured", icon: "shield" },
+                        { text: "PCI Compliant", icon: "certificate" },
+                        { text: "Money Back Guarantee", icon: "guarantee" },
+                        { text: "24/7 Support", icon: "support" }
+                    ]
                 }
             },
             header: {
+                announcementBanners: [
+                    {
+                        text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+                        link: "/products",
+                        backgroundColor: "#3B82F6",
+                        textColor: "#FFFFFF",
+                        isActive: true
+                    },
+                    {
+                        text: "🔥 Limited Time: 25% Off Premium Wallpapers!",
+                        link: "/sale",
+                        backgroundColor: "#EF4444",
+                        textColor: "#FFFFFF",
+                        isActive: true
+                    }
+                ],
                 logo: {
                     text: "Universal Wallpaper",
                     tagline: "Transform Your Space"
                 },
                 navigation: {
-                    mainMenu: [
-                        { label: "Home", path: "/" },
-                        { label: "Products", path: "/products" },
-                        { label: "Categories", path: "/categories" },
-                        { label: "About", path: "/about-us" },
-                        { label: "Contact", path: "/contact-us" }
-                    ],
-                    userMenu: [
-                        { label: "My Account", path: "/profile" },
-                        { label: "My Orders", path: "/my-orders" },
-                        { label: "Wishlist", path: "/wishlist" },
-                        { label: "Cart", path: "/cart" }
+                    items: [
+                        { 
+                            label: "Home", 
+                            path: "/", 
+                            dropdown: null,
+                            isActive: true
+                        },
+                        { 
+                            label: "Products", 
+                            path: "/products",
+                            dropdown: {
+                                items: [
+                                    { label: "All Wallpapers", path: "/products" },
+                                    { label: "New Arrivals", path: "/products?filter=new" },
+                                    { label: "Best Sellers", path: "/products?filter=popular" },
+                                    { label: "On Sale", path: "/products?filter=sale" }
+                                ]
+                            },
+                            isActive: true
+                        },
+                        { 
+                            label: "Categories", 
+                            path: "/categories",
+                            dropdown: {
+                                items: [
+                                    { label: "Living Room", path: "/categories/living-room" },
+                                    { label: "Bedroom", path: "/categories/bedroom" },
+                                    { label: "Kitchen", path: "/categories/kitchen" },
+                                    { label: "Bathroom", path: "/categories/bathroom" }
+                                ]
+                            },
+                            isActive: true
+                        },
+                        { 
+                            label: "About", 
+                            path: "/about-us", 
+                            dropdown: null,
+                            isActive: true
+                        },
+                        { 
+                            label: "Contact", 
+                            path: "/contact-us", 
+                            dropdown: null,
+                            isActive: true
+                        }
                     ]
-                },
-                announcements: {
-                    enabled: true,
-                    text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
-                    link: "/products",
-                    backgroundColor: "#3B82F6",
-                    textColor: "#FFFFFF"
                 },
                 searchPlaceholder: "Search for wallpapers, styles, colors..."
             },

@@ -23,12 +23,129 @@
       "address": "123 Design Street, Creative District, NY 10001",
       "phone": "+1 (555) 123-4567",
       "email": "info@universalwallpaper.com"
+    },
+    "businessHours": {
+      "title": "Business Hours",
+      "hours": [
+        { "days": "Monday - Friday", "time": "9:00 AM - 6:00 PM" },
+        { "days": "Saturday", "time": "10:00 AM - 4:00 PM" },
+        { "days": "Sunday", "time": "Closed" }
+      ]
+    },
+    "socialMedia": [
+      { "platform": "Facebook", "url": "https://facebook.com/universalwallpaper", "icon": "FaFacebook", "color": "#1877F2" },
+      { "platform": "Instagram", "url": "https://instagram.com/universalwallpaper", "icon": "FaInstagram", "color": "#E4405F" },
+      { "platform": "Twitter", "url": "https://twitter.com/universalwallpaper", "icon": "FaTwitter", "color": "#1DA1F2" },
+      { "platform": "Pinterest", "url": "https://pinterest.com/universalwallpaper", "icon": "FaPinterest", "color": "#BD081C" }
+    ],
+    "quickLinks": {
+      "shop": [
+        { "label": "All Products", "path": "/products" },
+        { "label": "Categories", "path": "/categories" },
+        { "label": "New Arrivals", "path": "/new-arrivals" },
+        { "label": "Sale Items", "path": "/sale" }
+      ],
+      "support": [
+        { "label": "Help Center", "path": "/help-center" },
+        { "label": "Contact Us", "path": "/contact-us" },
+        { "label": "Track Order", "path": "/track-order" },
+        { "label": "Returns", "path": "/returns-refunds" }
+      ],
+      "company": [
+        { "label": "About Us", "path": "/about-us" },
+        { "label": "Privacy Policy", "path": "/privacy-policy" },
+        { "label": "Terms of Service", "path": "/terms-of-service" },
+        { "label": "Cookie Policy", "path": "/cookie-policy" }
+      ]
+    },
+    "paymentMethods": {
+      "title": "We Accept",
+      "methods": [
+        { "name": "Visa", "icon": "visa" },
+        { "name": "Mastercard", "icon": "mastercard" },
+        { "name": "American Express", "icon": "amex" },
+        { "name": "PayPal", "icon": "paypal" },
+        { "name": "Stripe", "icon": "stripe" }
+      ]
+    },
+    "certifications": {
+      "title": "Trusted & Secure",
+      "items": [
+        { "text": "SSL Secured", "icon": "shield" },
+        { "text": "PCI Compliant", "icon": "certificate" },
+        { "text": "Money Back Guarantee", "icon": "guarantee" },
+        { "text": "24/7 Support", "icon": "support" }
+      ]
     }
   },
   "header": {
+    "announcementBanners": [
+      {
+        "text": "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+        "link": "/products",
+        "backgroundColor": "#3B82F6",
+        "textColor": "#FFFFFF",
+        "isActive": true
+      },
+      {
+        "text": "🔥 Limited Time: 25% Off Premium Wallpapers!",
+        "link": "/sale",
+        "backgroundColor": "#EF4444",
+        "textColor": "#FFFFFF",
+        "isActive": true
+      }
+    ],
     "logo": {
       "text": "Universal Wallpaper",
       "tagline": "Transform Your Space"
+    },
+    "navigation": {
+      "items": [
+        { 
+          "label": "Home", 
+          "path": "/", 
+          "dropdown": null,
+          "isActive": true
+        },
+        { 
+          "label": "Products", 
+          "path": "/products",
+          "dropdown": {
+            "items": [
+              { "label": "All Wallpapers", "path": "/products" },
+              { "label": "New Arrivals", "path": "/products?filter=new" },
+              { "label": "Best Sellers", "path": "/products?filter=popular" },
+              { "label": "On Sale", "path": "/products?filter=sale" }
+            ]
+          },
+          "isActive": true
+        },
+        { 
+          "label": "Categories", 
+          "path": "/categories",
+          "dropdown": {
+            "items": [
+              { "label": "Living Room", "path": "/categories/living-room" },
+              { "label": "Bedroom", "path": "/categories/bedroom" },
+              { "label": "Kitchen", "path": "/categories/kitchen" },
+              { "label": "Bathroom", "path": "/categories/bathroom" }
+            ]
+          },
+          "isActive": true
+        },
+        { 
+          "label": "About", 
+          "path": "/about-us", 
+          "dropdown": null,
+          "isActive": true
+        },
+        { 
+          "label": "Contact", 
+          "path": "/contact-us", 
+          "dropdown": null,
+          "isActive": true
+        }
+      ]
     },
     "searchPlaceholder": "Search for wallpapers, styles, colors..."
   },

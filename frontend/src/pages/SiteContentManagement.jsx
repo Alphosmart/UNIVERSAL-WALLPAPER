@@ -29,6 +29,40 @@ const SiteContentManagement = () => {
                 address: "123 Design Street, Creative District, NY 10001",
                 phone: "+1 (555) 123-4567",
                 email: "info@universalwallpaper.com"
+            },
+            businessHours: {
+                title: "Business Hours",
+                hours: [
+                    { days: "Monday - Friday", time: "9:00 AM - 6:00 PM" },
+                    { days: "Saturday", time: "10:00 AM - 4:00 PM" },
+                    { days: "Sunday", time: "Closed" }
+                ]
+            },
+            socialMedia: [
+                { platform: "Facebook", url: "https://facebook.com/universalwallpaper", icon: "FaFacebook", color: "#1877F2" },
+                { platform: "Instagram", url: "https://instagram.com/universalwallpaper", icon: "FaInstagram", color: "#E4405F" },
+                { platform: "Twitter", url: "https://twitter.com/universalwallpaper", icon: "FaTwitter", color: "#1DA1F2" },
+                { platform: "Pinterest", url: "https://pinterest.com/universalwallpaper", icon: "FaPinterest", color: "#BD081C" }
+            ],
+            quickLinks: {
+                shop: [
+                    { label: "All Products", path: "/products" },
+                    { label: "Categories", path: "/categories" },
+                    { label: "New Arrivals", path: "/new-arrivals" },
+                    { label: "Sale Items", path: "/sale" }
+                ],
+                support: [
+                    { label: "Help Center", path: "/help-center" },
+                    { label: "Contact Us", path: "/contact-us" },
+                    { label: "Track Order", path: "/track-order" },
+                    { label: "Returns", path: "/returns-refunds" }
+                ],
+                company: [
+                    { label: "About Us", path: "/about-us" },
+                    { label: "Privacy Policy", path: "/privacy-policy" },
+                    { label: "Terms of Service", path: "/terms-of-service" },
+                    { label: "Cookie Policy", path: "/cookie-policy" }
+                ]
             }
         },
         header: {
@@ -36,6 +70,26 @@ const SiteContentManagement = () => {
                 text: "Universal Wallpaper",
                 tagline: "Transform Your Space"
             },
+            navigation: {
+                mainMenu: [
+                    { label: "Home", path: "/", order: 1 },
+                    { label: "Products", path: "/products", order: 2 },
+                    { label: "Categories", path: "/categories", order: 3 },
+                    { label: "About", path: "/about-us", order: 4 },
+                    { label: "Contact", path: "/contact-us", order: 5 }
+                ]
+            },
+            announcements: [
+                {
+                    id: 1,
+                    enabled: true,
+                    text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+                    link: "/products",
+                    backgroundColor: "#3B82F6",
+                    textColor: "#FFFFFF",
+                    order: 1
+                }
+            ],
             searchPlaceholder: "Search for wallpapers, styles, colors..."
         },
         errorPage: {
@@ -783,6 +837,15 @@ const SiteContentManagement = () => {
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Company Description</label>
+                                            <textarea
+                                                value={contentData.footer?.companyInfo?.description || ''}
+                                                onChange={(e) => updateNestedContentData('footer', 'companyInfo', 'description', e.target.value)}
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
@@ -815,6 +878,320 @@ const SiteContentManagement = () => {
                                     </div>
                                 </div>
 
+                                {/* Business Hours */}
+                                <div className="border rounded-lg p-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-medium text-gray-800">Business Hours</h3>
+                                        <button
+                                            onClick={() => {
+                                                const newHours = [...(contentData.footer?.businessHours?.hours || []), { days: "", time: "" }];
+                                                setContentData(prev => ({
+                                                    ...prev,
+                                                    footer: {
+                                                        ...prev.footer,
+                                                        businessHours: {
+                                                            ...prev.footer?.businessHours,
+                                                            hours: newHours
+                                                        }
+                                                    }
+                                                }));
+                                            }}
+                                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                                        >
+                                            + Add Hours
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Section Title</label>
+                                        <input
+                                            type="text"
+                                            value={contentData.footer?.businessHours?.title || ''}
+                                            onChange={(e) => updateNestedContentData('footer', 'businessHours', 'title', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        {(contentData.footer?.businessHours?.hours || []).map((hour, index) => (
+                                            <div key={index} className="flex gap-2 items-center">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Days"
+                                                    value={hour.days}
+                                                    onChange={(e) => {
+                                                        const newHours = [...(contentData.footer?.businessHours?.hours || [])];
+                                                        newHours[index] = { ...newHours[index], days: e.target.value };
+                                                        setContentData(prev => ({
+                                                            ...prev,
+                                                            footer: {
+                                                                ...prev.footer,
+                                                                businessHours: {
+                                                                    ...prev.footer?.businessHours,
+                                                                    hours: newHours
+                                                                }
+                                                            }
+                                                        }));
+                                                    }}
+                                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Time"
+                                                    value={hour.time}
+                                                    onChange={(e) => {
+                                                        const newHours = [...(contentData.footer?.businessHours?.hours || [])];
+                                                        newHours[index] = { ...newHours[index], time: e.target.value };
+                                                        setContentData(prev => ({
+                                                            ...prev,
+                                                            footer: {
+                                                                ...prev.footer,
+                                                                businessHours: {
+                                                                    ...prev.footer?.businessHours,
+                                                                    hours: newHours
+                                                                }
+                                                            }
+                                                        }));
+                                                    }}
+                                                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                                <button
+                                                    onClick={() => {
+                                                        const newHours = (contentData.footer?.businessHours?.hours || []).filter((_, i) => i !== index);
+                                                        setContentData(prev => ({
+                                                            ...prev,
+                                                            footer: {
+                                                                ...prev.footer,
+                                                                businessHours: {
+                                                                    ...prev.footer?.businessHours,
+                                                                    hours: newHours
+                                                                }
+                                                            }
+                                                        }));
+                                                    }}
+                                                    className="px-2 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Social Media Links */}
+                                <div className="border rounded-lg p-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-medium text-gray-800">Social Media Links</h3>
+                                        <button
+                                            onClick={() => {
+                                                const newSocialMedia = [...(contentData.footer?.socialMedia || []), { platform: "", url: "", icon: "", color: "#000000" }];
+                                                setContentData(prev => ({
+                                                    ...prev,
+                                                    footer: {
+                                                        ...prev.footer,
+                                                        socialMedia: newSocialMedia
+                                                    }
+                                                }));
+                                            }}
+                                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                                        >
+                                            + Add Social Media
+                                        </button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {(contentData.footer?.socialMedia || []).map((social, index) => (
+                                            <div key={index} className="grid grid-cols-1 md:grid-cols-5 gap-2 items-center p-3 border rounded-md">
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Platform</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Facebook"
+                                                        value={social.platform}
+                                                        onChange={(e) => {
+                                                            const newSocialMedia = [...(contentData.footer?.socialMedia || [])];
+                                                            newSocialMedia[index] = { ...newSocialMedia[index], platform: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                footer: { ...prev.footer, socialMedia: newSocialMedia }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">URL</label>
+                                                    <input
+                                                        type="url"
+                                                        placeholder="https://facebook.com/..."
+                                                        value={social.url}
+                                                        onChange={(e) => {
+                                                            const newSocialMedia = [...(contentData.footer?.socialMedia || [])];
+                                                            newSocialMedia[index] = { ...newSocialMedia[index], url: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                footer: { ...prev.footer, socialMedia: newSocialMedia }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Icon</label>
+                                                    <select
+                                                        value={social.icon}
+                                                        onChange={(e) => {
+                                                            const newSocialMedia = [...(contentData.footer?.socialMedia || [])];
+                                                            newSocialMedia[index] = { ...newSocialMedia[index], icon: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                footer: { ...prev.footer, socialMedia: newSocialMedia }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    >
+                                                        <option value="">Select Icon</option>
+                                                        <option value="FaFacebook">Facebook</option>
+                                                        <option value="FaInstagram">Instagram</option>
+                                                        <option value="FaTwitter">Twitter</option>
+                                                        <option value="FaPinterest">Pinterest</option>
+                                                        <option value="FaLinkedin">LinkedIn</option>
+                                                        <option value="FaYoutube">YouTube</option>
+                                                        <option value="FaTiktok">TikTok</option>
+                                                        <option value="FaSnapchat">Snapchat</option>
+                                                        <option value="FaDiscord">Discord</option>
+                                                        <option value="FaTelegram">Telegram</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Color</label>
+                                                    <input
+                                                        type="color"
+                                                        value={social.color}
+                                                        onChange={(e) => {
+                                                            const newSocialMedia = [...(contentData.footer?.socialMedia || [])];
+                                                            newSocialMedia[index] = { ...newSocialMedia[index], color: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                footer: { ...prev.footer, socialMedia: newSocialMedia }
+                                                            }));
+                                                        }}
+                                                        className="w-full h-8 border border-gray-300 rounded cursor-pointer"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Action</label>
+                                                    <button
+                                                        onClick={() => {
+                                                            const newSocialMedia = (contentData.footer?.socialMedia || []).filter((_, i) => i !== index);
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                footer: { ...prev.footer, socialMedia: newSocialMedia }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Quick Links */}
+                                <div className="border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Quick Links</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        {['shop', 'support', 'company'].map((section) => (
+                                            <div key={section}>
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <h4 className="font-medium text-gray-700 capitalize">{section} Links</h4>
+                                                    <button
+                                                        onClick={() => {
+                                                            const newLinks = [...(contentData.footer?.quickLinks?.[section] || []), { label: "", path: "" }];
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                footer: {
+                                                                    ...prev.footer,
+                                                                    quickLinks: {
+                                                                        ...prev.footer?.quickLinks,
+                                                                        [section]: newLinks
+                                                                    }
+                                                                }
+                                                            }));
+                                                        }}
+                                                        className="text-sm px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    {(contentData.footer?.quickLinks?.[section] || []).map((link, index) => (
+                                                        <div key={index} className="flex gap-1">
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Label"
+                                                                value={link.label}
+                                                                onChange={(e) => {
+                                                                    const newLinks = [...(contentData.footer?.quickLinks?.[section] || [])];
+                                                                    newLinks[index] = { ...newLinks[index], label: e.target.value };
+                                                                    setContentData(prev => ({
+                                                                        ...prev,
+                                                                        footer: {
+                                                                            ...prev.footer,
+                                                                            quickLinks: {
+                                                                                ...prev.footer?.quickLinks,
+                                                                                [section]: newLinks
+                                                                            }
+                                                                        }
+                                                                    }));
+                                                                }}
+                                                                className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            />
+                                                            <input
+                                                                type="text"
+                                                                placeholder="Path"
+                                                                value={link.path}
+                                                                onChange={(e) => {
+                                                                    const newLinks = [...(contentData.footer?.quickLinks?.[section] || [])];
+                                                                    newLinks[index] = { ...newLinks[index], path: e.target.value };
+                                                                    setContentData(prev => ({
+                                                                        ...prev,
+                                                                        footer: {
+                                                                            ...prev.footer,
+                                                                            quickLinks: {
+                                                                                ...prev.footer?.quickLinks,
+                                                                                [section]: newLinks
+                                                                            }
+                                                                        }
+                                                                    }));
+                                                                }}
+                                                                className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            />
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newLinks = (contentData.footer?.quickLinks?.[section] || []).filter((_, i) => i !== index);
+                                                                    setContentData(prev => ({
+                                                                        ...prev,
+                                                                        footer: {
+                                                                            ...prev.footer,
+                                                                            quickLinks: {
+                                                                                ...prev.footer?.quickLinks,
+                                                                                [section]: newLinks
+                                                                            }
+                                                                        }
+                                                                    }));
+                                                                }}
+                                                                className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+                                                            >
+                                                                ×
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <button
                                     onClick={() => handleSave('footer')}
                                     disabled={isLoading}
@@ -830,6 +1207,139 @@ const SiteContentManagement = () => {
                             <div className="space-y-6">
                                 <h2 className="text-xl font-semibold text-gray-900">Header & Navigation Content</h2>
                                 
+                                {/* Announcement Banner */}
+                                <div className="border rounded-lg p-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-medium text-gray-800">Announcement Banners</h3>
+                                        <button
+                                            onClick={() => {
+                                                const newBanners = [...(contentData.header?.announcementBanners || []), { 
+                                                    text: "", 
+                                                    link: "", 
+                                                    backgroundColor: "#1f2937", 
+                                                    textColor: "#ffffff",
+                                                    isActive: true 
+                                                }];
+                                                setContentData(prev => ({
+                                                    ...prev,
+                                                    header: {
+                                                        ...prev.header,
+                                                        announcementBanners: newBanners
+                                                    }
+                                                }));
+                                            }}
+                                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                                        >
+                                            + Add Banner
+                                        </button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {(contentData.header?.announcementBanners || []).map((banner, index) => (
+                                            <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-2 items-center p-3 border rounded-md">
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Text</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Banner text..."
+                                                        value={banner.text}
+                                                        onChange={(e) => {
+                                                            const newBanners = [...(contentData.header?.announcementBanners || [])];
+                                                            newBanners[index] = { ...newBanners[index], text: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                header: { ...prev.header, announcementBanners: newBanners }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Link (Optional)</label>
+                                                    <input
+                                                        type="url"
+                                                        placeholder="/sale or https://..."
+                                                        value={banner.link}
+                                                        onChange={(e) => {
+                                                            const newBanners = [...(contentData.header?.announcementBanners || [])];
+                                                            newBanners[index] = { ...newBanners[index], link: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                header: { ...prev.header, announcementBanners: newBanners }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Background</label>
+                                                    <input
+                                                        type="color"
+                                                        value={banner.backgroundColor}
+                                                        onChange={(e) => {
+                                                            const newBanners = [...(contentData.header?.announcementBanners || [])];
+                                                            newBanners[index] = { ...newBanners[index], backgroundColor: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                header: { ...prev.header, announcementBanners: newBanners }
+                                                            }));
+                                                        }}
+                                                        className="w-full h-8 border border-gray-300 rounded cursor-pointer"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Text Color</label>
+                                                    <input
+                                                        type="color"
+                                                        value={banner.textColor}
+                                                        onChange={(e) => {
+                                                            const newBanners = [...(contentData.header?.announcementBanners || [])];
+                                                            newBanners[index] = { ...newBanners[index], textColor: e.target.value };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                header: { ...prev.header, announcementBanners: newBanners }
+                                                            }));
+                                                        }}
+                                                        className="w-full h-8 border border-gray-300 rounded cursor-pointer"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Status</label>
+                                                    <select
+                                                        value={banner.isActive ? 'active' : 'inactive'}
+                                                        onChange={(e) => {
+                                                            const newBanners = [...(contentData.header?.announcementBanners || [])];
+                                                            newBanners[index] = { ...newBanners[index], isActive: e.target.value === 'active' };
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                header: { ...prev.header, announcementBanners: newBanners }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    >
+                                                        <option value="active">Active</option>
+                                                        <option value="inactive">Inactive</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="block text-xs text-gray-600 mb-1">Action</label>
+                                                    <button
+                                                        onClick={() => {
+                                                            const newBanners = (contentData.header?.announcementBanners || []).filter((_, i) => i !== index);
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                header: { ...prev.header, announcementBanners: newBanners }
+                                                            }));
+                                                        }}
+                                                        className="w-full px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 {/* Logo Section */}
                                 <div className="border rounded-lg p-4">
                                     <h3 className="text-lg font-medium text-gray-800 mb-4">Logo & Branding</h3>
@@ -852,6 +1362,266 @@ const SiteContentManagement = () => {
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>
+                                    </div>
+                                </div>
+
+                                {/* Navigation Items */}
+                                <div className="border rounded-lg p-4">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-medium text-gray-800">Navigation Menu</h3>
+                                        <button
+                                            onClick={() => {
+                                                const newNavItems = [...(contentData.header?.navigation?.items || []), { 
+                                                    label: "", 
+                                                    path: "", 
+                                                    dropdown: null,
+                                                    isActive: true 
+                                                }];
+                                                setContentData(prev => ({
+                                                    ...prev,
+                                                    header: {
+                                                        ...prev.header,
+                                                        navigation: {
+                                                            ...prev.header?.navigation,
+                                                            items: newNavItems
+                                                        }
+                                                    }
+                                                }));
+                                            }}
+                                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                                        >
+                                            + Add Nav Item
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {(contentData.header?.navigation?.items || []).map((item, index) => (
+                                            <div key={index} className="border rounded-md p-3">
+                                                <div className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center">
+                                                    <div>
+                                                        <label className="block text-xs text-gray-600 mb-1">Label</label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Home, Shop, etc."
+                                                            value={item.label}
+                                                            onChange={(e) => {
+                                                                const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                                newNavItems[index] = { ...newNavItems[index], label: e.target.value };
+                                                                setContentData(prev => ({
+                                                                    ...prev,
+                                                                    header: {
+                                                                        ...prev.header,
+                                                                        navigation: {
+                                                                            ...prev.header?.navigation,
+                                                                            items: newNavItems
+                                                                        }
+                                                                    }
+                                                                }));
+                                                            }}
+                                                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs text-gray-600 mb-1">Path</label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="/home, /shop, etc."
+                                                            value={item.path}
+                                                            onChange={(e) => {
+                                                                const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                                newNavItems[index] = { ...newNavItems[index], path: e.target.value };
+                                                                setContentData(prev => ({
+                                                                    ...prev,
+                                                                    header: {
+                                                                        ...prev.header,
+                                                                        navigation: {
+                                                                            ...prev.header?.navigation,
+                                                                            items: newNavItems
+                                                                        }
+                                                                    }
+                                                                }));
+                                                            }}
+                                                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs text-gray-600 mb-1">Status</label>
+                                                        <select
+                                                            value={item.isActive ? 'active' : 'inactive'}
+                                                            onChange={(e) => {
+                                                                const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                                newNavItems[index] = { ...newNavItems[index], isActive: e.target.value === 'active' };
+                                                                setContentData(prev => ({
+                                                                    ...prev,
+                                                                    header: {
+                                                                        ...prev.header,
+                                                                        navigation: {
+                                                                            ...prev.header?.navigation,
+                                                                            items: newNavItems
+                                                                        }
+                                                                    }
+                                                                }));
+                                                            }}
+                                                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                        >
+                                                            <option value="active">Active</option>
+                                                            <option value="inactive">Inactive</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs text-gray-600 mb-1">Action</label>
+                                                        <button
+                                                            onClick={() => {
+                                                                const newNavItems = (contentData.header?.navigation?.items || []).filter((_, i) => i !== index);
+                                                                setContentData(prev => ({
+                                                                    ...prev,
+                                                                    header: {
+                                                                        ...prev.header,
+                                                                        navigation: {
+                                                                            ...prev.header?.navigation,
+                                                                            items: newNavItems
+                                                                        }
+                                                                    }
+                                                                }));
+                                                            }}
+                                                            className="w-full px-2 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Dropdown Items */}
+                                                {item.dropdown && (
+                                                    <div className="mt-3 pl-4 border-l-2 border-gray-200">
+                                                        <div className="flex justify-between items-center mb-2">
+                                                            <span className="text-sm text-gray-600">Dropdown Items</span>
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                                    if (!newNavItems[index].dropdown) {
+                                                                        newNavItems[index].dropdown = { items: [] };
+                                                                    }
+                                                                    newNavItems[index].dropdown.items = [...(newNavItems[index].dropdown.items || []), { label: "", path: "" }];
+                                                                    setContentData(prev => ({
+                                                                        ...prev,
+                                                                        header: {
+                                                                            ...prev.header,
+                                                                            navigation: {
+                                                                                ...prev.header?.navigation,
+                                                                                items: newNavItems
+                                                                            }
+                                                                        }
+                                                                    }));
+                                                                }}
+                                                                className="px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                                                            >
+                                                                + Add Dropdown Item
+                                                            </button>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            {(item.dropdown?.items || []).map((dropdownItem, dropIndex) => (
+                                                                <div key={dropIndex} className="flex gap-2">
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Label"
+                                                                        value={dropdownItem.label}
+                                                                        onChange={(e) => {
+                                                                            const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                                            const newDropdownItems = [...(newNavItems[index].dropdown?.items || [])];
+                                                                            newDropdownItems[dropIndex] = { ...newDropdownItems[dropIndex], label: e.target.value };
+                                                                            newNavItems[index].dropdown.items = newDropdownItems;
+                                                                            setContentData(prev => ({
+                                                                                ...prev,
+                                                                                header: {
+                                                                                    ...prev.header,
+                                                                                    navigation: {
+                                                                                        ...prev.header?.navigation,
+                                                                                        items: newNavItems
+                                                                                    }
+                                                                                }
+                                                                            }));
+                                                                        }}
+                                                                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                    />
+                                                                    <input
+                                                                        type="text"
+                                                                        placeholder="Path"
+                                                                        value={dropdownItem.path}
+                                                                        onChange={(e) => {
+                                                                            const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                                            const newDropdownItems = [...(newNavItems[index].dropdown?.items || [])];
+                                                                            newDropdownItems[dropIndex] = { ...newDropdownItems[dropIndex], path: e.target.value };
+                                                                            newNavItems[index].dropdown.items = newDropdownItems;
+                                                                            setContentData(prev => ({
+                                                                                ...prev,
+                                                                                header: {
+                                                                                    ...prev.header,
+                                                                                    navigation: {
+                                                                                        ...prev.header?.navigation,
+                                                                                        items: newNavItems
+                                                                                    }
+                                                                                }
+                                                                            }));
+                                                                        }}
+                                                                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                    />
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                                            const newDropdownItems = (newNavItems[index].dropdown?.items || []).filter((_, i) => i !== dropIndex);
+                                                                            newNavItems[index].dropdown.items = newDropdownItems;
+                                                                            setContentData(prev => ({
+                                                                                ...prev,
+                                                                                header: {
+                                                                                    ...prev.header,
+                                                                                    navigation: {
+                                                                                        ...prev.header?.navigation,
+                                                                                        items: newNavItems
+                                                                                    }
+                                                                                }
+                                                                            }));
+                                                                        }}
+                                                                        className="px-2 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700"
+                                                                    >
+                                                                        ×
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                <div className="mt-2">
+                                                    <button
+                                                        onClick={() => {
+                                                            const newNavItems = [...(contentData.header?.navigation?.items || [])];
+                                                            if (newNavItems[index].dropdown) {
+                                                                newNavItems[index].dropdown = null;
+                                                            } else {
+                                                                newNavItems[index].dropdown = { items: [] };
+                                                            }
+                                                            setContentData(prev => ({
+                                                                ...prev,
+                                                                header: {
+                                                                    ...prev.header,
+                                                                    navigation: {
+                                                                        ...prev.header?.navigation,
+                                                                        items: newNavItems
+                                                                    }
+                                                                }
+                                                            }));
+                                                        }}
+                                                        className={`px-3 py-1 rounded text-sm ${
+                                                            item.dropdown 
+                                                                ? 'bg-yellow-600 text-white hover:bg-yellow-700' 
+                                                                : 'bg-green-600 text-white hover:bg-green-700'
+                                                        }`}
+                                                    >
+                                                        {item.dropdown ? 'Remove Dropdown' : 'Add Dropdown'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
 
