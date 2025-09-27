@@ -183,8 +183,8 @@ const getSearchSuggestions = async (req, res) => {
 
         const searchRegex = new RegExp(searchTerm.trim(), 'i');
         
-        // Get product name suggestions
-        const productSuggestions = await Product.aggregate([
+        // Get categorized suggestions with better organization
+        const suggestionData = await Product.aggregate([
             {
                 $match: {
                     status: 'ACTIVE',
@@ -202,36 +202,76 @@ const getSearchSuggestions = async (req, res) => {
                     brandNames: { $addToSet: '$brandName' },
                     categories: { $addToSet: '$category' }
                 }
-            },
-            {
-                $project: {
-                    suggestions: {
-                        $concatArrays: [
-                            { $slice: ['$productNames', 5] },
-                            { $slice: ['$brandNames', 3] },
-                            { $slice: ['$categories', 3] }
-                        ]
-                    }
-                }
             }
         ]);
 
-        const suggestions = productSuggestions[0]?.suggestions || [];
+        const data = suggestionData[0] || { productNames: [], brandNames: [], categories: [] };
         
-        // Filter and sort suggestions by relevance
-        const filteredSuggestions = suggestions
-            .filter(suggestion => 
-                suggestion.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-            .slice(0, 8)
-            .map(suggestion => ({
-                text: suggestion,
-                type: 'product'
+        // Create categorized suggestions with priorities
+        const suggestions = [];
+        
+        // 1. Categories first (highest priority) - limited to top 3
+        const matchingCategories = (data.categories || [])
+            .filter(cat => cat && cat.toLowerCase().includes(searchTerm.toLowerCase()))
+            .slice(0, 3)
+            .map(category => ({
+                text: category,
+                type: 'category',
+                priority: 1
             }));
+        
+        // 2. Brand names - limited to top 3  
+        const matchingBrands = (data.brandNames || [])
+            .filter(brand => brand && brand.toLowerCase().includes(searchTerm.toLowerCase()))
+            .slice(0, 3)
+            .map(brand => ({
+                text: brand,
+                type: 'brand', 
+                priority: 2
+            }));
+        
+        // 3. Product names - limited to top 4
+        const matchingProducts = (data.productNames || [])
+            .filter(product => product && product.toLowerCase().includes(searchTerm.toLowerCase()))
+            .slice(0, 4)
+            .map(product => ({
+                text: product,
+                type: 'product',
+                priority: 3
+            }));
+
+        // Combine and sort by priority, then alphabetically
+        const allSuggestions = [...matchingCategories, ...matchingBrands, ...matchingProducts]
+            .sort((a, b) => {
+                if (a.priority !== b.priority) {
+                    return a.priority - b.priority;
+                }
+                return a.text.localeCompare(b.text);
+            })
+            .slice(0, 8); // Limit total suggestions
+        
+        // Add some default popular categories if no matches found
+        if (allSuggestions.length === 0 && searchTerm.length >= 2) {
+            const popularCategories = [
+                'Living Room', 'Bedroom', 'Kitchen', 'Bathroom', 'Office', 
+                'Children\'s Room', 'Dining Room', 'Hallway'
+            ];
+            
+            const matchingPopular = popularCategories
+                .filter(cat => cat.toLowerCase().includes(searchTerm.toLowerCase()))
+                .slice(0, 4)
+                .map(category => ({
+                    text: category,
+                    type: 'category',
+                    priority: 1
+                }));
+                
+            allSuggestions.push(...matchingPopular);
+        }
 
         res.json({
             success: true,
-            suggestions: filteredSuggestions
+            suggestions: allSuggestions
         });
 
     } catch (error) {

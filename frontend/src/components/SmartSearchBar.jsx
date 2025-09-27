@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaSearch, FaTimes, FaHistory, FaFire } from 'react-icons/fa';
+import { FaSearch, FaTimes, FaHistory, FaFire, FaTag, FaStore, FaLayerGroup } from 'react-icons/fa';
 import { debounce } from '../utils/searchUtils';
 import SummaryApi from '../common';
 
@@ -161,11 +161,39 @@ const SmartSearchBar = ({
         searchRef.current?.focus();
     };
 
-    // Remove from search history
+    // Clear search history
     const removeFromHistory = (term) => {
         const newHistory = searchHistory.filter(h => h !== term);
         setSearchHistory(newHistory);
         localStorage.setItem('searchHistory', JSON.stringify(newHistory));
+    };
+
+    // Get icon for suggestion type
+    const getSuggestionIcon = (type) => {
+        switch (type) {
+            case 'category':
+                return <FaLayerGroup className="text-blue-500 text-sm" />;
+            case 'brand':
+                return <FaStore className="text-green-500 text-sm" />;
+            case 'product':
+                return <FaTag className="text-purple-500 text-sm" />;
+            default:
+                return <FaSearch className="text-gray-400 text-sm" />;
+        }
+    };
+
+    // Get suggestion label
+    const getSuggestionLabel = (type) => {
+        switch (type) {
+            case 'category':
+                return 'Category';
+            case 'brand':
+                return 'Brand';
+            case 'product':
+                return 'Product';
+            default:
+                return '';
+        }
     };
 
     return (
@@ -219,14 +247,21 @@ const SmartSearchBar = ({
                                 <button
                                     key={`suggestion-${index}`}
                                     onClick={() => handleSearch(suggestion.text)}
-                                    className={`w-full text-left px-3 py-2 rounded hover:bg-gray-100 flex items-center gap-3 ${
+                                    className={`w-full text-left px-3 py-2 rounded hover:bg-gray-100 flex items-center gap-3 group ${
                                         selectedIndex === index ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
                                     }`}
                                 >
-                                    <FaSearch className="text-gray-400 text-sm" />
-                                    <span className="flex-1">
-                                        {suggestion.text}
-                                    </span>
+                                    {getSuggestionIcon(suggestion.type)}
+                                    <div className="flex-1">
+                                        <span className="block">
+                                            {suggestion.text}
+                                        </span>
+                                        {suggestion.type !== 'product' && (
+                                            <span className="text-xs text-gray-400 group-hover:text-gray-500">
+                                                {getSuggestionLabel(suggestion.type)}
+                                            </span>
+                                        )}
+                                    </div>
                                 </button>
                             ))}
                         </div>
