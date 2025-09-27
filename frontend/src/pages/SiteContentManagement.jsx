@@ -649,13 +649,15 @@ const SiteContentManagement = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             Button Text
+                                            <span className="text-xs text-amber-600 ml-1">(Read-only)</span>
                                         </label>
                                         <input
                                             type="text"
                                             value={contentData.maintenancePage.buttonText}
-                                            onChange={(e) => updateContentData('maintenancePage', 'buttonText', e.target.value)}
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            readOnly
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                                             placeholder="Refresh Page"
+                                            title="This field is not editable"
                                         />
                                     </div>
                                 </div>
@@ -748,21 +750,57 @@ const SiteContentManagement = () => {
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Primary Button Text</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Primary Button Text
+                                                    <span className="text-xs text-amber-600 ml-1">(Read-only)</span>
+                                                </label>
                                                 <input
                                                     type="text"
                                                     value={contentData.homePage?.hero?.primaryButtonText || ''}
-                                                    onChange={(e) => updateNestedContentData('homePage', 'hero', 'primaryButtonText', e.target.value)}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    readOnly
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                                                    title="This field is not editable"
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-2">Primary Button Link</label>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Primary Button Link
+                                                    <span className="text-xs text-amber-600 ml-1">(Read-only)</span>
+                                                </label>
                                                 <input
                                                     type="text"
                                                     value={contentData.homePage?.hero?.primaryButtonLink || ''}
-                                                    onChange={(e) => updateNestedContentData('homePage', 'hero', 'primaryButtonLink', e.target.value)}
-                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                    readOnly
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                                                    title="This field is not editable"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Secondary Button Text
+                                                    <span className="text-xs text-amber-600 ml-1">(Read-only)</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={contentData.homePage?.hero?.secondaryButtonText || ''}
+                                                    readOnly
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                                                    title="This field is not editable"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                    Secondary Button Link
+                                                    <span className="text-xs text-amber-600 ml-1">(Read-only)</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={contentData.homePage?.hero?.secondaryButtonLink || ''}
+                                                    readOnly
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                                                    title="This field is not editable"
                                                 />
                                             </div>
                                         </div>
