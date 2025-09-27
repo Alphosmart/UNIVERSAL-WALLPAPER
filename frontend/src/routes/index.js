@@ -13,6 +13,7 @@ import AllProducts from '../pages/AllProducts';
 import AllUsers from '../pages/AllUsers';
 import AddProduct from '../pages/AddProduct';
 import EditProduct from '../pages/EditProduct';
+import CategoryManagement from '../pages/CategoryManagement';
 import MyProducts from '../pages/MyProducts';
 import ProductDetail from '../pages/ProductDetail';
 import Cart from '../pages/Cart';
@@ -277,6 +278,14 @@ const router = createBrowserRouter([
                     {
                         path: "all-products",
                         element: <AllProducts />
+                    },
+                    {
+                        path: "add-product",
+                        element: <AddProduct />
+                    },
+                    {
+                        path: "categories",
+                        element: <CategoryManagement />
                     },
                     {
                         path: "all-users", 

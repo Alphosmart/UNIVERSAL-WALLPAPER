@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, Link } from 'react-router-dom';
-import { FaHome, FaUsers, FaBoxOpen, FaChartBar, FaCog, FaImage, FaEnvelope, FaUserCog } from 'react-icons/fa';
+import { FaHome, FaUsers, FaBoxOpen, FaChartBar, FaCog, FaImage, FaEnvelope, FaUserCog, FaTags } from 'react-icons/fa';
 // FaShippingFast removed - single company model
 
 const AdminPanel = () => {
@@ -19,6 +19,11 @@ const AdminPanel = () => {
       label: 'All Products',
       path: '/admin-panel/all-products',
       icon: <FaBoxOpen />
+    },
+    {
+      label: 'Category Management',
+      path: '/admin-panel/categories',
+      icon: <FaTags />
     },
     {
       label: 'All Users',

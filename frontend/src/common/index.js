@@ -95,6 +95,28 @@ const SummaryApi = {
         method : 'put'
     },
     
+    // Category Management APIs
+    adminCategories : {
+        url : `${backendDomain}/api/admin/categories`,
+        method : 'get'
+    },
+    addCategory : {
+        url : `${backendDomain}/api/admin/categories`,
+        method : 'post'
+    },
+    updateCategory : {
+        url : `${backendDomain}/api/admin/categories`,
+        method : 'put'
+    },
+    deleteCategory : {
+        url : `${backendDomain}/api/admin/categories`,
+        method : 'delete'
+    },
+    reorderCategories : {
+        url : `${backendDomain}/api/admin/categories/reorder`,
+        method : 'put'
+    },
+    
     // Database backup APIs
     createBackup : {
         url : `${backendDomain}/api/admin/backup/create`,

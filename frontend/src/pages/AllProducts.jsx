@@ -130,7 +130,10 @@ const AllProducts = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-800">All Products</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+        <button 
+          onClick={() => navigate('/admin-panel/add-product')}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2"
+        >
           <FaPlus />
           <span>Add Product</span>
         </button>

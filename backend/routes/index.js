@@ -39,6 +39,13 @@ const {
 } = require('../controller/adminController');
 const createAdminUser = require('../controller/createAdminUser');
 const {
+    getCategories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    reorderCategories
+} = require('../controller/categoryController');
+const {
     getSiteContent,
     updateSiteContent,
     getAllSiteContent,
@@ -239,6 +246,14 @@ router.put('/admin/update-user-role/:userId', authToken, updateUserRole);
 router.get('/admin/all-products', authToken, getAllProductsAdmin);
 router.delete('/admin/delete-product/:productId', authToken, deleteProductAdmin);
 router.put('/admin/update-product-status/:productId', authToken, updateProductStatus);
+
+// Category management routes
+router.get('/admin/categories', authToken, getCategories);
+router.post('/admin/categories', authToken, addCategory);
+router.put('/admin/categories', authToken, updateCategory);
+router.delete('/admin/categories', authToken, deleteCategory);
+router.put('/admin/categories/reorder', authToken, reorderCategories);
+
 router.get('/admin/dashboard-stats', authToken, getDashboardStats);
 router.put('/admin/seller-suspension/:userId', authToken, setSellerSuspension);
 

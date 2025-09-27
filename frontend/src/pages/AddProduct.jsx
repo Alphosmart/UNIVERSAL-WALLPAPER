@@ -132,7 +132,12 @@ const AddProduct = () => {
                     tags: "",
                     currency: "NGN"
                 });
-                navigate('/my-products');
+                // Navigate based on user role
+                if (user.role === 'ADMIN') {
+                    navigate('/admin-panel/all-products');
+                } else {
+                    navigate('/my-products');
+                }
             } else {
                 toast.error(responseData.message);
             }
