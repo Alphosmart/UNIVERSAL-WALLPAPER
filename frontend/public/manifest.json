@@ -1,21 +1,21 @@
 {
-  "short_name": "AshAmSmart",
-  "name": "AshAmSmart - E-Commerce Marketplace",
+  "short_name": "Universal Wallpaper",
+  "name": "Universal Wallpaper - Premium Interior Decoration & E-commerce Marketplace",
   "icons": [
     {
-      "src": "favicon.ico",
+      "src": "uwi.png",
       "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "type": "image/png"
     },
     {
-      "src": "logo192.png",
+      "src": "uwi.png",
       "type": "image/png",
-      "sizes": "192x52"
+      "sizes": "192x192"
     },
     {
-      "src": "logo512.png",
+      "src": "uwi.png",
       "type": "image/png",
-      "sizes": "512x138"
+      "sizes": "512x512"
     }
   ],
   "start_url": ".",
