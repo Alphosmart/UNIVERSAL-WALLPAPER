@@ -1,16 +1,28 @@
 import React from 'react';
 import { FaUsers, FaGlobe, FaAward, FaShieldAlt, FaHeart, FaClock, FaTruck, FaHeadset } from 'react-icons/fa';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 const AboutUs = () => {
+  const { content: aboutContent } = useSiteContent('aboutUs');
+
+  // Default content fallback
+  const heroContent = aboutContent?.hero || {
+    title: "About Universal Wallpaper",
+    subtitle: "Your premier destination for high-quality wallpapers and home décor solutions",
+    description: "Transforming spaces worldwide with premium wallpapers and interior decoration solutions through our innovative e-commerce marketplace."
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+      {/* Dynamic Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">About Universal Wallpaper</h1>
-          <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto">
-            Transforming spaces worldwide with premium wallpapers and interior decoration solutions 
-            through our innovative e-commerce marketplace.
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">{heroContent.title}</h1>
+          <p className="text-xl md:text-2xl font-light max-w-3xl mx-auto mb-4">
+            {heroContent.subtitle}
+          </p>
+          <p className="text-lg font-light max-w-4xl mx-auto opacity-90">
+            {heroContent.description}
           </p>
         </div>
       </div>

@@ -12,38 +12,49 @@ import {
   FaShieldAlt,
   FaTruck
 } from 'react-icons/fa';
+import { useSiteContent } from '../hooks/useSiteContent';
 
 const Footer = () => {
+  const { content: footerContent } = useSiteContent('footer');
+
+  // Default content fallback
+  const companyInfo = footerContent?.companyInfo || {
+    name: "Universal Wallpaper",
+    description: "Your premier destination for high-quality wallpapers and home décor solutions. Transform your space with our extensive collection from trusted sellers worldwide.",
+    address: "123 Design Street, Creative District, NY 10001",
+    phone: "+1 (555) 123-4567",
+    email: "info@universalwallpaper.com"
+  };
+
   return (
     <footer className='bg-gray-900 text-white'>
       {/* Main Footer Content */}
       <div className='container mx-auto px-4 py-12'>
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
           
-          {/* Company Information */}
+          {/* Dynamic Company Information */}
           <div className='space-y-4'>
             <div className='flex items-center space-x-2'>
               <div className='bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg'>
                 <FaTruck className='text-white text-xl' />
               </div>
-              <h3 className='text-xl font-bold'>Universal Wallpaper</h3>
+              <h3 className='text-xl font-bold'>{companyInfo.name}</h3>
             </div>
             <p className='text-gray-300 text-sm leading-relaxed'>
-              Your premier destination for high-quality wallpapers and home décor solutions. 
-              Transform your space with our extensive collection from trusted sellers worldwide.
+              {companyInfo.description}
             </p>
             <div className='space-y-2'>
               <div className='flex items-center space-x-3 text-gray-300'>
                 <FaMapMarkerAlt className='text-blue-400 flex-shrink-0' />
-                <span className='text-sm'>123 Design Street, Creative District, NY 10001</span>
+                <span className='text-sm'>{companyInfo.address}</span>
               </div>
               <div className='flex items-center space-x-3 text-gray-300'>
                 <FaPhone className='text-green-400 flex-shrink-0' />
-                <span className='text-sm'>+1 (555) 123-4567</span>
+                <span className='text-sm'>{companyInfo.phone}</span>
               </div>
               <div className='flex items-center space-x-3 text-gray-300'>
                 <FaEnvelope className='text-purple-400 flex-shrink-0' />
-                <span className='text-sm'>info@universalwallpaper.com</span>
+                <span className='text-sm'>{companyInfo.email}</span>
               </div>
             </div>
           </div>

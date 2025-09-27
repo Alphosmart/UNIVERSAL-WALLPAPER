@@ -35,10 +35,157 @@ const getSiteContent = async (req, res) => {
                     liveChatHours: "Mon-Fri 9AM-6PM"
                 }
             },
+            homePage: {
+                hero: {
+                    title: "Transform Your Space with Premium Wallpapers",
+                    subtitle: "Discover thousands of high-quality wallpapers from trusted sellers worldwide. From modern minimalist to classic elegant designs.",
+                    primaryButtonText: "Shop Now",
+                    primaryButtonLink: "/products",
+                    secondaryButtonText: "Learn More",
+                    secondaryButtonLink: "/about-us"
+                },
+                featuredSection: {
+                    title: "Featured Categories",
+                    subtitle: "Explore our most popular wallpaper collections",
+                    categories: [
+                        { name: "Modern Minimalist", image: "", description: "Clean, simple designs for contemporary spaces" },
+                        { name: "Vintage Classic", image: "", description: "Timeless patterns with character" },
+                        { name: "Nature Inspired", image: "", description: "Bring the outdoors inside" },
+                        { name: "Luxury Collection", image: "", description: "Premium designs for sophisticated interiors" }
+                    ]
+                },
+                testimonials: {
+                    title: "What Our Customers Say",
+                    subtitle: "Join thousands of satisfied customers who transformed their spaces",
+                    reviews: [
+                        { name: "Sarah Johnson", rating: 5, comment: "Amazing quality and fast delivery!", location: "New York, NY" },
+                        { name: "Mike Chen", rating: 5, comment: "Perfect wallpapers, exactly as described.", location: "Los Angeles, CA" },
+                        { name: "Emma Davis", rating: 5, comment: "Great customer service and beautiful designs.", location: "Chicago, IL" }
+                    ]
+                },
+                stats: {
+                    title: "Trusted by Thousands",
+                    items: [
+                        { number: "50,000+", label: "Happy Customers" },
+                        { number: "10,000+", label: "Wallpaper Designs" },
+                        { number: "500+", label: "Verified Sellers" },
+                        { number: "99%", label: "Customer Satisfaction" }
+                    ]
+                }
+            },
+            aboutUs: {
+                hero: {
+                    title: "About Universal Wallpaper",
+                    subtitle: "Your premier destination for high-quality wallpapers and home décor solutions",
+                    description: "We connect homeowners with the world's finest wallpaper creators and suppliers, making it easy to transform any space into something extraordinary."
+                },
+                mission: {
+                    title: "Our Mission",
+                    description: "To democratize interior design by providing access to premium wallpapers and connecting customers with skilled sellers worldwide.",
+                    values: [
+                        { title: "Quality First", description: "We partner only with verified sellers who maintain the highest quality standards." },
+                        { title: "Customer Focused", description: "Every decision we make puts our customers' satisfaction and experience first." },
+                        { title: "Global Community", description: "We bring together sellers and buyers from around the world in one trusted marketplace." },
+                        { title: "Innovation", description: "We continuously improve our platform to make wallpaper shopping easier and more enjoyable." }
+                    ]
+                },
+                story: {
+                    title: "Our Story",
+                    content: "Founded in 2020, Universal Wallpaper began as a simple idea: why should finding the perfect wallpaper be so difficult? Our founders, interior design enthusiasts themselves, recognized the gap between amazing wallpaper creators and customers who needed their products.\n\nToday, we're proud to be the leading marketplace for wallpapers and home décor, connecting thousands of sellers with millions of satisfied customers worldwide."
+                },
+                team: {
+                    title: "Leadership Team",
+                    members: [
+                        { name: "Alex Johnson", role: "CEO & Founder", bio: "Interior design expert with 15 years of industry experience." },
+                        { name: "Sarah Williams", role: "CTO", bio: "Technology leader passionate about creating seamless user experiences." },
+                        { name: "Michael Brown", role: "Head of Operations", bio: "Operations specialist ensuring quality and reliability." }
+                    ]
+                }
+            },
+            footer: {
+                companyInfo: {
+                    name: "Universal Wallpaper",
+                    description: "Your premier destination for high-quality wallpapers and home décor solutions. Transform your space with our extensive collection from trusted sellers worldwide.",
+                    address: "123 Design Street, Creative District, NY 10001",
+                    phone: "+1 (555) 123-4567",
+                    email: "info@universalwallpaper.com"
+                },
+                businessHours: {
+                    title: "Business Hours",
+                    hours: [
+                        { days: "Monday - Friday", time: "9:00 AM - 6:00 PM" },
+                        { days: "Saturday", time: "10:00 AM - 4:00 PM" },
+                        { days: "Sunday", time: "Closed" }
+                    ]
+                },
+                socialMedia: {
+                    facebook: "https://facebook.com/universalwallpaper",
+                    instagram: "https://instagram.com/universalwallpaper",
+                    twitter: "https://twitter.com/universalwallpaper",
+                    pinterest: "https://pinterest.com/universalwallpaper"
+                },
+                quickLinks: {
+                    shop: [
+                        { label: "All Products", path: "/products" },
+                        { label: "Categories", path: "/categories" },
+                        { label: "New Arrivals", path: "/new-arrivals" },
+                        { label: "Sale Items", path: "/sale" }
+                    ],
+                    support: [
+                        { label: "Help Center", path: "/help-center" },
+                        { label: "Contact Us", path: "/contact-us" },
+                        { label: "Track Order", path: "/track-order" },
+                        { label: "Returns", path: "/returns-refunds" }
+                    ],
+                    company: [
+                        { label: "About Us", path: "/about-us" },
+                        { label: "Privacy Policy", path: "/privacy-policy" },
+                        { label: "Terms of Service", path: "/terms-of-service" },
+                        { label: "Cookie Policy", path: "/cookie-policy" }
+                    ]
+                },
+                paymentMethods: {
+                    title: "We Accept",
+                    methods: ["Visa", "Mastercard", "American Express", "PayPal", "Stripe"]
+                },
+                certifications: {
+                    title: "Trusted & Secure",
+                    items: ["SSL Secured", "PCI Compliant", "Money Back Guarantee", "24/7 Support"]
+                }
+            },
+            header: {
+                logo: {
+                    text: "Universal Wallpaper",
+                    tagline: "Transform Your Space"
+                },
+                navigation: {
+                    mainMenu: [
+                        { label: "Home", path: "/" },
+                        { label: "Products", path: "/products" },
+                        { label: "Categories", path: "/categories" },
+                        { label: "About", path: "/about-us" },
+                        { label: "Contact", path: "/contact-us" }
+                    ],
+                    userMenu: [
+                        { label: "My Account", path: "/profile" },
+                        { label: "My Orders", path: "/my-orders" },
+                        { label: "Wishlist", path: "/wishlist" },
+                        { label: "Cart", path: "/cart" }
+                    ]
+                },
+                announcements: {
+                    enabled: true,
+                    text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+                    link: "/products",
+                    backgroundColor: "#3B82F6",
+                    textColor: "#FFFFFF"
+                },
+                searchPlaceholder: "Search for wallpapers, styles, colors..."
+            },
             siteSettings: {
-                siteName: "AshAmSmart",
-                siteDescription: "Your trusted e-commerce marketplace for quality products",
-                supportEmail: "support@ashamsmart.com",
+                siteName: "Universal Wallpaper",
+                siteDescription: "Your premier destination for high-quality wallpapers and home décor solutions",
+                supportEmail: "support@universalwallpaper.com",
                 maintenanceMode: false,
                 lastUpdated: new Date().toISOString()
             }

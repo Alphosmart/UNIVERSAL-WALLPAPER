@@ -1,10 +1,43 @@
 {
+  "homePage": {
+    "hero": {
+      "title": "Transform Your Space with Premium Wallpapers",
+      "subtitle": "Discover thousands of high-quality wallpapers from trusted sellers worldwide. From modern minimalist to classic elegant designs.",
+      "primaryButtonText": "Shop Now",
+      "primaryButtonLink": "/products",
+      "secondaryButtonText": "Learn More",
+      "secondaryButtonLink": "/about-us"
+    }
+  },
+  "aboutUs": {
+    "hero": {
+      "title": "About Universal Wallpaper",
+      "subtitle": "Your premier destination for high-quality wallpapers and home décor solutions",
+      "description": "We connect homeowners with the world's finest wallpaper creators and suppliers, making it easy to transform any space into something extraordinary."
+    }
+  },
+  "footer": {
+    "companyInfo": {
+      "name": "Universal Wallpaper",
+      "description": "Your premier destination for high-quality wallpapers and home décor solutions.",
+      "address": "123 Design Street, Creative District, NY 10001",
+      "phone": "+1 (555) 123-4567",
+      "email": "info@universalwallpaper.com"
+    }
+  },
+  "header": {
+    "logo": {
+      "text": "Universal Wallpaper",
+      "tagline": "Transform Your Space"
+    },
+    "searchPlaceholder": "Search for wallpapers, styles, colors..."
+  },
   "siteSettings": {
-    "siteName": "AshAmSmart",
-    "siteDescription": "Your trusted e-commerce marketplace for quality products",
-    "supportEmail": "support@ashamsmart.com",
+    "siteName": "Universal Wallpaper",
+    "siteDescription": "Your premier destination for high-quality wallpapers and home décor solutions",
+    "supportEmail": "support@universalwallpaper.com",
     "maintenanceMode": false,
-    "lastUpdated": "2025-08-17T21:12:23.725Z"
+    "lastUpdated": "2025-09-27T18:00:00.000Z"
   },
   "errorPage": {
     "title": "404",
@@ -30,12 +63,27 @@
     ],
     "lastUpdated": "2025-08-17T19:59:28.519Z"
   },
+  "contactUs": {
+    "title": "Contact Us",
+    "subtitle": "We're here to help! Get in touch with our team for any questions, support, or feedback.",
+    "businessInfo": {
+      "address": "123 E-Commerce Street\nBusiness District\nCity, State 12345",
+      "phone": "+1 (555) 123-4567",
+      "email": "support@universalwallpaper.com",
+      "hours": "Mon-Fri 9am-6pm"
+    },
+    "responseInfo": {
+      "emailResponse": "24-48 hours",
+      "phoneHours": "Mon-Fri 9AM-6PM",
+      "liveChatHours": "Mon-Fri 9AM-6PM"
+    }
+  },
   "maintenancePage": {
     "title": "Under Maintenance",
     "message": "We're currently performing scheduled maintenance to improve your experience. We'll be back online shortly.",
     "estimatedDowntime": "1-5 hours",
     "statusMessage": "Service will resume automatically",
-    "contactEmail": "support@ashamsmart.com",
+    "contactEmail": "support@universalwallpaper.com",
     "progressPercentage": 45,
     "showProgressBar": true,
     "showContactInfo": true,

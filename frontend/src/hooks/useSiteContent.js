@@ -69,6 +69,39 @@ export const useSiteContent = (section = null) => {
 // Default content fallbacks
 const getDefaultContent = (section) => {
     const defaultContent = {
+        homePage: {
+            hero: {
+                title: "Transform Your Space with Premium Wallpapers",
+                subtitle: "Discover thousands of high-quality wallpapers from trusted sellers worldwide. From modern minimalist to classic elegant designs.",
+                primaryButtonText: "Shop Now",
+                primaryButtonLink: "/products",
+                secondaryButtonText: "Learn More",
+                secondaryButtonLink: "/about-us"
+            }
+        },
+        aboutUs: {
+            hero: {
+                title: "About Universal Wallpaper",
+                subtitle: "Your premier destination for high-quality wallpapers and home décor solutions",
+                description: "We connect homeowners with the world's finest wallpaper creators and suppliers, making it easy to transform any space into something extraordinary."
+            }
+        },
+        footer: {
+            companyInfo: {
+                name: "Universal Wallpaper",
+                description: "Your premier destination for high-quality wallpapers and home décor solutions.",
+                address: "123 Design Street, Creative District, NY 10001",
+                phone: "+1 (555) 123-4567",
+                email: "info@universalwallpaper.com"
+            }
+        },
+        header: {
+            logo: {
+                text: "Universal Wallpaper",
+                tagline: "Transform Your Space"
+            },
+            searchPlaceholder: "Search for wallpapers, styles, colors..."
+        },
         errorPage: {
             title: "404",
             heading: "Oops! Page Not Found",
@@ -86,7 +119,7 @@ const getDefaultContent = (section) => {
             businessInfo: {
                 address: "123 E-Commerce Street\nBusiness District\nCity, State 12345",
                 phone: "+1 (555) 123-4567",
-                email: "support@ashamsmart.com",
+                email: "support@universalwallpaper.com",
                 hours: "Mon-Fri 9am-6pm"
             },
             responseInfo: {
@@ -96,9 +129,9 @@ const getDefaultContent = (section) => {
             }
         },
         siteSettings: {
-            siteName: "AshAmSmart",
-            siteDescription: "Your trusted e-commerce marketplace for quality products",
-            supportEmail: "support@ashamsmart.com",
+            siteName: "Universal Wallpaper",
+            siteDescription: "Your premier destination for high-quality wallpapers and home décor solutions",
+            supportEmail: "support@universalwallpaper.com",
             maintenanceMode: false
         }
     };

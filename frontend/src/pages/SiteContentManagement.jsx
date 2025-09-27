@@ -5,6 +5,39 @@ import SummaryApi from '../common';
 const SiteContentManagement = () => {
     const isLoadingData = useRef(false);
     const [contentData, setContentData] = useState({
+        homePage: {
+            hero: {
+                title: "Transform Your Space with Premium Wallpapers",
+                subtitle: "Discover thousands of high-quality wallpapers from trusted sellers worldwide. From modern minimalist to classic elegant designs.",
+                primaryButtonText: "Shop Now",
+                primaryButtonLink: "/products",
+                secondaryButtonText: "Learn More",
+                secondaryButtonLink: "/about-us"
+            }
+        },
+        aboutUs: {
+            hero: {
+                title: "About Universal Wallpaper",
+                subtitle: "Your premier destination for high-quality wallpapers and home décor solutions",
+                description: "We connect homeowners with the world's finest wallpaper creators and suppliers, making it easy to transform any space into something extraordinary."
+            }
+        },
+        footer: {
+            companyInfo: {
+                name: "Universal Wallpaper",
+                description: "Your premier destination for high-quality wallpapers and home décor solutions.",
+                address: "123 Design Street, Creative District, NY 10001",
+                phone: "+1 (555) 123-4567",
+                email: "info@universalwallpaper.com"
+            }
+        },
+        header: {
+            logo: {
+                text: "Universal Wallpaper",
+                tagline: "Transform Your Space"
+            },
+            searchPlaceholder: "Search for wallpapers, styles, colors..."
+        },
         errorPage: {
             title: "404",
             heading: "Oops! Page Not Found",
@@ -32,9 +65,9 @@ const SiteContentManagement = () => {
             }
         },
         siteSettings: {
-            siteName: "AshAmSmart",
-            siteDescription: "Your trusted e-commerce marketplace for quality products",
-            supportEmail: "support@ashamsmart.com",
+            siteName: "Universal Wallpaper",
+            siteDescription: "Your premier destination for high-quality wallpapers and home décor solutions",
+            supportEmail: "support@universalwallpaper.com",
             maintenanceMode: false
         },
         maintenancePage: {
@@ -42,7 +75,7 @@ const SiteContentManagement = () => {
             message: "We're currently performing scheduled maintenance to improve your experience. We'll be back online shortly.",
             estimatedDowntime: "1-2 hours",
             statusMessage: "Service will resume automatically",
-            contactEmail: "support@ashamsmart.com",
+            contactEmail: "support@universalwallpaper.com",
             progressPercentage: 45,
             showProgressBar: true,
             showContactInfo: true,
@@ -51,7 +84,7 @@ const SiteContentManagement = () => {
         }
     });
 
-    const [activeTab, setActiveTab] = useState('errorPage');
+    const [activeTab, setActiveTab] = useState('homePage');
     const [isLoading, setIsLoading] = useState(false);
 
     // Load content data from backend only once
@@ -174,8 +207,12 @@ const SiteContentManagement = () => {
     };
 
     const tabs = [
-        { id: 'errorPage', label: '404 Error Page', icon: '⚠️' },
+        { id: 'homePage', label: 'Home Page', icon: '🏠' },
+        { id: 'aboutUs', label: 'About Us', icon: 'ℹ️' },
+        { id: 'footer', label: 'Footer', icon: '📄' },
+        { id: 'header', label: 'Header & Navigation', icon: '🧭' },
         { id: 'contactUs', label: 'Contact Us Page', icon: '📞' },
+        { id: 'errorPage', label: '404 Error Page', icon: '⚠️' },
         { id: 'siteSettings', label: 'Site Settings', icon: '⚙️' },
         { id: 'maintenancePage', label: 'Maintenance Page', icon: '🔧' }
     ];
@@ -624,6 +661,220 @@ const SiteContentManagement = () => {
                                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
                                 >
                                     {isLoading ? 'Saving...' : 'Save Maintenance Page Settings'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Home Page Content */}
+                        {activeTab === 'homePage' && (
+                            <div className="space-y-6">
+                                <h2 className="text-xl font-semibold text-gray-900">Home Page Content</h2>
+                                
+                                {/* Hero Section */}
+                                <div className="border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Hero Section</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Hero Title</label>
+                                            <input
+                                                type="text"
+                                                value={contentData.homePage?.hero?.title || ''}
+                                                onChange={(e) => updateNestedContentData('homePage', 'hero', 'title', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Hero Subtitle</label>
+                                            <textarea
+                                                value={contentData.homePage?.hero?.subtitle || ''}
+                                                onChange={(e) => updateNestedContentData('homePage', 'hero', 'subtitle', e.target.value)}
+                                                rows={3}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Primary Button Text</label>
+                                                <input
+                                                    type="text"
+                                                    value={contentData.homePage?.hero?.primaryButtonText || ''}
+                                                    onChange={(e) => updateNestedContentData('homePage', 'hero', 'primaryButtonText', e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Primary Button Link</label>
+                                                <input
+                                                    type="text"
+                                                    value={contentData.homePage?.hero?.primaryButtonLink || ''}
+                                                    onChange={(e) => updateNestedContentData('homePage', 'hero', 'primaryButtonLink', e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => handleSave('homePage')}
+                                    disabled={isLoading}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {isLoading ? 'Saving...' : 'Save Home Page Content'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* About Us Content */}
+                        {activeTab === 'aboutUs' && (
+                            <div className="space-y-6">
+                                <h2 className="text-xl font-semibold text-gray-900">About Us Page Content</h2>
+                                
+                                {/* Hero Section */}
+                                <div className="border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Hero Section</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Page Title</label>
+                                            <input
+                                                type="text"
+                                                value={contentData.aboutUs?.hero?.title || ''}
+                                                onChange={(e) => updateNestedContentData('aboutUs', 'hero', 'title', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                            <textarea
+                                                value={contentData.aboutUs?.hero?.description || ''}
+                                                onChange={(e) => updateNestedContentData('aboutUs', 'hero', 'description', e.target.value)}
+                                                rows={4}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => handleSave('aboutUs')}
+                                    disabled={isLoading}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {isLoading ? 'Saving...' : 'Save About Us Content'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Footer Content */}
+                        {activeTab === 'footer' && (
+                            <div className="space-y-6">
+                                <h2 className="text-xl font-semibold text-gray-900">Footer Content</h2>
+                                
+                                {/* Company Info */}
+                                <div className="border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Company Information</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                                            <input
+                                                type="text"
+                                                value={contentData.footer?.companyInfo?.name || ''}
+                                                onChange={(e) => updateNestedContentData('footer', 'companyInfo', 'name', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+                                                <input
+                                                    type="text"
+                                                    value={contentData.footer?.companyInfo?.phone || ''}
+                                                    onChange={(e) => updateNestedContentData('footer', 'companyInfo', 'phone', e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={contentData.footer?.companyInfo?.email || ''}
+                                                    onChange={(e) => updateNestedContentData('footer', 'companyInfo', 'email', e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
+                                                <input
+                                                    type="text"
+                                                    value={contentData.footer?.companyInfo?.address || ''}
+                                                    onChange={(e) => updateNestedContentData('footer', 'companyInfo', 'address', e.target.value)}
+                                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => handleSave('footer')}
+                                    disabled={isLoading}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {isLoading ? 'Saving...' : 'Save Footer Content'}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* Header Content */}
+                        {activeTab === 'header' && (
+                            <div className="space-y-6">
+                                <h2 className="text-xl font-semibold text-gray-900">Header & Navigation Content</h2>
+                                
+                                {/* Logo Section */}
+                                <div className="border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Logo & Branding</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+                                            <input
+                                                type="text"
+                                                value={contentData.header?.logo?.text || ''}
+                                                onChange={(e) => updateNestedContentData('header', 'logo', 'text', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Tagline</label>
+                                            <input
+                                                type="text"
+                                                value={contentData.header?.logo?.tagline || ''}
+                                                onChange={(e) => updateNestedContentData('header', 'logo', 'tagline', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Search */}
+                                <div className="border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Search Settings</h3>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Search Placeholder Text</label>
+                                        <input
+                                            type="text"
+                                            value={contentData.header?.searchPlaceholder || ''}
+                                            onChange={(e) => updateContentData('header', 'searchPlaceholder', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => handleSave('header')}
+                                    disabled={isLoading}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {isLoading ? 'Saving...' : 'Save Header Content'}
                                 </button>
                             </div>
                         )}
