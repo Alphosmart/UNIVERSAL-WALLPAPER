@@ -44,7 +44,9 @@ app.use(cors({
         process.env.FRONTEND_URL || 'http://localhost:3000',
         'http://localhost:3001',
         'http://192.168.1.100:3000',
-        'http://192.168.1.100:3001'
+        'http://192.168.1.100:3001',
+        'https://universaldotwallpaper.onrender.com',
+        /\.onrender\.com$/
     ],
     credentials: true
 }))
@@ -56,6 +58,18 @@ app.use(cookieParser())
 
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+
+// Root route for Render deployment
+app.get('/', (req, res) => {
+    res.json({ 
+        message: 'Universal Wallpaper API Server',
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        environment: process.env.NODE_ENV || 'development',
+        version: '1.0.0'
+    })
+})
 
 // Health check route
 app.get('/health', (req, res) => {
