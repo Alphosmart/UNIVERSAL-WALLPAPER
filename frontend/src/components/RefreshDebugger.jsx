@@ -1,7 +1,12 @@
 import { useEffect } from 'react';
 
 const RefreshDebugger = () => {
+    // Only enable in development or when explicitly debugging
+    const isDebugMode = process.env.NODE_ENV === 'development' || window.location.search.includes('debug=true');
+    
     useEffect(() => {
+        if (!isDebugMode) return;
+        
         // Override console methods to track potential refresh triggers
         const originalError = console.error;
         const originalWarn = console.warn;
@@ -66,10 +71,11 @@ const RefreshDebugger = () => {
             window.history.pushState = originalPushState;
             window.history.replaceState = originalReplaceState;
         };
-    }, []);
+    }, [isDebugMode]);
 
     // Monitor for common refresh patterns
     useEffect(() => {
+        if (!isDebugMode) return;
         const intervals = [];
         const timeouts = [];
         
@@ -100,7 +106,7 @@ const RefreshDebugger = () => {
             window.setInterval = originalSetInterval;
             window.setTimeout = originalSetTimeout;
         };
-    }, []);
+    }, [isDebugMode]);
 
     return null; // This component doesn't render anything
 };

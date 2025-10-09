@@ -105,9 +105,11 @@ function App() {
     // Failsafe: Don't let loading hang indefinitely
     const loadingTimeout = setTimeout(() => {
       console.log('🔍 Loading timeout triggered - forcing completion');
-      setLoading(false)
-      userDetailsCachedRef.current = true
-    }, 15000) // 15 second absolute maximum
+      if (!userDetailsCachedRef.current) {
+        setLoading(false)
+        userDetailsCachedRef.current = true
+      }
+    }, 20000) // Increased to 20 seconds to reduce false triggers
     
     return () => {
       console.log('🔍 App useEffect cleanup');

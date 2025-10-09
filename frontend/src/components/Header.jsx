@@ -13,7 +13,7 @@ import { useCart } from '../context/CartContext';
 
 const Header = memo(() => {
   const user = useSelector(state => state?.user?.user)
-  console.log('🔍 Header rendered. User:', user?._id ? `${user.name} (${user._id})` : 'Not logged in');
+  // console.log('🔍 Header rendered. User:', user?._id ? `${user.name} (${user._id})` : 'Not logged in');
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [menuDisplay, setMenuDisplay] = useState(false)
