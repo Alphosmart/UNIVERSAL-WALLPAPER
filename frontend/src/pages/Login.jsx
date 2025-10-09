@@ -18,7 +18,7 @@ const Login = () => {
   })
   const navigate = useNavigate()
   const location = useLocation()
-  const { refreshUserDetails } = useContext(Context)
+  const { silentRefreshUserDetails } = useContext(Context)
   const { refreshCart } = useCart()
 
   // Get the page user was trying to access before login
@@ -56,30 +56,39 @@ const Login = () => {
     if(dataApi.success){
       toast.success(dataApi.message)
       
-      console.log('🔑 Login successful, using comprehensive refresh approach')
+      console.log('🔑 Login successful, using silent refresh approach')
       setIsLoggingIn(true)
       
-      // Always use the context refresh function for consistent behavior
+      // Use silent refresh that doesn't trigger loading states
       setTimeout(async () => {
         try {
-          // This will fetch fresh user data and update Redux
-          await refreshUserDetails()
-          console.log('🔑 User details refreshed successfully')
+          const userData = await silentRefreshUserDetails()
+          console.log('🔑 Silent refresh completed, userData:', userData)
           
-          // Refresh cart for the logged-in user
-          await refreshCart()
-          console.log('🔑 Cart refreshed after login')
-          
-          console.log('🔑 Navigating to:', from)
-          navigate(from, { replace: true })
+          if (userData) {
+            // Refresh cart for the logged-in user
+            try {
+              await refreshCart()
+              console.log('🔑 Cart refreshed after login')
+            } catch (cartError) {
+              console.log('🔑 Cart refresh failed, but continuing:', cartError)
+            }
+            
+            console.log('🔑 Navigating to:', from)
+            navigate(from, { replace: true })
+          } else {
+            console.log('🔑 Silent refresh failed, showing info message')
+            toast.info('Login successful! Please refresh the page if not redirected.')
+            navigate(from, { replace: true })
+          }
         } catch (error) {
-          console.error('🔑 Error during login refresh:', error)
-          // Still navigate even if refresh fails
+          console.error('🔑 Error during silent refresh:', error)
+          toast.info('Login successful! Please refresh the page if not redirected.')
           navigate(from, { replace: true })
         } finally {
           setIsLoggingIn(false)
         }
-      }, 200) // Longer delay to ensure cookie is properly set
+      }, 250) // Longer delay to ensure cookie is fully set
     }
 
     if(dataApi.error){
