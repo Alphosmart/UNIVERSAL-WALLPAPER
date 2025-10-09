@@ -1,4 +1,4 @@
-import React, { useState, memo, useCallback, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import Logo from './Logo';
 import SmartSearchBar from './SmartSearchBar';
 import {FaRegCircleUser} from 'react-icons/fa6';
@@ -11,9 +11,9 @@ import { toast } from 'react-toastify';
 import { setUserDetails } from '../store/userSlice';
 import { useCart } from '../context/CartContext';
 
-const Header = memo(() => {
+const Header = () => {
   const user = useSelector(state => state?.user?.user)
-  // console.log('🔍 Header rendered. User:', user?._id ? `${user.name} (${user._id})` : 'Not logged in');
+  console.log('🔍 Header rendered. User:', user?._id ? `${user.name} (${user._id})` : 'Not logged in');
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [menuDisplay, setMenuDisplay] = useState(false)
@@ -413,8 +413,6 @@ const Header = memo(() => {
       </div>
     </header>
   )
-})
-
-Header.displayName = 'Header'
+}
 
 export default Header

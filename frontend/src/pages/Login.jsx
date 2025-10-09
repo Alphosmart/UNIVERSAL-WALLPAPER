@@ -7,6 +7,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import SummaryApi from "../common";
 import { toast } from 'react-toastify';
 import Context from '../context';
+import { useCart } from '../context/CartContext';
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,6 +19,7 @@ const Login = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { refreshUserDetails } = useContext(Context)
+  const { refreshCart } = useCart()
 
   // Get the page user was trying to access before login
   const from = location.state?.from?.pathname || '/';
@@ -54,25 +56,30 @@ const Login = () => {
     if(dataApi.success){
       toast.success(dataApi.message)
       
-      console.log('🔑 Login successful, fetching user details directly...')
+      console.log('🔑 Login successful, using comprehensive refresh approach')
       setIsLoggingIn(true)
       
-      // Add small delay to ensure cookie is set before fetching user details
+      // Always use the context refresh function for consistent behavior
       setTimeout(async () => {
         try {
-          // Use context to refresh user details which will handle Redux updates properly
+          // This will fetch fresh user data and update Redux
           await refreshUserDetails()
-          console.log('🔑 User details refreshed via context')
+          console.log('🔑 User details refreshed successfully')
           
-          // Navigate immediately after refresh is complete
+          // Refresh cart for the logged-in user
+          await refreshCart()
+          console.log('🔑 Cart refreshed after login')
+          
           console.log('🔑 Navigating to:', from)
-          setIsLoggingIn(false)
           navigate(from, { replace: true })
         } catch (error) {
-          console.error('🔑 Error refreshing user details:', error)
+          console.error('🔑 Error during login refresh:', error)
+          // Still navigate even if refresh fails
+          navigate(from, { replace: true })
+        } finally {
           setIsLoggingIn(false)
         }
-      }, 100)
+      }, 200) // Longer delay to ensure cookie is properly set
     }
 
     if(dataApi.error){

@@ -121,16 +121,66 @@ function App() {
   const refreshUserDetails = useCallback(async () => {
     console.log('🔄 refreshUserDetails called - forcing refresh');
     userDetailsCachedRef.current = false
-    setLoading(true)
     try {
-      await fetchUserDetails(0) // Force fetch with retryCount 0
+      await fetchUserDetails(0) // Force fetch with retryCount 0 without setting global loading
       console.log('🔄 User details refresh completed');
     } catch (error) {
       console.error('🔄 Error in refreshUserDetails:', error);
-    } finally {
-      setLoading(false)
     }
   }, [fetchUserDetails])
+
+  // Create a silent refresh function that doesn't show loading screen (for login/logout)
+  const silentRefreshUserDetails = useCallback(async () => {
+    console.log('🔄 silentRefreshUserDetails called - non-blocking refresh');
+    userDetailsCachedRef.current = false
+    
+    // Create a controller for timeout
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
+    
+    try {
+      const dataResponse = await fetch(SummaryApi.current_user.url, {
+        method: SummaryApi.current_user.method,
+        credentials: 'include',
+        signal: controller.signal
+      })
+      
+      clearTimeout(timeoutId)
+      
+      console.log('🔄 Silent user details response status:', dataResponse.status)
+      
+      if (dataResponse.status === 200) {
+        const dataApi = await dataResponse.json()
+        console.log('🔄 Silent user details API response:', dataApi)
+        
+        if (dataApi.success && dataApi.data) {
+          console.log('🔄 Setting user details in Redux (silent):', dataApi.data.name)
+          dispatch(setUserDetails(dataApi.data))
+          userDetailsCachedRef.current = true
+          return dataApi.data // Return user data for success confirmation
+        } else {
+          console.log('🔄 API response not successful or no data')
+          dispatch(setUserDetails(null))
+        }
+      } else if (dataResponse.status === 401) {
+        console.log('🔄 User not authenticated (401) - clearing user data');
+        dispatch(setUserDetails(null))
+      } else {
+        console.log('🔄 Non-200 response:', dataResponse.status);
+        // Don't clear user data for other error codes to maintain current state
+      }
+      
+      console.log('🔄 Silent user details refresh completed');
+      return null
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('🔄 Silent refresh timed out');
+      } else {
+        console.error('🔄 Error in silentRefreshUserDetails:', error);
+      }
+      return null
+    }
+  }, [dispatch])
 
   if (loading) {
     return <Loading message="Setting up your marketplace experience..." />
@@ -142,7 +192,8 @@ function App() {
         <SecurityProvider>
           <Context.Provider value={{
               fetchUserDetails,
-              refreshUserDetails
+              refreshUserDetails,
+              silentRefreshUserDetails
           }}>
             <ProductProvider>
               <CartProvider>
