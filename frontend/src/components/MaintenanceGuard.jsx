@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import useMaintenanceMode from '../hooks/useMaintenanceMode';
 import MaintenancePage from './MaintenancePage';
@@ -7,6 +7,9 @@ import Loading from './Loading';
 const MaintenanceGuard = ({ children }) => {
     const user = useSelector(state => state?.user?.user);
     const { isMaintenanceMode, isLoading, error } = useMaintenanceMode();
+
+    // Memoize the admin check to prevent unnecessary re-renders
+    const isAdmin = useMemo(() => user?.role === 'ADMIN', [user?.role]);
 
     // While checking maintenance status, show loading
     if (isLoading) {
@@ -26,8 +29,6 @@ const MaintenanceGuard = ({ children }) => {
     }
 
     // If maintenance mode is enabled, check if user is admin
-    const isAdmin = user?.role === 'ADMIN';
-    
     if (isAdmin) {
         // Admin users can access during maintenance
         return (

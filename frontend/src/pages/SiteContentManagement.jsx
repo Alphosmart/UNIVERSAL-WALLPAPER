@@ -138,7 +138,21 @@ const SiteContentManagement = () => {
         }
     });
 
-    const [activeTab, setActiveTab] = useState('homePage');
+    const [activeTab, setActiveTab] = useState(() => {
+        // Check if there's a saved tab preference or URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        const savedTab = localStorage.getItem('siteContentActiveTab');
+        
+        // Priority: URL param > saved preference > default
+        if (tabParam && ['homePage', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(tabParam)) {
+            return tabParam;
+        }
+        if (savedTab && ['homePage', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(savedTab)) {
+            return savedTab;
+        }
+        return 'homePage';
+    });
     const [isLoading, setIsLoading] = useState(false);
 
     // Load content data from backend only once
@@ -168,6 +182,21 @@ const SiteContentManagement = () => {
         };
 
         loadContentData();
+    }, []);
+
+    // Handle browser back/forward navigation to sync tab state
+    useEffect(() => {
+        const handlePopState = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab');
+            if (tabParam && ['homePage', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(tabParam)) {
+                setActiveTab(tabParam);
+                localStorage.setItem('siteContentActiveTab', tabParam);
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
     const handleSave = async (section) => {
@@ -260,6 +289,18 @@ const SiteContentManagement = () => {
         }));
     };
 
+    // Custom tab handler to persist tab state and update URL
+    const handleTabChange = (tabId) => {
+        setActiveTab(tabId);
+        // Save to localStorage to persist across page refreshes
+        localStorage.setItem('siteContentActiveTab', tabId);
+        
+        // Update URL without triggering page reload
+        const url = new URL(window.location);
+        url.searchParams.set('tab', tabId);
+        window.history.replaceState({}, '', url);
+    };
+
     const tabs = [
         { id: 'homePage', label: 'Home Page', icon: '🏠' },
         { id: 'aboutUs', label: 'About Us', icon: 'ℹ️' },
@@ -287,7 +328,7 @@ const SiteContentManagement = () => {
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
+                                    onClick={() => handleTabChange(tab.id)}
                                     className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
                                         activeTab === tab.id
                                             ? 'border-blue-500 text-blue-600'
