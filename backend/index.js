@@ -5,6 +5,15 @@ const compression = require('compression')
 const path = require('path')
 // Load environment variables first with explicit path
 require('dotenv').config({ path: path.join(__dirname, '.env') })
+
+// Ensure JWT secret is available
+if (!process.env.TOKEN_SECRET_KEY) {
+    // Set a fallback for production deployment
+    const fallbackSecret = 'universal-wallpaper-jwt-secret-key-' + process.env.NODE_ENV + '-' + Date.now()
+    process.env.TOKEN_SECRET_KEY = fallbackSecret
+    console.warn('⚠️  TOKEN_SECRET_KEY not found in environment, using fallback. Please set this in production!')
+}
+
 const connectDB = require('./config/db')
 const { globalErrorHandler, notFoundHandler } = require('./utils/responseHandler')
 const logger = require('./utils/logger')
