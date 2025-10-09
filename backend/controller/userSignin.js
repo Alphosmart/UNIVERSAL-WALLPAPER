@@ -37,11 +37,12 @@ const userSignInController = catchAsync(async (req, res) => {
     
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET_KEY, { expiresIn: '8h' });
 
-    // Set secure cookie
+    // Set secure cookie with proper production settings
+    const isProduction = process.env.NODE_ENV === 'production';
     const tokenOptions = {
         httpOnly: true,
-        secure: false, // Set to false for localhost development
-        sameSite: 'lax', // Changed from 'strict' to 'lax' for cross-origin localhost
+        secure: isProduction, // Use secure cookies in production (HTTPS)
+        sameSite: isProduction ? 'none' : 'lax', // 'none' for cross-origin in production, 'lax' for localhost
         maxAge: 8 * 60 * 60 * 1000 // 8 hours
     };
 
