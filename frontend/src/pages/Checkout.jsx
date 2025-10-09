@@ -70,12 +70,12 @@ const Checkout = () => {
         if (isInitialized && cartItemsRef.current.length === 0) {
             // Use setTimeout to prevent immediate navigation during cart sync
             const timer = setTimeout(() => {
-                // Double-check cart is still empty after delay
-                if (cartItemsRef.current.length === 0) {
+                // Double-check cart is still empty after delay and user is still on checkout
+                if (cartItemsRef.current.length === 0 && window.location.pathname.includes('checkout')) {
                     toast.error('Your cart is empty');
                     navigate('/cart');
                 }
-            }, 1000); // 1 second delay
+            }, 2000); // Increased to 2 second delay to be safer
             
             return () => clearTimeout(timer);
         }

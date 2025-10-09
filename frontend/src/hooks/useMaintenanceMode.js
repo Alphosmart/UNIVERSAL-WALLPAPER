@@ -57,8 +57,9 @@ const useMaintenanceMode = () => {
     useEffect(() => {
         checkMaintenanceMode();
         
-        // Check maintenance status every 30 seconds
-        const interval = setInterval(checkMaintenanceMode, 30000);
+        // Check maintenance status every 5 minutes instead of 30 seconds to reduce API calls
+        // and prevent potential refresh loops
+        const interval = setInterval(checkMaintenanceMode, 5 * 60 * 1000); // 5 minutes
         
         return () => clearInterval(interval);
     }, [checkMaintenanceMode]);

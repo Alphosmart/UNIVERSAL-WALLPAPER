@@ -66,9 +66,21 @@ const SecurityProvider = ({ children }) => {
       
       // Auto logout at 30 minutes
       sessionTimeout = setTimeout(() => {
-        alert('Your session has expired for security reasons. Please log in again.');
-        // Force logout logic here
-        window.location.href = '/login';
+        // Check if user is still on the page and active before forcing logout
+        if (document.hasFocus() || document.visibilityState === 'visible') {
+          const shouldLogout = window.confirm('Your session has expired for security reasons. Would you like to continue your session or log out?');
+          if (shouldLogout) {
+            // Use React Router navigation instead of window.location.href
+            window.location.href = '/login';
+          } else {
+            // Reset session timeout for continued activity
+            resetSessionTimeout();
+          }
+        } else {
+          // If page is not visible, just clear tokens without redirect
+          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
+        }
       }, 30 * 60 * 1000);
     };
 

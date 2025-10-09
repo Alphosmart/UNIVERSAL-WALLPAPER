@@ -73,12 +73,13 @@ const Analytics = () => {
         }
     };
 
-    // Auto-refresh functionality
+    // Auto-refresh functionality - only refresh data, not the entire page
     useEffect(() => {
         let interval;
         if (autoRefresh && refreshInterval > 0) {
             interval = setInterval(() => {
-                setTimePeriod(prev => prev);
+                // Just trigger state update to re-fetch data without navigation
+                setTimePeriod(prev => ({ ...prev }));
             }, refreshInterval * 1000);
         }
         return () => {
