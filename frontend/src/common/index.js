@@ -1,4 +1,6 @@
-const backendDomain = "http://localhost:8080"
+const backendDomain = process.env.NODE_ENV === 'production' 
+    ? "https://universaldotwallpaper.onrender.com" 
+    : "http://localhost:8080"
 
 const SummaryApi = {
     signUP : {
