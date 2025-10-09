@@ -114,6 +114,30 @@ app.use('/api', router)
 // Database error handling middleware
 app.use(handleDatabaseError)
 
+// Serve static files from React build (for production)
+if (process.env.NODE_ENV === 'production') {
+    const frontendBuildPath = path.join(__dirname, '../frontend/build')
+    
+    // Serve static assets from the build folder
+    app.use(express.static(frontendBuildPath))
+    
+    // SPA catch-all handler: serve index.html for all non-API routes
+    // Using middleware instead of app.get('*') to avoid path-to-regexp issues
+    app.use((req, res, next) => {
+        // Only serve index.html for non-API routes and GET requests
+        if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+            // Check if it's a request for a static file
+            const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot'];
+            const hasStaticExtension = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext));
+            
+            if (!hasStaticExtension) {
+                return res.sendFile(path.join(frontendBuildPath, 'index.html'));
+            }
+        }
+        next();
+    });
+} 
+
 // Handle undefined routes - using middleware instead of app.all('*') to avoid Express 5 issues
 app.use((req, res, next) => {
     notFoundHandler(req, res, next)

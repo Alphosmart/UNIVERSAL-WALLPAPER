@@ -12,7 +12,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "lint": "echo 'No linter configured'",
-    "build": "echo 'Build step - copy files if needed'",
+    "build": "cd ../frontend && npm install && npm run build",
     "migrate": "node migrate-tracking-numbers.js"
   },
   "author": "",
