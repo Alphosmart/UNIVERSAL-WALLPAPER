@@ -4,11 +4,7 @@ services:
     name: universal-wallpaper
     env: node
     plan: free
-    buildCommand: |
-      # Install backend dependencies
-      npm install
-      # Install frontend dependencies and build
-      cd frontend && npm install && npm run build && cd ..
+    buildCommand: npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
