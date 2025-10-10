@@ -130,8 +130,16 @@ if (process.env.NODE_ENV === 'production') {
     
     // Redirect frontend routes to the actual frontend deployment
     app.use((req, res, next) => {
-        // Only redirect GET requests for non-API routes
-        if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads') && !req.path.startsWith('/health')) {
+        console.log(`🔍 Middleware checking route: ${req.method} ${req.path}`)
+        
+        // Only redirect GET requests for non-API routes and non-specific routes
+        if (req.method === 'GET' && 
+            !req.path.startsWith('/api') && 
+            !req.path.startsWith('/uploads') && 
+            !req.path.startsWith('/health') &&
+            req.path !== '/' &&
+            req.path !== '/test') {
+            
             // Check if it's a request for a static file
             const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot'];
             const hasStaticExtension = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext));
@@ -139,7 +147,11 @@ if (process.env.NODE_ENV === 'production') {
             if (!hasStaticExtension) {
                 console.log(`🔄 Redirecting frontend route: ${req.path} -> ${FRONTEND_URL}${req.path}`)
                 return res.redirect(301, `${FRONTEND_URL}${req.path}`);
+            } else {
+                console.log(`📁 Static file request, not redirecting: ${req.path}`)
             }
+        } else {
+            console.log(`⏭️  Skipping redirect for: ${req.method} ${req.path}`)
         }
         next();
     });
