@@ -126,25 +126,54 @@ app.use(handleDatabaseError)
 
 // Serve static files from React build (for production)
 if (process.env.NODE_ENV === 'production') {
-    const frontendBuildPath = path.join(__dirname, '../frontend/build')
+    const fs = require('fs')
+    let frontendBuildPath = path.join(__dirname, '../frontend/build')
     
     // Log the build path for debugging
     console.log('🔍 Frontend build path:', frontendBuildPath)
     
-    // Check if build directory exists
-    const fs = require('fs')
-    if (fs.existsSync(frontendBuildPath)) {
-        console.log('✅ Frontend build directory found')
-        
-        // Check if index.html exists
-        const indexPath = path.join(frontendBuildPath, 'index.html')
-        if (fs.existsSync(indexPath)) {
-            console.log('✅ index.html found')
+    // Check if build directory exists at different possible locations
+    const possiblePaths = [
+        path.join(__dirname, '../frontend/build'),
+        path.join(__dirname, '../../frontend/build'),
+        path.join(process.cwd(), 'frontend/build'),
+        path.join(__dirname, '../build'),
+        path.join(__dirname, 'build')
+    ]
+    
+    let buildFound = false
+    for (const testPath of possiblePaths) {
+        if (fs.existsSync(testPath)) {
+            frontendBuildPath = testPath
+            buildFound = true
+            console.log('✅ Frontend build directory found at:', testPath)
+            break
         } else {
-            console.log('❌ index.html NOT found at:', indexPath)
+            console.log('❌ Not found at:', testPath)
         }
+    }
+    
+    if (!buildFound) {
+        console.log('❌ Frontend build directory NOT found at any location')
+        console.log('🔄 Attempting to build frontend now...')
+        
+        // Try to build the frontend dynamically
+        const { exec } = require('child_process')
+        exec('cd frontend && npm install && npm run build', (error, stdout, stderr) => {
+            if (error) {
+                console.log('❌ Dynamic build failed:', error.message)
+            } else {
+                console.log('✅ Dynamic build completed:', stdout)
+            }
+        })
+    }
+    
+    // Check if index.html exists
+    const indexPath = path.join(frontendBuildPath, 'index.html')
+    if (fs.existsSync(indexPath)) {
+        console.log('✅ index.html found')
     } else {
-        console.log('❌ Frontend build directory NOT found at:', frontendBuildPath)
+        console.log('❌ index.html NOT found at:', indexPath)
     }
     
     // Serve static assets from the build folder
@@ -169,13 +198,27 @@ if (process.env.NODE_ENV === 'production') {
                     return res.sendFile(indexPath);
                 } else {
                     console.log('❌ index.html not found for SPA routing:', indexPath)
-                    return res.status(404).json({
-                        success: false,
-                        error: true,
-                        message: `SPA routing failed - index.html not found at ${indexPath}`,
-                        path: req.path,
-                        timestamp: new Date().toISOString()
-                    });
+                    
+                    // Fallback: serve a basic HTML page with React mounting point
+                    const fallbackHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Universal Wallpaper</title>
+</head>
+<body>
+    <div id="root">
+        <div style="text-align: center; padding: 50px; font-family: Arial;">
+            <h1>Universal Wallpaper</h1>
+            <p>Loading...</p>
+            <p><small>Frontend build not found. Please check deployment configuration.</small></p>
+        </div>
+    </div>
+</body>
+</html>`;
+                    return res.send(fallbackHtml);
                 }
             }
         }
