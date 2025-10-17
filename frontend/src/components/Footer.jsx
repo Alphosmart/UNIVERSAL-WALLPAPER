@@ -12,7 +12,7 @@ import {
   FaShieldAlt,
   FaTruck
 } from 'react-icons/fa';
-import { useSiteContent } from '../hooks/useSiteContent';
+import useSiteContent from '../hooks/useSiteContent';
 
 const Footer = () => {
   const { content: footerContent } = useSiteContent('footer');

@@ -4,7 +4,7 @@ import BannerProduct from '../components/BannerProduct'
 import HorizontalCardProduct from '../components/HorizontalCardProduct'
 import VerticalCardProduct from '../components/VerticalCardProduct'
 import BackendStatus from '../components/BackendStatus'
-import { useSiteContent } from '../hooks/useSiteContent'
+import useSiteContent from '../hooks/useSiteContent'
 import { Link } from 'react-router-dom'
 // import ShippingPartnerBanner from '../components/ShippingPartnerBanner'
 

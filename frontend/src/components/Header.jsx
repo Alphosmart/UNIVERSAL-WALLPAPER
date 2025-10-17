@@ -14,6 +14,7 @@ import { useCart } from '../context/CartContext';
 const Header = () => {
   const user = useSelector(state => state?.user?.user)
   console.log('🔍 Header rendered. User:', user?._id ? `${user.name} (${user._id})` : 'Not logged in');
+  console.log('🔍 Header render time:', new Date().toISOString());
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [menuDisplay, setMenuDisplay] = useState(false)
