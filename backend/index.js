@@ -66,6 +66,8 @@ app.use(cors({
         'http://192.168.1.100:3001',
         'https://universaldotwallpaper.onrender.com',
         'https://universal-wallpaper.onrender.com',
+        'https://www.universaldotwalpaper.com',
+        'https://universaldotwalpaper.com',
         /\.onrender\.com$/
     ],
     credentials: true
