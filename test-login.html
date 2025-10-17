@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login</title>
+</head>
+<body>
+    <h1>Test Login Debug</h1>
+    <button onclick="testLogin()">Test Login</button>
+    <div id="output"></div>
+
+    <script>
+        async function testLogin() {
+            const output = document.getElementById('output');
+            
+            try {
+                const response = await fetch('http://localhost:8080/api/signin', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: 'admin@example.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const data = await response.json();
+                output.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                console.log('Login response:', data);
+                
+                if (data.success && data.data && data.data.user) {
+                    console.log('✅ User data structure is correct:', data.data.user);
+                } else {
+                    console.log('❌ Unexpected response structure');
+                }
+            } catch (error) {
+                output.innerHTML = 'Error: ' + error.message;
+                console.error('Login error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

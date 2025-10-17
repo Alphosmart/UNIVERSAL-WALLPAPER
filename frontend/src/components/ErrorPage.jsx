@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRouteError, Link } from 'react-router-dom';
-import { useSiteContent } from '../hooks/useSiteContent';
+import useSiteContent from '../hooks/useSiteContent';
 
 const ErrorPage = () => {
   const error = useRouteError();

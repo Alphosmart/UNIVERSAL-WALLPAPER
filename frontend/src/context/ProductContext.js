@@ -69,16 +69,20 @@ export const ProductProvider = ({ children }) => {
   }, [user]);
 
   const fetchAllProducts = useCallback(async (forceRefresh = false, currency = null) => {
+    console.log('🔍 ProductContext: fetchAllProducts called', { forceRefresh, currency, currentProducts: allProductsRef.current.length });
+    
     // Get user's preferred currency
     const userCurrency = currency || currentCurrency;
     
     // Check if we have recent data and don't need to refetch
     if (!forceRefresh && allProductsRef.current.length > 0 && lastFetch && 
         (Date.now() - lastFetch < CACHE_DURATION)) {
+      console.log('🔍 ProductContext: Using cached data', allProductsRef.current.length, 'products');
       return allProductsRef.current;
     }
 
     try {
+      console.log('🔍 ProductContext: Starting API fetch');
       setLoading(true);
       setError(null);
       
@@ -88,6 +92,7 @@ export const ProductProvider = ({ children }) => {
         url.searchParams.append('currency', userCurrency);
       }
       
+      console.log('🔍 ProductContext: Fetching from URL:', url.toString());
       const response = await fetch(url.toString(), {
         method: SummaryApi.allProduct.method,
         credentials: 'include',
@@ -96,9 +101,12 @@ export const ProductProvider = ({ children }) => {
         }
       });
 
+      console.log('🔍 ProductContext: API response status:', response.status);
       const dataResponse = await response.json();
+      console.log('🔍 ProductContext: API response data:', { success: dataResponse.success, count: dataResponse.data?.length });
 
       if (dataResponse.success) {
+        console.log('🔍 ProductContext: Success! Setting', dataResponse.data.length, 'products');
         setAllProducts(dataResponse.data);
         allProductsRef.current = dataResponse.data;
         setLastFetch(Date.now());
@@ -107,11 +115,12 @@ export const ProductProvider = ({ children }) => {
         }
         return dataResponse.data;
       } else {
+        console.log('🔍 ProductContext: API returned error:', dataResponse.message);
         setError(dataResponse.message || 'Failed to fetch products');
         return [];
       }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('🔍 ProductContext: Fetch error:', error);
       setError(error.message);
       return [];
     } finally {
@@ -120,13 +129,18 @@ export const ProductProvider = ({ children }) => {
   }, [lastFetch, CACHE_DURATION, currentCurrency]); // Removed allProducts to prevent infinite loop
 
   const getProductsByCategory = useCallback((category) => {
+    console.log('🔍 ProductContext: getProductsByCategory called', { category, totalProducts: allProductsRef.current.length });
+    
     if (!category || category === 'all') {
+      console.log('🔍 ProductContext: Returning all products:', allProductsRef.current.length);
       return allProductsRef.current;
     }
     
-    return allProductsRef.current.filter(product => 
+    const filtered = allProductsRef.current.filter(product => 
       product.category?.toLowerCase() === category?.toLowerCase()
     );
+    console.log('🔍 ProductContext: Filtered products for category', category, ':', filtered.length);
+    return filtered;
   }, []); // No dependencies needed since we use ref
 
   const getProductById = useCallback((id) => {
@@ -135,7 +149,9 @@ export const ProductProvider = ({ children }) => {
 
   // Auto-fetch on mount and when currency changes
   useEffect(() => {
+    console.log('🔍 ProductContext: useEffect triggered', { currentProducts: allProductsRef.current.length });
     if (allProductsRef.current.length === 0) {
+      console.log('🔍 ProductContext: No products found, fetching...');
       fetchAllProducts();
     }
   }, [fetchAllProducts]);

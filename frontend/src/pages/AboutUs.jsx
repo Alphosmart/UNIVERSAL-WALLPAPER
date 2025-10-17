@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaUsers, FaGlobe, FaAward, FaShieldAlt, FaHeart, FaClock, FaTruck, FaHeadset } from 'react-icons/fa';
-import { useSiteContent } from '../hooks/useSiteContent';
+import useSiteContent from '../hooks/useSiteContent';
 
 const AboutUs = () => {
   const { content: aboutContent } = useSiteContent('aboutUs');

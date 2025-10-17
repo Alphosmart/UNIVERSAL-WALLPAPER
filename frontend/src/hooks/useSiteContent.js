@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import SummaryApi from '../common';
 
 // Custom hook to fetch and cache site content
-export const useSiteContent = (section = null) => {
+const useSiteContent = () => {
     const [content, setContent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -12,24 +13,23 @@ export const useSiteContent = (section = null) => {
                 setLoading(true);
                 
                 // Try to get content from public endpoint first
-                const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-                const response = await fetch(`${baseUrl}/api/site-content`);
+                const response = await fetch(SummaryApi.getSiteContent.url);
                 
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success) {
-                        setContent(section ? data.data[section] : data.data);
+                        setContent(data.data);
                     } else {
                         // Fallback to default content
-                        setContent(getDefaultContent(section));
+                        setContent(getDefaultContent());
                     }
                 } else {
                     // Fallback to default content
-                    setContent(getDefaultContent(section));
+                    setContent(getDefaultContent());
                 }
             } catch (err) {
                 console.warn('Failed to fetch site content, using defaults:', err);
-                setContent(getDefaultContent(section));
+                setContent(getDefaultContent());
                 setError(err);
             } finally {
                 setLoading(false);
@@ -40,7 +40,7 @@ export const useSiteContent = (section = null) => {
         
         // Return fetchContent for manual refetch
         return fetchContent;
-    }, [section]);
+    }, []);
 
     const refetch = async () => {
         try {
@@ -52,7 +52,7 @@ export const useSiteContent = (section = null) => {
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
-                    setContent(section ? data.data[section] : data.data);
+                    setContent(data.data);
                 }
             }
         } catch (err) {
@@ -67,7 +67,7 @@ export const useSiteContent = (section = null) => {
 };
 
 // Default content fallbacks
-const getDefaultContent = (section) => {
+const getDefaultContent = () => {
     const defaultContent = {
         homePage: {
             hero: {
@@ -154,7 +154,7 @@ const getDefaultContent = (section) => {
         }
     };
 
-    return section ? defaultContent[section] : defaultContent;
+    return defaultContent;
 };
 
 export default useSiteContent;

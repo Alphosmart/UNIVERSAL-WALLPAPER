@@ -79,35 +79,30 @@ app.use(cookieParser())
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
-// Root route for Render deployment
+// Root route - redirect to frontend
 app.get('/', (req, res) => {
-    res.json({ 
-        message: 'Universal Wallpaper API Server',
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        environment: process.env.NODE_ENV || 'development',
-        version: '1.0.0'
-    })
+    const FRONTEND_URL = 'https://universal-wallpaper.onrender.com'
+    console.log('🔄 Root route accessed, redirecting to:', FRONTEND_URL)
+    res.redirect(301, FRONTEND_URL)
 })
 
 // Health check route
 app.get('/health', (req, res) => {
-    const fs = require('fs')
-    const frontendBuildPath = path.join(__dirname, '../frontend/build')
-    const indexPath = path.join(frontendBuildPath, 'index.html')
+    const FRONTEND_URL = 'https://universal-wallpaper.onrender.com'
     
     res.json({ 
         status: 'OK',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
         environment: process.env.NODE_ENV || 'development',
-        spa_config: {
-            frontend_build_path: frontendBuildPath,
-            build_exists: fs.existsSync(frontendBuildPath),
-            index_exists: fs.existsSync(indexPath),
-            is_production: process.env.NODE_ENV === 'production'
-        }
+        architecture: 'Separate Frontend/Backend Deployments',
+        deployment_info: {
+            backend_url: 'https://universaldotwallpaper.onrender.com',
+            frontend_url: FRONTEND_URL,
+            api_endpoints: 'https://universaldotwallpaper.onrender.com/api/*',
+            main_website: FRONTEND_URL
+        },
+        message: 'This is the API server. For the website, visit: ' + FRONTEND_URL
     })
 })
 
@@ -126,58 +121,37 @@ app.use(handleDatabaseError)
 
 // Serve static files from React build (for production)
 if (process.env.NODE_ENV === 'production') {
-    const frontendBuildPath = path.join(__dirname, '../frontend/build')
+    // For separate frontend/backend deployments, redirect frontend routes to frontend URL
+    const FRONTEND_URL = 'https://universal-wallpaper.onrender.com'
     
-    // Log the build path for debugging
-    console.log('🔍 Frontend build path:', frontendBuildPath)
+    console.log('🔄 Production mode: Separate frontend/backend deployments')
+    console.log('📍 Frontend URL:', FRONTEND_URL)
+    console.log('📍 Backend URL: Current domain (API only)')
     
-    // Check if build directory exists
-    const fs = require('fs')
-    if (fs.existsSync(frontendBuildPath)) {
-        console.log('✅ Frontend build directory found')
-        
-        // Check if index.html exists
-        const indexPath = path.join(frontendBuildPath, 'index.html')
-        if (fs.existsSync(indexPath)) {
-            console.log('✅ index.html found')
-        } else {
-            console.log('❌ index.html NOT found at:', indexPath)
-        }
-    } else {
-        console.log('❌ Frontend build directory NOT found at:', frontendBuildPath)
-    }
-    
-    // Serve static assets from the build folder
-    app.use(express.static(frontendBuildPath))
-    
-    // SPA catch-all handler: serve index.html for all non-API routes
+    // Redirect frontend routes to the actual frontend deployment
     app.use((req, res, next) => {
-        // Only serve index.html for non-API routes and GET requests
-        if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+        console.log(`🔍 Middleware checking route: ${req.method} ${req.path}`)
+        
+        // Only redirect GET requests for non-API routes and non-specific routes
+        if (req.method === 'GET' && 
+            !req.path.startsWith('/api') && 
+            !req.path.startsWith('/uploads') && 
+            !req.path.startsWith('/health') &&
+            req.path !== '/' &&
+            req.path !== '/test') {
+            
             // Check if it's a request for a static file
             const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot'];
             const hasStaticExtension = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext));
             
             if (!hasStaticExtension) {
-                const indexPath = path.join(frontendBuildPath, 'index.html')
-                
-                // Log SPA routing attempt
-                console.log(`🔄 SPA routing: ${req.path} -> index.html`)
-                
-                // Check if index.html exists before serving
-                if (fs.existsSync(indexPath)) {
-                    return res.sendFile(indexPath);
-                } else {
-                    console.log('❌ index.html not found for SPA routing:', indexPath)
-                    return res.status(404).json({
-                        success: false,
-                        error: true,
-                        message: `SPA routing failed - index.html not found at ${indexPath}`,
-                        path: req.path,
-                        timestamp: new Date().toISOString()
-                    });
-                }
+                console.log(`🔄 Redirecting frontend route: ${req.path} -> ${FRONTEND_URL}${req.path}`)
+                return res.redirect(301, `${FRONTEND_URL}${req.path}`);
+            } else {
+                console.log(`📁 Static file request, not redirecting: ${req.path}`)
             }
+        } else {
+            console.log(`⏭️  Skipping redirect for: ${req.method} ${req.path}`)
         }
         next();
     });

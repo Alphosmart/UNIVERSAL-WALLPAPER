@@ -49,7 +49,7 @@ const EnhancedSearchResults = () => {
     // Fetch search filters data
     const fetchFilters = useCallback(async () => {
         try {
-            const response = await fetch(`${SummaryApi.baseURL}/api/search/filters`);
+            const response = await fetch(SummaryApi.searchFilters.url);
             const data = await response.json();
             
             if (data.success) {

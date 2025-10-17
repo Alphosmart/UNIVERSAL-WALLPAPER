@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSiteContent } from '../hooks/useSiteContent';
+import useSiteContent from '../hooks/useSiteContent';
 
 const ContactUs = () => {
     const [formData, setFormData] = useState({
