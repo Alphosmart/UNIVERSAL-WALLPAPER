@@ -59,7 +59,7 @@ const ContactUs = () => {
     };
 
     // Use dynamic content or fallback to defaults
-    const pageContent = content || {
+    const defaultContent = {
         title: "Contact Us",
         subtitle: "We're here to help! Get in touch with our team for any questions, support, or feedback.",
         businessInfo: {
@@ -72,6 +72,19 @@ const ContactUs = () => {
             emailResponse: "24-48 hours",
             phoneHours: "Mon-Fri 9AM-6PM",
             liveChatHours: "Mon-Fri 9AM-6PM"
+        }
+    };
+
+    const pageContent = {
+        ...defaultContent,
+        ...content,
+        businessInfo: {
+            ...defaultContent.businessInfo,
+            ...(content?.businessInfo || {})
+        },
+        responseInfo: {
+            ...defaultContent.responseInfo,
+            ...(content?.responseInfo || {})
         }
     };
 
