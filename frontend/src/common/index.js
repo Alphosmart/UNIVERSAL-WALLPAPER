@@ -498,6 +498,12 @@ const SummaryApi = {
     searchFilters : {
         url : `${backendDomain}/api/search/filters`,
         method : 'get'
+    },
+    
+    // Contact Us API
+    contactUs : {
+        url : `${backendDomain}/api/contact`,
+        method : 'post'
     }
 }
 

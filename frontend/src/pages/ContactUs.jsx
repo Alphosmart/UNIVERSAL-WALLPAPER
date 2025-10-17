@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import useSiteContent from '../hooks/useSiteContent';
+import SummaryApi from '../common';
 
 const ContactUs = () => {
     const [formData, setFormData] = useState({
@@ -28,8 +29,8 @@ const ContactUs = () => {
         setSubmitMessage('');
 
         try {
-            const response = await fetch('http://localhost:8080/api/contact', {
-                method: 'POST',
+            const response = await fetch(SummaryApi.contactUs.url, {
+                method: SummaryApi.contactUs.method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
