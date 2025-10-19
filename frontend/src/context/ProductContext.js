@@ -13,6 +13,8 @@ export const useProducts = () => {
 };
 
 export const ProductProvider = ({ children }) => {
+  console.log('🔍 ProductProvider: Initializing at', new Date().toISOString());
+  
   const user = useSelector(state => state?.user?.user);
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -20,6 +22,8 @@ export const ProductProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const allProductsRef = useRef([]);
   const [currentCurrency, setCurrentCurrency] = useState('NGN');
+
+  console.log('🔍 ProductProvider: Initial state set. User:', user?.name || 'Not logged in');
 
   // Cache products for 5 minutes
   const CACHE_DURATION = 5 * 60 * 1000;
@@ -149,10 +153,20 @@ export const ProductProvider = ({ children }) => {
 
   // Auto-fetch on mount and when currency changes
   useEffect(() => {
-    console.log('🔍 ProductContext: useEffect triggered', { currentProducts: allProductsRef.current.length });
+    console.log('🔍 ProductContext: useEffect triggered', { 
+      currentProducts: allProductsRef.current.length,
+      timestamp: new Date().toISOString(),
+      fetchAllProductsRef: !!fetchAllProducts
+    });
     if (allProductsRef.current.length === 0) {
-      console.log('🔍 ProductContext: No products found, fetching...');
-      fetchAllProducts();
+      console.log('🔍 ProductContext: No products found, calling fetchAllProducts...');
+      fetchAllProducts().then((products) => {
+        console.log('🔍 ProductContext: fetchAllProducts completed with', products?.length || 0, 'products');
+      }).catch((error) => {
+        console.error('🔍 ProductContext: fetchAllProducts failed:', error);
+      });
+    } else {
+      console.log('🔍 ProductContext: Already have', allProductsRef.current.length, 'products, skipping fetch');
     }
   }, [fetchAllProducts]);
 
