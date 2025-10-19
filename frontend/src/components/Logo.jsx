@@ -1,12 +1,15 @@
 import React from 'react';
-import { FaPalette } from 'react-icons/fa';
 
 const Logo = ({ w = 120, h = 40, showText = true, className = "" }) => {
   return (
     <div className={`flex items-center space-x-2 ${className}`}>
-      <div className='bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-lg'>
-        <FaPalette className='text-white text-xl' />
-      </div>
+      <img 
+        src="/logo.svg" 
+        alt="Universal Wallpaper Logo"
+        width={h}
+        height={h}
+        className="object-contain"
+      />
       {showText && (
         <div className='text-xl font-bold text-gray-800'>
           Universal Wallpaper
