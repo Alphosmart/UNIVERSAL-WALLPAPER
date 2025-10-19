@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import BannerProduct from '../components/BannerProduct.jsx'
-import HorizontalCardProduct from '../components/HorizontalCardProduct.jsx'
+// import BannerProduct from '../components/BannerProduct.jsx'
+// import HorizontalCardProduct from '../components/HorizontalCardProduct.jsx'
 import VerticalCardProduct from '../components/VerticalCardProduct.jsx'
 import BackendStatus from '../components/BackendStatus'
 import useSiteContent from '../hooks/useSiteContent'
@@ -31,6 +31,8 @@ const Home = () => {
     <div>
       <BackendStatus />
       
+      <p className="text-center p-4 text-red-600 font-bold">🔍 DEBUG: Home component is rendering successfully!</p>
+      
       {/* Dynamic Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
@@ -57,16 +59,17 @@ const Home = () => {
         </div>
       </div>
       
-      <BannerProduct />
+      {/* Temporarily commenting out product components to debug */}
+      {/* <BannerProduct /> */}
+      
+      <p className="text-center p-4 text-blue-600 font-bold">🔍 DEBUG: About to load VerticalCardProduct...</p>
       
       {/* Show all products from our company */}
       <VerticalCardProduct category={"all"} heading={"All Interior Decoration Products"} />
       
+      {/* Commenting out other components temporarily 
       <HorizontalCardProduct category={"wallpapers"} heading={"Premium Wallpapers"} />
       <HorizontalCardProduct category={"wall-paint"} heading={"Quality Wall Paints"} />
-
-      {/* Shipping Partner Banner - Only show to non-shipping company users */}
-      {/* {user?.role !== 'SHIPPING_COMPANY' && <ShippingPartnerBanner />} */}
 
       <VerticalCardProduct category={"decorative-panels"} heading={"Decorative Panels"} />
       <VerticalCardProduct category={"tiles"} heading={"Designer Tiles"} />
@@ -76,6 +79,7 @@ const Home = () => {
       <VerticalCardProduct category={"mirrors"} heading={"Designer Mirrors"} />
       <VerticalCardProduct category={"brushes-rollers"} heading={"Painting Tools"} />
       <VerticalCardProduct category={"wood-stain"} heading={"Wood Stains & Finishes"} />
+      */}
     </div>
   )
 }

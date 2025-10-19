@@ -6,6 +6,8 @@ import { trackSearchEvent } from '../utils/searchUtils';
 import SummaryApi from '../common';
 
 const EnhancedSearchResults = () => {
+    console.log('🔍 EnhancedSearchResults component loaded at:', new Date().toISOString());
+    
     const location = useLocation();
     const navigate = useNavigate();
     
@@ -63,10 +65,11 @@ const EnhancedSearchResults = () => {
     // Enhanced search function
     const performSearch = useCallback(async (query = searchTerm, page = 1, searchFilters = filters) => {
         try {
+            console.log('🔍 performSearch called:', { query, page, searchFilters });
             setLoading(true);
             
             const searchParams = new URLSearchParams({
-                q: query,
+                q: query || '', // Allow empty query to show all products
                 page: page.toString(),
                 limit: '20',
                 sortBy: searchFilters.sortBy,
@@ -78,8 +81,13 @@ const EnhancedSearchResults = () => {
             if (searchFilters.minPrice) searchParams.append('minPrice', searchFilters.minPrice);
             if (searchFilters.maxPrice) searchParams.append('maxPrice', searchFilters.maxPrice);
 
-            const response = await fetch(`${SummaryApi.baseURL}/api/search/smart?${searchParams}`);
+            const searchUrl = `${SummaryApi.baseURL}/api/search/smart?${searchParams}`;
+            console.log('🔍 Making search request to:', searchUrl);
+
+            const response = await fetch(searchUrl);
             const data = await response.json();
+            
+            console.log('🔍 Search response:', { status: response.status, data });
             
             if (data.success) {
                 setProducts(data.data || []);
@@ -87,9 +95,15 @@ const EnhancedSearchResults = () => {
                 setTotalPages(data.pagination?.totalPages || 1);
                 setCurrentPage(data.pagination?.currentPage || 1);
                 
+                console.log('🔍 Search successful:', { 
+                    productsCount: data.data?.length, 
+                    totalResults: data.pagination?.totalProducts 
+                });
+                
                 // Track search analytics
                 trackSearchEvent(query, data.pagination?.totalProducts || 0, searchFilters);
             } else {
+                console.log('🔍 Search failed:', data.message);
                 setProducts([]);
                 setTotalResults(0);
             }
@@ -121,9 +135,9 @@ const EnhancedSearchResults = () => {
 
     // Perform search when dependencies change
     useEffect(() => {
-        if (searchTerm || filters.category) {
-            performSearch(searchTerm, currentPage, filters);
-        }
+        console.log('🔍 Search useEffect triggered:', { searchTerm, category: filters.category, currentPage });
+        // Always perform search - if no search term, show all products
+        performSearch(searchTerm, currentPage, filters);
     }, [searchTerm, currentPage, filters, performSearch]);
 
     // Handle search from SmartSearchBar
