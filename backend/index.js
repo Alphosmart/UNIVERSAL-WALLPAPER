@@ -66,6 +66,8 @@ app.use(cors({
         'http://192.168.1.100:3001',
         'https://universaldotwallpaper.onrender.com',
         'https://universal-wallpaper.onrender.com',
+        'https://www.universaldotwallpaper.com',
+        'https://universaldotwallpaper.com',
         'https://www.universaldotwalpaper.com',
         'https://universaldotwalpaper.com',
         /\.onrender\.com$/
@@ -81,16 +83,11 @@ app.use(cookieParser())
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
-// Root route - redirect to frontend
-app.get('/', (req, res) => {
-    const FRONTEND_URL = 'https://universal-wallpaper.onrender.com'
-    console.log('🔄 Root route accessed, redirecting to:', FRONTEND_URL)
-    res.redirect(301, FRONTEND_URL)
-})
+// Root route - will be handled by SPA routing middleware in production
 
 // Health check route
 app.get('/health', (req, res) => {
-    const FRONTEND_URL = 'https://universal-wallpaper.onrender.com'
+    const FRONTEND_URL = 'https://www.universaldotwalpaper.com'
     
     res.json({ 
         status: 'OK',
@@ -123,7 +120,9 @@ app.use(handleDatabaseError)
 
 // Serve static files from React build (for production)
 if (process.env.NODE_ENV === 'production') {
-    console.log('🔄 Production mode: Combined frontend/backend deployment')
+    console.log('🔄 Production mode: Separate frontend/backend deployments')
+    console.log('📍 Frontend: https://www.universaldotwalpaper.com')
+    console.log('📍 Backend: API only')
     
     // Serve static files from frontend build directory
     const frontendBuildPath = path.join(__dirname, '../frontend/build');
