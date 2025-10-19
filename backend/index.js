@@ -124,40 +124,9 @@ if (process.env.NODE_ENV === 'production') {
     console.log('📍 Frontend: https://www.universaldotwalpaper.com')
     console.log('📍 Backend: API only')
     
-    // Serve static files from frontend build directory
-    const frontendBuildPath = path.join(__dirname, '../frontend/build');
-    console.log('� Serving static files from:', frontendBuildPath);
+    // Backend API server only - no frontend files served
     
-    app.use(express.static(frontendBuildPath));
-    
-    // SPA routing: serve index.html for all non-API routes
-    // Use a middleware instead of app.get('*') to avoid path-to-regexp issues
-    app.use((req, res, next) => {
-        // Only handle GET requests
-        if (req.method !== 'GET') {
-            return next();
-        }
-        
-        // Skip API routes and static files
-        if (req.path.startsWith('/api') || 
-            req.path.startsWith('/uploads') || 
-            req.path.startsWith('/health') || 
-            req.path === '/test') {
-            return next();
-        }
-        
-        // Check if it's a static file request
-        const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot', '.map'];
-        const hasStaticExtension = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext));
-        
-        if (hasStaticExtension) {
-            return next();
-        }
-        
-        // Serve index.html for all other routes (SPA routing)
-        console.log(`🎯 SPA routing: serving index.html for ${req.path}`);
-        res.sendFile(path.join(frontendBuildPath, 'index.html'));
-    });
+    // No SPA routing needed - frontend deployed separately
 } else {
     // Development mode - let the undefined routes handler work
     // Handle undefined routes - using middleware instead of app.all('*') to avoid Express 5 issues
