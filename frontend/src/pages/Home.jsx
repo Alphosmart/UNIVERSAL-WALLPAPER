@@ -9,8 +9,13 @@ import { Link } from 'react-router-dom'
 // import ShippingPartnerBanner from '../components/ShippingPartnerBanner'
 
 const Home = () => {
+  console.log('🔍 Home component: Rendering at', new Date().toISOString());
+  
   const user = useSelector(state => state?.user?.user)
   const { content: homeContent } = useSiteContent('homePage')
+
+  console.log('🔍 Home component: User state:', user?.name || 'Not logged in');
+  console.log('🔍 Home component: Site content loading...');
 
   // Default content fallback
   const heroContent = homeContent?.hero || {
