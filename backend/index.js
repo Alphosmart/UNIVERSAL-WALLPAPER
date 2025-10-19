@@ -132,12 +132,30 @@ if (process.env.NODE_ENV === 'production') {
     app.use(express.static(frontendBuildPath));
     
     // SPA routing: serve index.html for all non-API routes
-    app.get('*', (req, res) => {
-        // Skip API routes
-        if (req.path.startsWith('/api') || req.path.startsWith('/uploads') || req.path.startsWith('/health') || req.path === '/test') {
-            return res.status(404).json({ message: 'API route not found' });
+    // Use a middleware instead of app.get('*') to avoid path-to-regexp issues
+    app.use((req, res, next) => {
+        // Only handle GET requests
+        if (req.method !== 'GET') {
+            return next();
         }
         
+        // Skip API routes and static files
+        if (req.path.startsWith('/api') || 
+            req.path.startsWith('/uploads') || 
+            req.path.startsWith('/health') || 
+            req.path === '/test') {
+            return next();
+        }
+        
+        // Check if it's a static file request
+        const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot', '.map'];
+        const hasStaticExtension = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext));
+        
+        if (hasStaticExtension) {
+            return next();
+        }
+        
+        // Serve index.html for all other routes (SPA routing)
         console.log(`🎯 SPA routing: serving index.html for ${req.path}`);
         res.sendFile(path.join(frontendBuildPath, 'index.html'));
     });
