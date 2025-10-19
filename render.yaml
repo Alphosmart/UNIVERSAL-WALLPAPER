@@ -1,5 +1,5 @@
 services:
-  # Combined Frontend + Backend Service (since using same domain)
+  # Combined Frontend + Backend Service
   - type: web
     name: universal-wallpaper
     env: node

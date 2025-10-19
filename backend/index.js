@@ -123,46 +123,31 @@ app.use(handleDatabaseError)
 
 // Serve static files from React build (for production)
 if (process.env.NODE_ENV === 'production') {
-    // For separate frontend/backend deployments, redirect frontend routes to frontend URL
-    const FRONTEND_URL = 'https://universal-wallpaper.onrender.com'
+    console.log('🔄 Production mode: Combined frontend/backend deployment')
     
-    console.log('🔄 Production mode: Separate frontend/backend deployments')
-    console.log('📍 Frontend URL:', FRONTEND_URL)
-    console.log('📍 Backend URL: Current domain (API only)')
+    // Serve static files from frontend build directory
+    const frontendBuildPath = path.join(__dirname, '../frontend/build');
+    console.log('� Serving static files from:', frontendBuildPath);
     
-    // Redirect frontend routes to the actual frontend deployment
-    app.use((req, res, next) => {
-        console.log(`🔍 Middleware checking route: ${req.method} ${req.path}`)
-        
-        // Only redirect GET requests for non-API routes and non-specific routes
-        if (req.method === 'GET' && 
-            !req.path.startsWith('/api') && 
-            !req.path.startsWith('/uploads') && 
-            !req.path.startsWith('/health') &&
-            req.path !== '/' &&
-            req.path !== '/test') {
-            
-            // Check if it's a request for a static file
-            const staticExtensions = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf', '.eot'];
-            const hasStaticExtension = staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext));
-            
-            if (!hasStaticExtension) {
-                console.log(`🔄 Redirecting frontend route: ${req.path} -> ${FRONTEND_URL}${req.path}`)
-                return res.redirect(301, `${FRONTEND_URL}${req.path}`);
-            } else {
-                console.log(`📁 Static file request, not redirecting: ${req.path}`)
-            }
-        } else {
-            console.log(`⏭️  Skipping redirect for: ${req.method} ${req.path}`)
+    app.use(express.static(frontendBuildPath));
+    
+    // SPA routing: serve index.html for all non-API routes
+    app.get('*', (req, res) => {
+        // Skip API routes
+        if (req.path.startsWith('/api') || req.path.startsWith('/uploads') || req.path.startsWith('/health') || req.path === '/test') {
+            return res.status(404).json({ message: 'API route not found' });
         }
-        next();
+        
+        console.log(`🎯 SPA routing: serving index.html for ${req.path}`);
+        res.sendFile(path.join(frontendBuildPath, 'index.html'));
     });
-} 
-
-// Handle undefined routes - using middleware instead of app.all('*') to avoid Express 5 issues
-app.use((req, res, next) => {
-    notFoundHandler(req, res, next)
-})
+} else {
+    // Development mode - let the undefined routes handler work
+    // Handle undefined routes - using middleware instead of app.all('*') to avoid Express 5 issues
+    app.use((req, res, next) => {
+        notFoundHandler(req, res, next)
+    })
+}
 
 // Global error handling middleware
 app.use(globalErrorHandler)
