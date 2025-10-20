@@ -251,27 +251,6 @@ const SummaryApi = {
         url : `${backendDomain}/api/track/:trackingNumber`,
         method : 'get'
     },
-    // Shipping endpoints
-    getShippingSettings : {
-        url : `${backendDomain}/api/admin/shipping/settings`,
-        method : 'get'
-    },
-    updateGlobalShippingSettings : {
-        url : `${backendDomain}/api/admin/shipping/global`,
-        method : 'put'
-    },
-    createShippingZone : {
-        url : `${backendDomain}/api/admin/shipping/zones`,
-        method : 'post'
-    },
-    updateShippingZone : {
-        url : `${backendDomain}/api/admin/shipping/zones/:zoneId`,
-        method : 'put'
-    },
-    deleteShippingZone : {
-        url : `${backendDomain}/api/admin/shipping/zones/:zoneId`,
-        method : 'delete'
-    },
     calculateShippingCost : {
         url : `${backendDomain}/api/shipping/calculate`,
         method : 'post'
@@ -333,56 +312,6 @@ const SummaryApi = {
         url : `${backendDomain}/api/admin/site-content/reset`,
         method : 'delete'
     },
-    
-    // Shipping Company APIs - REMOVED (single company model)
-    // registerShippingCompany : {
-    //     url : `${backendDomain}/api/shipping-company/register`,
-    //     method : 'post'
-    // },
-    // getShippingCompanyProfile : {
-    //     url : `${backendDomain}/api/shipping-company/profile`,
-    //     method : 'get'
-    // },
-    // updateShippingCompanyProfile : {
-    //     url : `${backendDomain}/api/shipping-company/profile`,
-    //     method : 'put'
-    // },
-    // getAvailableOrders : {
-    //     url : `${backendDomain}/api/shipping-company/available-orders`,
-    //     method : 'get'
-    // },
-    // submitShippingQuote : {
-    //     url : `${backendDomain}/api/shipping-company/orders`,
-    //     method : 'post'
-    // },
-    // getShippingQuotes : {
-    //     url : `${backendDomain}/api/shipping-company/quotes`,
-    //     method : 'get'
-    // },
-    // getShippingCompanyStats : {
-    //     url : `${backendDomain}/api/shipping-company/stats`,
-    //     method : 'get'
-    // },
-    
-    // Order Shipping APIs - REMOVED (single company model)
-    // getOrderShippingQuotes : {
-    //     url : `${backendDomain}/api/orders`,
-    //     method : 'get'
-    // },
-    // selectShippingQuote : {
-    //     url : `${backendDomain}/api/orders`,
-    //     method : 'post'
-    // },
-    
-    // Admin Shipping Company Management - REMOVED (single company model)
-    // getAllShippingCompanies : {
-    //     url : `${backendDomain}/api/admin/shipping-companies`,
-    //     method : 'get'
-    // },
-    // updateShippingCompanyStatus : {
-    //     url : `${backendDomain}/api/admin/shipping-companies`,
-    //     method : 'put'
-    // },
     
     // Maintenance Mode
     maintenanceStatus : {

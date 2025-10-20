@@ -2,7 +2,6 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, Link } from 'react-router-dom';
 import { FaHome, FaUsers, FaBoxOpen, FaChartBar, FaCog, FaImage, FaEnvelope, FaUserCog, FaTags } from 'react-icons/fa';
-// FaShippingFast removed - single company model
 
 const AdminPanel = () => {
   const user = useSelector(state => state?.user?.user);
@@ -45,17 +44,6 @@ const AdminPanel = () => {
       path: '/admin-panel/banners',
       icon: <FaImage />
     },
-    // {
-    //   label: 'Seller Applications',
-    //   path: '/admin-panel/seller-applications',
-    //   icon: <FaUserCheck />
-    // },
-    // Shipping Companies removed - single company model
-    // {
-    //   label: 'Shipping Companies',
-    //   path: '/admin-panel/shipping-companies',
-    //   icon: <FaShippingFast />
-    // },
     {
       label: 'Analytics',
       path: '/admin-panel/analytics',
@@ -66,12 +54,6 @@ const AdminPanel = () => {
       path: '/admin-panel/site-content',
       icon: <FaCog />
     },
-    // Shipping Settings removed - single company model
-    // {
-    //   label: 'Shipping Settings',
-    //   path: '/admin-panel/shipping-settings',
-    //   icon: <FaShippingFast />
-    // },
     {
       label: 'Email Templates',
       path: '/admin-panel/email-templates',

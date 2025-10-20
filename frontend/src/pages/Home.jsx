@@ -6,7 +6,6 @@ import VerticalCardProduct from '../components/VerticalCardProduct.jsx'
 import BackendStatus from '../components/BackendStatus'
 import useSiteContent from '../hooks/useSiteContent'
 import { Link } from 'react-router-dom'
-// import ShippingPartnerBanner from '../components/ShippingPartnerBanner'
 
 const Home = () => {
   console.log('🔍 Home component: Rendering at', new Date().toISOString());

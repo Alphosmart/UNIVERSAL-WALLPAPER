@@ -22,7 +22,6 @@ import Checkout from '../pages/Checkout';
 import Analytics from '../pages/Analytics';
 import Settings from '../pages/Settings';
 import SiteContentManagement from '../pages/SiteContentManagement';
-// import ShippingSettings from '../pages/ShippingSettings';
 import BannerManagement from '../pages/BannerManagement';
 // SellerOrders removed - single company model
 import OrderTracking from '../pages/OrderTracking';
@@ -42,18 +41,11 @@ import PrivacyPolicy from '../pages/PrivacyPolicy';
 import TermsOfService from '../pages/TermsOfService';
 import ReturnRefundPolicy from '../pages/ReturnRefundPolicy';
 import CookiePolicy from '../pages/CookiePolicy';
-// import ShippingInfo from '../pages/ShippingInfo'; // Removed - single company model
 import AdminContactMessages from '../pages/AdminContactMessages';
 import StaffManagement from '../pages/StaffManagement';
 import EmailTemplateManager from '../components/EmailTemplateManager';
 import DevLogin from '../pages/DevLogin';
-// Shipping company components removed - single company model
-// import ShippingCompanyRegistration from '../pages/ShippingCompanyRegistration';
-// import ShippingCompanyDashboard from '../pages/ShippingCompanyDashboard';
-// import ShippingCompanyProfile from '../pages/ShippingCompanyProfile';
-// import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute, ShippingCompanyRoute } from '../components/AuthGuard';
 import { ProtectedRoute, GuestRoute, AdminRoute } from '../components/AuthGuard';
-// SellerProtectedRoute removed - single company model
 
 
 const router = createBrowserRouter([
@@ -212,26 +204,6 @@ const router = createBrowserRouter([
                 element: <CookiePolicy />,
                 errorElement: <ErrorPage />
             },
-            // {
-            //     path: "shipping-info",
-            //     element: <ShippingInfo />,
-            //     errorElement: <ErrorPage />
-            // },
-            // {
-            //     path: "shipping-company/register",
-            //     element: <ShippingCompanyRegistration />,
-            //     errorElement: <ErrorPage />
-            // },
-            // {
-            //     path: "shipping-company/dashboard",
-            //     element: <ShippingCompanyRoute><ShippingCompanyDashboard /></ShippingCompanyRoute>,
-            //     errorElement: <ErrorPage />
-            // },
-            // {
-            //     path: "shipping-company/profile",
-            //     element: <ShippingCompanyRoute><ShippingCompanyProfile /></ShippingCompanyRoute>,
-            //     errorElement: <ErrorPage />
-            // },
             {
                 path: "returns-refunds",
                 element: <ReturnsRefunds />,
@@ -284,14 +256,6 @@ const router = createBrowserRouter([
                         path: "banners",
                         element: <BannerManagement />
                     },
-                    // {
-                    //     path: "seller-applications",
-                    //     element: <AdminSellerApplications />
-                    // },
-                    // {
-                    //     path: "shipping-companies",
-                    //     element: <AdminShippingCompanies />
-                    // },
                     {
                         path: "analytics",
                         element: <Analytics />
@@ -300,10 +264,6 @@ const router = createBrowserRouter([
                         path: "site-content",
                         element: <SiteContentManagement />
                     },
-                    // {
-                    //     path: "shipping-settings",
-                    //     element: <ShippingSettings />
-                    // },
                     {
                         path: "email-templates",
                         element: <EmailTemplateManager />

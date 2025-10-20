@@ -81,11 +81,6 @@ const userSchema = new mongoose.Schema({
         }
     }
     
-    // Seller and Shipping Company fields removed - single company model
-    // All seller registration, verification, and payment fields have been removed
-    // as the platform now operates with a single company model where
-    // only admin and staff manage products
-    
 }, {
     timestamps : true
 })

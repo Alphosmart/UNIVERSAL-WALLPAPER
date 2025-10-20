@@ -28,7 +28,6 @@ require('./models/bannerModel')
 require('./models/backupModel')
 require('./models/settingsModel')
 require('./models/contactMessageModel')
-// require('./models/shippingModel') // Removed - single company model
 
 const app = express()
 

@@ -341,16 +341,6 @@ async function getDashboardStats(req, res) {
     }
 }
 
-// Shipping company functions removed - single company model
-// getAllShippingCompanies and updateShippingCompanyStatus functions
-// have been removed as the platform now operates with a single company model
-
-// Get all shipping companies (admin only) - REMOVED
-// async function getAllShippingCompanies(req, res) { ... }
-
-// Update shipping company status (admin only) - REMOVED
-// async function updateShippingCompanyStatus(req, res) { ... }
-
 // Set seller suspension status (admin only)
 async function setSellerSuspension(req, res) {
     try {
