@@ -1,0 +1,33 @@
+# Vercel Environment Variables for Universal Wallpaper Frontend
+# Copy these key-value pairs to your Vercel project settings
+
+# === REQUIRED VARIABLES ===
+REACT_APP_API_URL=https://universaldotwallpaper.onrender.com
+GENERATE_SOURCEMAP=false
+BUILD_PATH=build
+PUBLIC_URL=/
+REACT_APP_DEBUG=false
+
+# === FEATURE FLAGS ===
+REACT_APP_ENABLE_SOCIAL_FEATURES=true
+REACT_APP_ENABLE_REVIEWS=true
+REACT_APP_ENABLE_SHIPPING_QUOTES=true
+
+# === ANALYTICS ===
+REACT_APP_ENABLE_ANALYTICS=true
+REACT_APP_ANALYTICS_DEBUG=false
+
+# === PAYMENT CONFIGURATION ===
+# Add your Stripe publishable key here (leave empty if not using Stripe)
+REACT_APP_STRIPE_PUBLISHABLE_KEY=
+
+# === GOOGLE ANALYTICS ===
+# Add your Google Analytics GA4 Measurement ID here (optional)
+REACT_APP_GA_TRACKING_ID=
+
+# === INSTRUCTIONS ===
+# 1. Go to your Vercel project dashboard
+# 2. Navigate to Settings → Environment Variables
+# 3. Add each variable above with its value
+# 4. Set Environment to "Production" (and "Preview" if needed)
+# 5. Redeploy your project after adding variables

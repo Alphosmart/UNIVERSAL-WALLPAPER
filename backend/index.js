@@ -70,7 +70,9 @@ app.use(cors({
         'https://universaldotwallpaper.com',
         'https://www.universaldotwalpaper.com',
         'https://universaldotwalpaper.com',
-        /\.onrender\.com$/
+        'https://universal-wallpaper.vercel.app',
+        /\.onrender\.com$/,
+        /\.vercel\.app$/
     ],
     credentials: true
 }))
@@ -87,7 +89,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // Health check route
 app.get('/health', (req, res) => {
-    const FRONTEND_URL = 'https://www.universaldotwalpaper.com'
+    const FRONTEND_URL = 'https://universal-wallpaper.vercel.app'
     
     res.json({ 
         status: 'OK',
