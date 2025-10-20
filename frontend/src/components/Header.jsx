@@ -91,24 +91,16 @@ const Header = () => {
     return <FaRegCircleUser />
   }, [user?.profilePic, user?.name])
 
-  const sellerMenuItems = useMemo(() => {
+  const adminMenuItems = useMemo(() => {
     if (!user) return null
     
-    // Show product management options for staff with upload permissions or verified sellers
-    const canManageProducts = (user.role === 'STAFF' && user.permissions?.canUploadProducts) || 
-                             user.sellerStatus === 'verified';
+    // Show product management options for admin and staff with upload permissions
+    const canManageProducts = user.role === 'ADMIN' || 
+                             (user.role === 'STAFF' && user.permissions?.canUploadProducts);
     
     if (canManageProducts) {
       return (
         <>
-          <Link 
-            to={'/seller-dashboard'} 
-            className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-            onClick={closeMenu}
-          >
-            <span className='text-sm'>📊</span>
-            Product Dashboard
-          </Link>
           <Link 
             to={'/add-product'} 
             className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
@@ -123,45 +115,22 @@ const Header = () => {
             onClick={closeMenu}
           >
             <span className='text-sm'>📦</span>
-            My Products
+            Manage Products
           </Link>
-          {user.sellerStatus === 'verified' && (
-            <>
-              <Link 
-                to={'/seller-orders'} 
-                className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-                onClick={closeMenu}
-              >
-                <span className='text-sm'>📋</span>
-                My Orders
-              </Link>
-              {user.role === 'ADMIN' && (
-                <Link 
-                  to={'/seller-account-settings'} 
-                  className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-                  onClick={closeMenu}
-                >
-                  <span className='text-sm'>💳</span>
-                  Payment Settings
-                </Link>
-              )}
-            </>
+          {user.role === 'ADMIN' && (
+            <Link 
+              to={'/admin-panel'} 
+              className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
+              onClick={closeMenu}
+            >
+              <span className='text-sm'>⚙️</span>
+              Admin Panel
+            </Link>
           )}
         </>
       )
     }
     
-    if (user.sellerStatus === 'pending_verification') {
-      return (
-        <div className='flex items-center gap-3 px-4 py-2 text-yellow-600 transition-colors' 
-        >
-          <span className='text-sm'>⏳</span>
-          <span className='text-sm'>Seller Application Pending</span>
-        </div>
-      )
-    }
-    
-    // Seller applications disabled - single company model
     return null
   }, [user, closeMenu])
 
@@ -199,9 +168,9 @@ const Header = () => {
 
         <div className='flex items-center gap-7'>
           
-          {user?._id && (
+          {user?._id && user?.role === 'ADMIN' && (
             <Link to={"/add-product"} className='px-3 py-1 rounded-full text-white bg-green-600 hover:bg-green-700 hidden md:block'>
-              Sell
+              Add Product
             </Link>
           )}
 
@@ -275,13 +244,13 @@ const Header = () => {
                       </Link>
                     )}
                     
-                    {sellerMenuItems && (
+                    {adminMenuItems && (
                       <>
                         <hr className='my-2 border-gray-100' />
                         <div className='px-4 py-1'>
                           <span className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Product Management</span>
                         </div>
-                        {sellerMenuItems}
+                        {adminMenuItems}
                       </>
                     )}
                     
