@@ -13,8 +13,6 @@ import { useCart } from '../context/CartContext';
 
 const Header = () => {
   const user = useSelector(state => state?.user?.user)
-  console.log('🔍 Header rendered. User:', user?._id ? `${user.name} (${user._id})` : 'Not logged in');
-  console.log('🔍 Header render time:', new Date().toISOString());
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [menuDisplay, setMenuDisplay] = useState(false)
@@ -134,8 +132,6 @@ const Header = () => {
     return null
   }, [user, closeMenu])
 
-  // Shipping Company functionality removed - single company model
-
   return (
     <header className='h-16 shadow-md bg-white fixed w-full z-40'>
       <div className="h-full container mx-auto flex items-center px-4 justify-between">
@@ -253,8 +249,6 @@ const Header = () => {
                         {adminMenuItems}
                       </>
                     )}
-                    
-                    {/* Shipping company menu removed - single company model */}
                   </nav>
 
                   {/* Logout Button */}
@@ -325,23 +319,11 @@ const Header = () => {
                     <FaCreditCard className='text-sm text-purple-500' />
                     Payment Options
                   </Link>
-                  {/* TEMPORARILY DISABLED SHIPPING LINK */}
-                  {/* <Link 
-                    to={'/shipping-info'} 
-                    className='flex items-center gap-3 px-4 py-2 hover:bg-gray-50 text-gray-700 transition-colors' 
-                    onClick={closeHelpMenu}
-                  >
-                    <FaShippingFast className='text-sm text-orange-500' />
-                    Shipping & Delivery
-                  </Link> */}
                   
-                  {/* Business Partnership Section */}
                   <hr className='my-2 border-gray-100' />
                   <div className='px-4 py-1'>
                     <span className='text-xs font-medium text-gray-500 uppercase tracking-wider'>Partnerships</span>
                   </div>
-                  
-                  {/* Shipping company functionality removed - single company model */}
                   
                   <Link 
                     to={'/returns-exchanges'} 
