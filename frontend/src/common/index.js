@@ -1,6 +1,6 @@
 const backendDomain = process.env.NODE_ENV === 'production' 
     ? "https://universaldotwallpaper.onrender.com" 
-    : "https://universaldotwallpaper.onrender.com"  // Use production backend for development too
+    : "http://localhost:8080"  // Use local backend for development
 
 const SummaryApi = {
     signUP : {
