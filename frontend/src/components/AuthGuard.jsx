@@ -46,27 +46,6 @@ export const AdminRoute = ({ children }) => {
   return children;
 };
 
-// SellerRoute: Only allows verified sellers, staff with upload permissions, and admins
-export const SellerRoute = ({ children }) => {
-  const user = useSelector(state => state?.user?.user);
-  const location = useLocation();
-  
-  if (!user?._id) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
-  }
-  
-  // Allow admins, verified sellers, or staff with upload permissions
-  const hasAccess = user?.role === 'ADMIN' || 
-                   user?.sellerStatus === 'verified' ||
-                   (user?.role === 'STAFF' && user?.permissions?.canUploadProducts);
-
-  if (!hasAccess) {
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
-};
-
 // ShippingCompanyRoute removed - single company model
 // export const ShippingCompanyRoute = ({ children }) => {
 //   const user = useSelector(state => state?.user?.user);

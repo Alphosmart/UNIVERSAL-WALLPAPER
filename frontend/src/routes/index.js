@@ -18,17 +18,13 @@ import MyProducts from '../pages/MyProducts';
 import ProductDetail from '../pages/ProductDetail';
 import Cart from '../pages/Cart';
 import Checkout from '../pages/Checkout';
-import SellerAccountSettings from '../pages/SellerAccountSettings';
-// import BecomeSellerPage from '../pages/BecomeSellerPage';
-// import AdminSellerApplications from '../pages/AdminSellerApplications';
-// import AdminShippingCompanies from '../pages/AdminShippingCompanies';
-import SellerDashboard from '../pages/SellerDashboard';
+// Seller routes removed - single company model
 import Analytics from '../pages/Analytics';
 import Settings from '../pages/Settings';
 import SiteContentManagement from '../pages/SiteContentManagement';
 // import ShippingSettings from '../pages/ShippingSettings';
 import BannerManagement from '../pages/BannerManagement';
-import SellerOrders from '../pages/SellerOrders';
+// SellerOrders removed - single company model
 import OrderTracking from '../pages/OrderTracking';
 import TrackByNumber from '../pages/TrackByNumber';
 import MyOrders from '../pages/MyOrders';
@@ -56,8 +52,8 @@ import DevLogin from '../pages/DevLogin';
 // import ShippingCompanyDashboard from '../pages/ShippingCompanyDashboard';
 // import ShippingCompanyProfile from '../pages/ShippingCompanyProfile';
 // import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute, ShippingCompanyRoute } from '../components/AuthGuard';
-import { ProtectedRoute, GuestRoute, AdminRoute, SellerRoute } from '../components/AuthGuard';
-import SellerProtectedRoute from '../components/SellerProtectedRoute';
+import { ProtectedRoute, GuestRoute, AdminRoute } from '../components/AuthGuard';
+// SellerProtectedRoute removed - single company model
 
 
 const router = createBrowserRouter([
@@ -108,12 +104,12 @@ const router = createBrowserRouter([
             },
             {
                 path: "add-product",
-                element: <SellerProtectedRoute><AddProduct /></SellerProtectedRoute>,
+                element: <AdminRoute><AddProduct /></AdminRoute>,
                 errorElement: <ErrorPage />
             },
             {
                 path: "my-products",
-                element: <SellerProtectedRoute><MyProducts /></SellerProtectedRoute>,
+                element: <AdminRoute><MyProducts /></AdminRoute>,
                 errorElement: <ErrorPage />
             },
             {
@@ -129,21 +125,6 @@ const router = createBrowserRouter([
             {
                 path: "checkout",
                 element: <ProtectedRoute><Checkout /></ProtectedRoute>,
-                errorElement: <ErrorPage />
-            },
-            {
-                path: "seller-account-settings",
-                element: <SellerRoute><SellerAccountSettings /></SellerRoute>,
-                errorElement: <ErrorPage />
-            },
-            {
-                path: "seller-dashboard",
-                element: <SellerRoute><SellerDashboard /></SellerRoute>,
-                errorElement: <ErrorPage />
-            },
-            {
-                path: "seller-orders",
-                element: <SellerRoute><SellerOrders /></SellerRoute>,
                 errorElement: <ErrorPage />
             },
             {

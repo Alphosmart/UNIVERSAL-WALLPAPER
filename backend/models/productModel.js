@@ -27,7 +27,7 @@ const productSchema = new mongoose.Schema({
         date: { type: Date, default: Date.now }
     }], // Optional: track social shares
     
-    // Original price information with seller's currency
+    // Original price information with company currency
     pricing: {
         originalPrice: {
             amount: Number,
@@ -84,9 +84,10 @@ const productSchema = new mongoose.Schema({
     price: Number,
     sellingPrice: Number,
     
-    seller: {
+    // Company reference - single company model
+    companyId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'User', // References admin user
         required: true
     },
     
@@ -133,7 +134,7 @@ const productSchema = new mongoose.Schema({
         }
     }],
     
-    sellerInfo: {
+    companyInfo: {
         name: String,
         email: String,
         currency: {
@@ -141,7 +142,7 @@ const productSchema = new mongoose.Schema({
             default: 'NGN'
         },
         location: String,
-        // Seller's preferred payment methods for this product
+        // Company's accepted payment methods for this product
         acceptedPaymentMethods: {
             type: [String],
             enum: ['stripe', 'paypal', 'cashOnDelivery', 'bankTransfer', 'cryptocurrency'],

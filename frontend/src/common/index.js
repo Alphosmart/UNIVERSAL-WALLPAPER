@@ -225,83 +225,16 @@ const SummaryApi = {
         url : `${backendDomain}/api/upload-verification-document`,
         method : 'post'
     },
-    // Seller payment management APIs
-    getSellerPaymentDetails : {
-        url : `${backendDomain}/api/seller-payment-details`,
-        method : 'get'
-    },
-    updateSellerPaymentDetails : {
-        url : `${backendDomain}/api/seller-payment-details`,
-        method : 'put'
-    },
-    uploadSellerDocument : {
-        url : `${backendDomain}/api/seller-document-upload`,
-        method : 'post'
-    },
-    verifySellerDocument : {
-        url : `${backendDomain}/api/admin/verify-seller-document`,
-        method : 'put'
-    },
-    getAllSellersPaymentDetails : {
-        url : `${backendDomain}/api/admin/sellers-payment-details`,
-        method : 'get'
-    },
+
     // Payment method APIs
     getAvailablePaymentMethods : {
         url : `${backendDomain}/api/payment-methods/available`,
         method : 'post'
     },
-    getSellerPaymentPreferences : {
-        url : `${backendDomain}/api/seller/payment-preferences`,
-        method : 'get'
-    },
-    updateSellerPaymentPreferences : {
-        url : `${backendDomain}/api/seller/payment-preferences`,
-        method : 'put'
-    },
-    // Seller application endpoints
-    applyToBeSeller : {
-        url : `${backendDomain}/api/seller/apply`,
-        method : 'post'
-    },
-    uploadVerificationDocument : {
-        url : `${backendDomain}/api/seller/upload-document`,
-        method : 'post'
-    },
-    updateProfileForSeller : {
-        url : `${backendDomain}/api/seller/update-profile`,
-        method : 'put'
-    },
-    checkSellerEligibility : {
-        url : `${backendDomain}/api/seller/check-eligibility`,
-        method : 'get'
-    },
-    getSellerApplicationStatus : {
-        url : `${backendDomain}/api/seller/application-status`,
-        method : 'get'
-    },
-    getPendingSellerApplications : {
-        url : `${backendDomain}/api/admin/pending-seller-applications`,
-        method : 'get'
-    },
-    reviewSellerApplication : {
-        url : `${backendDomain}/api/admin/review-seller-application`,
-        method : 'put'
-    },
-    // Seller order management endpoints
-    getSellerOrders : {
-        url : `${backendDomain}/api/seller/orders`,
-        method : 'get'
-    },
-    getSellerOrderStats : {
-        url : `${backendDomain}/api/seller/order-stats`,
-        method : 'get'
-    },
-    updateSellerOrderStatus : {
-        url : `${backendDomain}/api/seller/orders`,
-        method : 'put'
-    },
-    // Order tracking endpoints
+
+
+
+    // Order tracking endpoints - Simplified for single company
     getOrderTracking : {
         url : `${backendDomain}/api/orders/:orderId/tracking`,
         method : 'get'
@@ -311,7 +244,7 @@ const SummaryApi = {
         method : 'get'
     },
     updateOrderTracking : {
-        url : `${backendDomain}/api/seller/orders/:orderId/tracking`,
+        url : `${backendDomain}/api/admin/orders/:orderId/tracking`,
         method : 'put'
     },
     trackByNumber : {

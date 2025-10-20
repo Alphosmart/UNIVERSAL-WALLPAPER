@@ -30,12 +30,10 @@ const {
     getDashboardStats,
     // getAllShippingCompanies, // Removed - single company model
     // updateShippingCompanyStatus, // Removed - single company model
-    setSellerSuspension,
     promoteToAdmin,
     grantProductPermissions,
     getAllStaff,
-    getStaffUploadStats,
-    promoteToVerifiedSeller
+    getStaffUploadStats
 } = require('../controller/adminController');
 const createAdminUser = require('../controller/createAdminUser');
 const {
@@ -70,25 +68,7 @@ const {
     clearCart,
     syncCart
 } = require('../controller/cartController');
-const {
-    applyToBeSeller,
-    uploadVerificationDocument,
-    getSellerApplications,
-    getPendingSellerApplications,
-    updateSellerStatus,
-    reviewSellerApplication,
-    updateProfileForSeller,
-    checkSellerEligibility,
-    getSellerPaymentDetails,
-    updateSellerPaymentDetails,
-    uploadSellerDocument,
-    getSellerApplicationStatus
-} = require('../controller/sellerController');
-const {
-    getSellerOrders,
-    updateSellerOrderStatus,
-    getSellerOrderStats
-} = require('../controller/sellerOrdersController');
+
 // Shipping company functionality removed - single company model
 // const {
 //     registerShippingCompany,
@@ -139,9 +119,7 @@ const {
     updateBannersOrder
 } = require('../controller/bannerController');
 const {
-    getAvailablePaymentMethods,
-    getSellerPaymentPreferences,
-    updateSellerPaymentPreferences
+    getAvailablePaymentMethods
 } = require('../controller/paymentMethodController');
 const {
     createPaymentIntent,
@@ -255,14 +233,12 @@ router.delete('/admin/categories', authToken, deleteCategory);
 router.put('/admin/categories/reorder', authToken, reorderCategories);
 
 router.get('/admin/dashboard-stats', authToken, getDashboardStats);
-router.put('/admin/seller-suspension/:userId', authToken, setSellerSuspension);
 
 // Staff management routes
 router.post('/admin/promote-to-admin', authToken, promoteToAdmin);
 router.put('/admin/grant-permissions', authToken, grantProductPermissions);
 router.get('/admin/staff', authToken, getAllStaff);
 router.get('/admin/staff/upload-stats', authToken, getStaffUploadStats);
-router.post('/admin/promote-to-seller', authToken, promoteToVerifiedSeller);
 // Admin seller application routes - DISABLED: Single company seller model  
 // router.get('/admin/seller-applications', authToken, getSellerApplications);
 // router.get('/admin/pending-seller-applications', authToken, getPendingSellerApplications);
@@ -299,15 +275,7 @@ router.delete('/admin/backup/:backupId', authToken, deleteBackup);
 // router.put('/seller/update-profile', checkMaintenanceMode, authToken, updateProfileForSeller);
 // router.get('/seller/check-eligibility', checkMaintenanceMode, authToken, checkSellerEligibility);
 
-// Seller payment management routes - Admin only
-router.get('/seller-payment-details', checkMaintenanceMode, authToken, getSellerPaymentDetails);
-router.put('/seller-payment-details', checkMaintenanceMode, authToken, updateSellerPaymentDetails);
-router.post('/seller-document-upload', checkMaintenanceMode, authToken, uploadSellerDocument);
 
-// Seller order management routes
-router.get('/seller/orders', authToken, getSellerOrders);
-router.get('/seller/order-stats', authToken, getSellerOrderStats);
-router.put('/seller/orders/:orderId/status', authToken, updateSellerOrderStatus);
 
 // Shipping routes
 // Shipping routes removed - single company model
@@ -344,19 +312,17 @@ router.delete('/admin/banners/:bannerId', authToken, deleteBanner);
 router.put('/admin/banners/:bannerId/toggle', authToken, toggleBannerStatus);
 router.put('/admin/banners/order', authToken, updateBannersOrder);
 
-// Payment method routes - Block during maintenance - Admin only for payment preferences
+// Payment method routes - Block during maintenance
 router.post('/payment-methods/available', checkMaintenanceMode, getAvailablePaymentMethods);
-router.get('/seller/payment-preferences/:sellerId', checkMaintenanceMode, authToken, getSellerPaymentPreferences);
-router.put('/seller/payment-preferences', checkMaintenanceMode, authToken, updateSellerPaymentPreferences);
 
 // Stripe payment processing routes
 router.post('/create-payment-intent', checkMaintenanceMode, authToken, createPaymentIntent);
 router.post('/process-payment', checkMaintenanceMode, authToken, processPayment);
 
-// Order tracking routes
+// Order tracking routes - Simplified for single company
 router.get('/orders/:orderId/tracking', checkMaintenanceMode, authToken, getOrderTracking);
 router.get('/buyer/orders/tracking', checkMaintenanceMode, authToken, getBuyerOrdersWithTracking);
-router.put('/seller/orders/:orderId/tracking', checkMaintenanceMode, authToken, updateOrderTracking);
+router.put('/admin/orders/:orderId/tracking', checkMaintenanceMode, authToken, updateOrderTracking);
 router.get('/track/:trackingNumber', checkMaintenanceMode, trackByTrackingNumber); // Public endpoint
 
 // Shipping Company Routes - REMOVED (single company model)

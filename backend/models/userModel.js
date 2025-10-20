@@ -79,69 +79,12 @@ const userSchema = new mongoose.Schema({
             type: Number,
             default: 0
         }
-    },
-    
-    // Seller-related fields
-    sellerStatus: {
-        type: String,
-        enum: ['none', 'pending_verification', 'verified', 'rejected'],
-        default: 'none'
-    },
-    businessType: {
-        type: String,
-        enum: ['individual', 'business', 'corporation']
-    },
-    sellerApplicationDate: Date,
-    verifiedAt: Date,
-    rejectionReason: String,
-    verificationDocuments: [{
-        type: {
-            type: String,
-            enum: ['business_license', 'tax_id', 'identity_proof', 'address_proof']
-        },
-        url: String,
-        uploadedAt: Date
-    }],
-    // Seller payment details
-    paymentDetails: {
-        bankAccount: {
-            accountNumber: String,
-            routingNumber: String,
-            accountHolderName: String,
-            bankName: String,
-            accountType: {
-                type: String,
-                enum: ['checking', 'savings'],
-                default: 'checking'
-            }
-        },
-        paypalEmail: String,
-        taxInfo: {
-            ssn: String,
-            ein: String,
-            businessType: {
-                type: String,
-                enum: ['individual', 'partnership', 'corporation', 'llc'],
-                default: 'individual'
-            }
-        }
-    },
-    // Seller settings
-    sellerSettings: {
-        payoutSchedule: {
-            type: String,
-            enum: ['daily', 'weekly', 'biweekly', 'monthly'],
-            default: 'weekly'
-        },
-        minimumPayout: {
-            type: Number,
-            default: 25.00
-        }
     }
     
-    // Shipping Company fields removed - single company model
-    // All shipping company related fields have been removed as the platform
-    // now operates with a single company seller model
+    // Seller and Shipping Company fields removed - single company model
+    // All seller registration, verification, and payment fields have been removed
+    // as the platform now operates with a single company model where
+    // only admin and staff manage products
     
 }, {
     timestamps : true
