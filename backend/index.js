@@ -89,7 +89,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 // Health check route
 app.get('/health', (req, res) => {
-    const FRONTEND_URL = 'https://universal-wallpaper.vercel.app'
+    const FRONTEND_URL = 'https://universaldotwalpaper.com'
     
     res.json({ 
         status: 'OK',
@@ -123,7 +123,7 @@ app.use(handleDatabaseError)
 // Serve static files from React build (for production)
 if (process.env.NODE_ENV === 'production') {
     console.log('🔄 Production mode: Separate frontend/backend deployments')
-    console.log('📍 Frontend: https://www.universaldotwalpaper.com')
+    console.log('📍 Frontend: https://universaldotwalpaper.com')
     console.log('📍 Backend: API only')
     
     // Backend API server only - no frontend files served
