@@ -380,6 +380,36 @@ const SummaryApi = {
     testPaymentMethod : {
         url : `${backendDomain}/api/admin/payment-config/test`,
         method : 'post'
+    },
+
+    // Testimonials APIs
+    getTestimonials : {
+        url : `${backendDomain}/api/testimonials`,
+        method : 'get'
+    },
+    adminGetAllTestimonials : {
+        url : `${backendDomain}/api/admin/testimonials`,
+        method : 'get'
+    },
+    adminAddTestimonial : {
+        url : `${backendDomain}/api/admin/testimonials`,
+        method : 'post'
+    },
+    adminUpdateTestimonial : {
+        url : `${backendDomain}/api/admin/testimonials`,
+        method : 'put'
+    },
+    adminDeleteTestimonial : {
+        url : `${backendDomain}/api/admin/testimonials`,
+        method : 'delete'
+    },
+    adminToggleTestimonialStatus : {
+        url : `${backendDomain}/api/admin/testimonials`,
+        method : 'put'
+    },
+    adminReorderTestimonials : {
+        url : `${backendDomain}/api/admin/testimonials/reorder`,
+        method : 'put'
     }
 }
 

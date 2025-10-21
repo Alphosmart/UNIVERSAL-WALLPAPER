@@ -196,7 +196,7 @@ const Cart = () => {
 
                     {/* Additional Info */}
                     <div className="mt-6 text-sm text-gray-600">
-                        <p className="mb-2">✓ Free shipping on all orders</p>
+                        <p className="mb-2">✓ Fast shipping available</p>
                         <p className="mb-2">✓ 30-day return policy</p>
                         <p>✓ Secure checkout</p>
                     </div>

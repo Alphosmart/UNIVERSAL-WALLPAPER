@@ -98,11 +98,11 @@ const getDefaultContent = () => {
         header: {
             announcementBanners: [
                 {
-                    text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+                    text: "🚀 Fast shipping available nationwide! Order today",
                     link: "/products",
                     backgroundColor: "#3B82F6",
                     textColor: "#FFFFFF",
-                    isActive: true
+                    isActive: false
                 }
             ],
             logo: {

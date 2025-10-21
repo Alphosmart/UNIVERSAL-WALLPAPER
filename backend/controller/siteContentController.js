@@ -167,18 +167,18 @@ const getSiteContent = async (req, res) => {
             header: {
                 announcementBanners: [
                     {
-                        text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+                        text: "🚀 Fast shipping available nationwide! Order today",
                         link: "/products",
                         backgroundColor: "#3B82F6",
                         textColor: "#FFFFFF",
-                        isActive: true
+                        isActive: false
                     },
                     {
                         text: "🔥 Limited Time: 25% Off Premium Wallpapers!",
                         link: "/sale",
                         backgroundColor: "#EF4444",
                         textColor: "#FFFFFF",
-                        isActive: true
+                        isActive: false
                     }
                 ],
                 logo: {
