@@ -26,9 +26,9 @@ async function getUserProductsController(req, res) {
             });
         }
 
-        // Get the company seller (single verified seller)
+        // Get the company seller (single company admin)
         const companySeller = await User.findOne({ 
-            sellerStatus: 'verified',
+            email: 'alpho4luv@gmail.com',
             role: 'ADMIN'
         });
 
@@ -40,8 +40,8 @@ async function getUserProductsController(req, res) {
             });
         }
 
-        // Build filter object - get all company products
-        let filter = { seller: companySeller._id };
+        // Build filter object - get all company products (using uploadedBy field)
+        let filter = { uploadedBy: companySeller._id };
         
         if (status) {
             filter.status = status;

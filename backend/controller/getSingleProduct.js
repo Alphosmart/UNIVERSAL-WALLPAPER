@@ -1,4 +1,5 @@
 const productModel = require("../models/productModel");
+const userModel = require("../models/userModel");
 const CurrencyService = require("../services/currencyService");
 const settingsModel = require("../models/settingsModel");
 

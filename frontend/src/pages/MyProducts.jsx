@@ -224,7 +224,7 @@ const MyProducts = () => {
                                         <div className='flex gap-2'>
                                             <button 
                                                 className='p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors'
-                                                onClick={() => navigate(`/edit-product/${product._id}`)}
+                                                onClick={() => navigate(`/admin-panel/edit-product/${product._id}`)}
                                                 title="Edit Product"
                                             >
                                                 <MdEdit />
