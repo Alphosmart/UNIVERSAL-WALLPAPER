@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import SummaryApi from '../common';
 import imageTobase64 from '../helper/imageTobase64';
+import productCategory from '../helper/productCategory';
 
 const AddProduct = () => {
     const user = useSelector(state => state?.user?.user);
@@ -153,12 +154,6 @@ const AddProduct = () => {
         }
     };
 
-    const categories = [
-        "wallpapers", "wall-paint", "ceiling-paint", "wood-stain", "primer", 
-        "brushes-rollers", "decorative-panels", "wall-decals", "murals", 
-        "tiles", "flooring", "curtains", "blinds", "lighting", "mirrors"
-    ];
-
     const conditions = [
         { value: "new", label: "New" },
         { value: "like-new", label: "Like New" },
@@ -215,8 +210,8 @@ const AddProduct = () => {
                         className='p-2 bg-slate-100 border rounded'
                     >
                         <option value="">Select Category</option>
-                        {categories.map((el, index) => (
-                            <option value={el} key={el + index}>{el}</option>
+                        {productCategory.map((el, index) => (
+                            <option value={el.value} key={el.value + index}>{el.label}</option>
                         ))}
                     </select>
 

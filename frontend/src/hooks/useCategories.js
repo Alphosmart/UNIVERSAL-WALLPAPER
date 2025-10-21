@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import SummaryApi from '../common';
+import productCategory from '../helper/productCategory';
 
 const useCategories = () => {
     const [categories, setCategories] = useState([]);
@@ -7,12 +8,9 @@ const useCategories = () => {
     const [error, setError] = useState(null);
 
     const fetchCategories = useCallback(async () => {
-        // Default fallback categories
-        const defaultCategories = [
-            'wallpapers', 'wall-paint', 'ceiling-paint', 'wood-stain', 'primer', 
-            'brushes-rollers', 'decorative-panels', 'wall-decals', 'murals', 
-            'tiles', 'flooring', 'curtains', 'blinds', 'lighting', 'mirrors'
-        ];
+        // Default fallback categories from productCategory helper
+        const defaultCategories = productCategory.map(cat => cat.value);
+        
         try {
             setLoading(true);
             setError(null);

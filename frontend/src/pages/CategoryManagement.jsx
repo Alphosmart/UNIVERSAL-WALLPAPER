@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaSave, FaTimes, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import SummaryApi from '../common';
+import productCategory from '../helper/productCategory';
 
 const CategoryManagement = () => {
     const [categories, setCategories] = useState([]);
@@ -12,12 +13,9 @@ const CategoryManagement = () => {
     const [showAddForm, setShowAddForm] = useState(false);
 
     const fetchCategories = useCallback(async () => {
-        // Default categories that come with the system
-        const defaultCategories = [
-            'wallpapers', 'wall-paint', 'ceiling-paint', 'wood-stain', 'primer', 
-            'brushes-rollers', 'decorative-panels', 'wall-decals', 'murals', 
-            'tiles', 'flooring', 'curtains', 'blinds', 'lighting', 'mirrors'
-        ];
+        // Default categories that come with the system - use productCategory helper
+        const defaultCategories = productCategory.map(cat => cat.label.toLowerCase().replace(/\s+/g, '-'));
+        
         try {
             setLoading(true);
             const response = await fetch(SummaryApi.adminCategories.url, {

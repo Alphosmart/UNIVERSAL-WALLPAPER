@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaEdit, FaTrash, FaEye, FaPlus } from 'react-icons/fa';
 import SummaryApi from '../common';
+import productCategory from '../helper/productCategory';
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
@@ -15,12 +16,6 @@ const AllProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10);
   const navigate = useNavigate();
-
-  const categories = [
-    'wallpapers', 'wall-paint', 'ceiling-paint', 'wood-stain', 'primer', 
-    'brushes-rollers', 'decorative-panels', 'wall-decals', 'murals', 
-    'tiles', 'flooring', 'curtains', 'blinds', 'lighting', 'mirrors'
-  ];
 
   useEffect(() => {
     fetchAllProducts();
@@ -165,9 +160,9 @@ const AllProducts = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               <option value="">All Categories</option>
-              {categories.map(category => (
-                <option key={category} value={category}>
-                  {category.charAt(0).toUpperCase() + category.slice(1)}
+              {productCategory.map(category => (
+                <option key={category.value} value={category.value}>
+                  {category.label}
                 </option>
               ))}
             </select>
