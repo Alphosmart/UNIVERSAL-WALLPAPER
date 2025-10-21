@@ -366,6 +366,20 @@ const SummaryApi = {
     contactUs : {
         url : `${backendDomain}/api/contact`,
         method : 'post'
+    },
+
+    // Payment Configuration API
+    adminPaymentConfig : {
+        url : `${backendDomain}/api/admin/payment-config`,
+        method : 'get'
+    },
+    updatePaymentConfig : {
+        url : `${backendDomain}/api/admin/payment-config`,
+        method : 'post'
+    },
+    testPaymentMethod : {
+        url : `${backendDomain}/api/admin/payment-config/test`,
+        method : 'post'
     }
 }
 

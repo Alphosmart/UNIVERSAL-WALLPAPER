@@ -44,6 +44,7 @@ import CookiePolicy from '../pages/CookiePolicy';
 import AdminContactMessages from '../pages/AdminContactMessages';
 import StaffManagement from '../pages/StaffManagement';
 import EmailTemplateManager from '../components/EmailTemplateManager';
+import PaymentConfiguration from '../pages/PaymentConfiguration';
 import DevLogin from '../pages/DevLogin';
 import { ProtectedRoute, GuestRoute, AdminRoute } from '../components/AuthGuard';
 
@@ -267,6 +268,10 @@ const router = createBrowserRouter([
                     {
                         path: "email-templates",
                         element: <EmailTemplateManager />
+                    },
+                    {
+                        path: "payment-config",
+                        element: <PaymentConfiguration />
                     },
                     {
                         path: "settings",

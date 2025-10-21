@@ -22,6 +22,7 @@ const EnhancedSearchResults = () => {
     // Filter state
     const [filters, setFilters] = useState({
         category: '',
+        brand: '',
         minPrice: '',
         maxPrice: '',
         inStock: true,
@@ -78,6 +79,7 @@ const EnhancedSearchResults = () => {
 
             // Add filter parameters
             if (searchFilters.category) searchParams.append('category', searchFilters.category);
+            if (searchFilters.brand) searchParams.append('brand', searchFilters.brand);
             if (searchFilters.minPrice) searchParams.append('minPrice', searchFilters.minPrice);
             if (searchFilters.maxPrice) searchParams.append('maxPrice', searchFilters.maxPrice);
 
@@ -121,14 +123,21 @@ const EnhancedSearchResults = () => {
         const params = new URLSearchParams(location.search);
         const query = params.get('q') || '';
         const category = params.get('category') || '';
+        const brand = params.get('brand') || '';
+        const minPrice = params.get('minPrice') || '';
+        const maxPrice = params.get('maxPrice') || '';
         const page = parseInt(params.get('page')) || 1;
         
         setSearchTerm(query);
         setCurrentPage(page);
         
-        if (category) {
-            setFilters(prev => ({ ...prev, category }));
-        }
+        setFilters(prev => ({
+            ...prev,
+            category,
+            brand,
+            minPrice,
+            maxPrice
+        }));
         
         fetchFilters();
     }, [location.search, fetchFilters]);
@@ -174,6 +183,7 @@ const EnhancedSearchResults = () => {
     const clearFilters = () => {
         const clearedFilters = {
             category: '',
+            brand: '',
             minPrice: '',
             maxPrice: '',
             inStock: true,
@@ -399,6 +409,95 @@ const EnhancedSearchResults = () => {
                         </button>
                     </div>
                 </div>
+
+                {/* Quick Filters - Show automatically when there are results */}
+                {totalResults > 0 && (
+                    <div className="bg-white rounded-lg p-4 mb-4 border border-gray-200">
+                        <div className="flex flex-wrap items-center gap-3">
+                            <span className="text-sm font-medium text-gray-700">Quick Filters:</span>
+                            
+                            {/* Category Quick Filters */}
+                            <div className="flex flex-wrap gap-2">
+                                {availableFilters.categories.slice(0, 6).map(category => (
+                                    <button
+                                        key={category}
+                                        onClick={() => handleFilterChange('category', filters.category === category ? '' : category)}
+                                        className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                                            filters.category === category
+                                                ? 'bg-blue-600 text-white border-blue-600'
+                                                : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        {category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Price Range Quick Filters */}
+                            <div className="flex flex-wrap gap-2">
+                                <button
+                                    onClick={() => {
+                                        handleFilterChange('minPrice', '');
+                                        handleFilterChange('maxPrice', '1000');
+                                    }}
+                                    className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                                        filters.maxPrice === '1000'
+                                            ? 'bg-green-600 text-white border-green-600'
+                                            : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    Under ₦1,000
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        handleFilterChange('minPrice', '1000');
+                                        handleFilterChange('maxPrice', '5000');
+                                    }}
+                                    className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                                        filters.minPrice === '1000' && filters.maxPrice === '5000'
+                                            ? 'bg-green-600 text-white border-green-600'
+                                            : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    ₦1,000 - ₦5,000
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        handleFilterChange('minPrice', '5000');
+                                        handleFilterChange('maxPrice', '');
+                                    }}
+                                    className={`px-3 py-1 text-sm rounded-full border transition-colors ${
+                                        filters.minPrice === '5000'
+                                            ? 'bg-green-600 text-white border-green-600'
+                                            : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                                    }`}
+                                >
+                                    Over ₦5,000
+                                </button>
+                            </div>
+
+                            {/* Advanced Filters Toggle */}
+                            <button
+                                onClick={() => setShowFilters(!showFilters)}
+                                className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 border border-blue-200 rounded-full hover:bg-blue-50"
+                            >
+                                <FaFilter className="text-xs" />
+                                More Filters
+                            </button>
+
+                            {/* Clear Filters */}
+                            {Object.values(filters).some(v => v && v !== 'relevance' && v !== true) && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 border border-red-200 rounded-full hover:bg-red-50"
+                                >
+                                    <FaTimes className="text-xs" />
+                                    Clear All
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Advanced Filters Panel */}
@@ -484,6 +583,48 @@ const EnhancedSearchResults = () => {
                                 <span className="text-sm text-gray-700">In Stock Only</span>
                             </label>
                         </div>
+                    </div>
+
+                    {/* Brand Filter Section */}
+                    {availableFilters.brands.length > 0 && (
+                        <div className="mt-6">
+                            <h4 className="text-md font-medium text-gray-800 mb-3">Brands</h4>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                                {availableFilters.brands.map(brand => (
+                                    <button
+                                        key={brand}
+                                        onClick={() => handleFilterChange('brand', filters.brand === brand ? '' : brand)}
+                                        className={`px-3 py-2 text-sm text-left rounded-lg border transition-colors ${
+                                            filters.brand === brand
+                                                ? 'bg-blue-600 text-white border-blue-600'
+                                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        {brand}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Apply Filters Button */}
+                    <div className="mt-6 flex justify-end gap-3">
+                        <button
+                            onClick={() => setShowFilters(false)}
+                            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        >
+                            Close
+                        </button>
+                        <button
+                            onClick={() => {
+                                // Trigger search with current filters
+                                performSearch(searchTerm, 1, filters);
+                                setShowFilters(false);
+                            }}
+                            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Apply Filters
+                        </button>
                     </div>
                 </div>
             )}

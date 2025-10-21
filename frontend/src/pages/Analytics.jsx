@@ -12,9 +12,9 @@ import {
 import AdvancedCalendarPicker from '../components/AdvancedCalendarPicker';
 import SummaryApi from '../common';
 import { toast } from 'react-toastify';
-import productCategory from '../helper/productCategory';
 
 const Analytics = () => {
+    const [categories, setCategories] = useState([]);
     const [analyticsData, setAnalyticsData] = useState({
         salesTrend: [],
         categoryPerformance: [],
@@ -325,6 +325,23 @@ const Analytics = () => {
     };
 
     useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(SummaryApi.adminCategories.url, {
+                    method: SummaryApi.adminCategories.method,
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (result.success && result.categories) {
+                    setCategories(result.categories);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                setCategories([]);
+            }
+        };
+
         const fetchData = async () => {
             try {
                 setAnalyticsData(prev => ({ ...prev, loading: true }));
@@ -367,6 +384,7 @@ const Analytics = () => {
             }
         };
 
+        fetchCategories();
         fetchData();
     }, [timePeriod, customDateMode, selectedDate.year, selectedDate.month, selectedDate.day, selectedDate.hour]);
 
@@ -476,9 +494,9 @@ const Analytics = () => {
                                     className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="all">All Categories</option>
-                                    {productCategory.map(category => (
-                                        <option key={category.value} value={category.value}>
-                                            {category.label}
+                                    {categories.map((category, index) => (
+                                        <option key={category._id || index} value={category.name}>
+                                            {category.displayName || category.name}
                                         </option>
                                     ))}
                                 </select>

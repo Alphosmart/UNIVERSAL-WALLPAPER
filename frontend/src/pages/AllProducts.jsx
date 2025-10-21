@@ -3,10 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaEdit, FaTrash, FaEye, FaPlus } from 'react-icons/fa';
 import SummaryApi from '../common';
-import productCategory from '../helper/productCategory';
 
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
@@ -19,7 +19,25 @@ const AllProducts = () => {
 
   useEffect(() => {
     fetchAllProducts();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(SummaryApi.adminCategories.url, {
+        method: SummaryApi.adminCategories.method,
+        credentials: 'include'
+      });
+      const result = await response.json();
+      
+      if (result.success && result.categories) {
+        setCategories(result.categories);
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      setCategories([]);
+    }
+  };
 
   const fetchAllProducts = async () => {
     try {
@@ -160,9 +178,9 @@ const AllProducts = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               <option value="">All Categories</option>
-              {productCategory.map(category => (
-                <option key={category.value} value={category.value}>
-                  {category.label}
+              {categories.map((category, index) => (
+                <option key={category._id || index} value={category.name}>
+                  {category.displayName || category.name}
                 </option>
               ))}
             </select>

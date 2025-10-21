@@ -517,80 +517,46 @@ const Settings = () => {
 
   const renderPaymentSettings = () => (
     <div className="space-y-6">
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-        <h3 className="text-lg font-medium text-green-800 mb-2">Payment Configuration</h3>
-        <p className="text-sm text-green-700">Configure payment methods and business settings</p>
-      </div>
-
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="enablePayPal"
-              checked={settings.payment.enablePayPal}
-              onChange={(e) => handleSettingChange('payment', 'enablePayPal', e.target.checked)}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-            />
-            <label htmlFor="enablePayPal" className="ml-2 text-sm text-gray-700">
-              Enable PayPal Payments
-            </label>
-          </div>
-
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="enableStripe"
-              checked={settings.payment.enableStripe}
-              onChange={(e) => handleSettingChange('payment', 'enableStripe', e.target.checked)}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-            />
-            <label htmlFor="enableStripe" className="ml-2 text-sm text-gray-700">
-              Enable Stripe Payments
-            </label>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Minimum Payout ($)
-            </label>
-            <input
-              type="number"
-              step="5"
-              value={settings.payment.minimumPayout}
-              onChange={(e) => handleSettingChange('payment', 'minimumPayout', parseFloat(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              min="10"
-              max="100"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Payout Schedule
-            </label>
-            <select
-              value={settings.payment.payoutSchedule}
-              onChange={(e) => handleSettingChange('payment', 'payoutSchedule', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="font-semibold text-gray-800 mb-2">Current Payment Configuration</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-            <p>Minimum Payout: <span className="font-semibold text-green-600">${settings.payment.minimumPayout}</span></p>
-            <p>Payout Schedule: <span className="font-semibold text-green-600">{settings.payment.payoutSchedule}</span></p>
-            <p>Payment Methods: <span className="font-semibold text-green-600">
-              {[settings.payment.enablePayPal && 'PayPal', settings.payment.enableStripe && 'Stripe'].filter(Boolean).join(', ') || 'None'}
-            </span></p>
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-start">
+          <FaCreditCard className="text-blue-600 text-2xl mt-1 mr-4" />
+          <div className="flex-1">
+            <h3 className="text-lg font-medium text-blue-800 mb-2">Payment Configuration</h3>
+            <p className="text-sm text-blue-700 mb-4">
+              For comprehensive payment gateway configuration, including API keys, fees, and advanced settings, 
+              please use the dedicated Payment Configuration panel.
+            </p>
+            
+            <div className="mb-4">
+              <h4 className="font-medium text-blue-800 mb-2">Quick Settings</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-blue-700">Minimum Payout: </span>
+                  <span className="font-semibold text-blue-900">${settings.payment.minimumPayout}</span>
+                </div>
+                <div>
+                  <span className="text-blue-700">Payout Schedule: </span>
+                  <span className="font-semibold text-blue-900">{settings.payment.payoutSchedule}</span>
+                </div>
+                <div>
+                  <span className="text-blue-700">Commission Rate: </span>
+                  <span className="font-semibold text-blue-900">{settings.payment.commissionRate}%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a 
+                href="/admin-panel/payment-config" 
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                <FaCog className="mr-2" />
+                Open Payment Configuration
+              </a>
+              <div className="text-xs text-blue-600">
+                Configure API keys, payment gateways, fees, and advanced settings
+              </div>
+            </div>
           </div>
         </div>
       </div>
