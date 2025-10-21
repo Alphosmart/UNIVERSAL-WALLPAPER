@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoCloudUpload } from "react-icons/io5";
 import { MdDelete } from "react-icons/md";
 import { toast } from 'react-toastify';
@@ -6,11 +6,11 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import SummaryApi from '../common';
 import imageTobase64 from '../helper/imageTobase64';
-import productCategory from '../helper/productCategory';
 
 const AddProduct = () => {
     const user = useSelector(state => state?.user?.user);
     const navigate = useNavigate();
+    const [categories, setCategories] = useState([]);
 
     const [data, setData] = useState({
         productName: "",
@@ -28,6 +28,29 @@ const AddProduct = () => {
     });
 
     const [uploadProductImageInput, setUploadProductImageInput] = useState("");
+
+    // Fetch categories from Category Management API
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await fetch(SummaryApi.adminCategories.url, {
+                method: SummaryApi.adminCategories.method,
+                credentials: 'include'
+            });
+            const result = await response.json();
+            
+            if (result.success && result.categories) {
+                setCategories(result.categories);
+            }
+        } catch (error) {
+            console.error('Error fetching categories:', error);
+            // Fallback to empty array
+            setCategories([]);
+        }
+    };
 
     const handleOnChange = (e) => {
         const { name, value } = e.target;
@@ -210,8 +233,10 @@ const AddProduct = () => {
                         className='p-2 bg-slate-100 border rounded'
                     >
                         <option value="">Select Category</option>
-                        {productCategory.map((el, index) => (
-                            <option value={el.value} key={el.value + index}>{el.label}</option>
+                        {categories.map((category, index) => (
+                            <option value={category.name} key={category._id || index}>
+                                {category.displayName || category.name}
+                            </option>
                         ))}
                     </select>
 

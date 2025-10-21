@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { FaCloudUploadAlt, FaTimes, FaArrowLeft } from 'react-icons/fa';
 import uploadImage from '../helper/uploadImage';
 import SummaryApi from '../common';
-import productCategory from '../helper/productCategory';
 
 const EditProduct = () => {
     const { id } = useParams();
@@ -14,6 +13,7 @@ const EditProduct = () => {
     
     const [loading, setLoading] = useState(false);
     const [productLoading, setProductLoading] = useState(true);
+    const [categories, setCategories] = useState([]);
     const [data, setData] = useState({
         productName: "",
         brandName: "",
@@ -52,8 +52,26 @@ const EditProduct = () => {
             }
         };
 
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch(SummaryApi.adminCategories.url, {
+                    method: SummaryApi.adminCategories.method,
+                    credentials: 'include'
+                });
+                const result = await response.json();
+                
+                if (result.success && result.categories) {
+                    setCategories(result.categories);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                setCategories([]);
+            }
+        };
+
         if (id) {
             fetchProduct();
+            fetchCategories();
         }
     }, [id, navigate]);
 
@@ -225,9 +243,9 @@ const EditProduct = () => {
                             required
                         >
                             <option value="">Select Category</option>
-                            {productCategory.map((category) => (
-                                <option key={category.id} value={category.value}>
-                                    {category.label}
+                            {categories.map((category, index) => (
+                                <option key={category._id || index} value={category.name}>
+                                    {category.displayName || category.name}
                                 </option>
                             ))}
                         </select>
