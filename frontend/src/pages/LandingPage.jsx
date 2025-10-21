@@ -29,7 +29,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch(`${SummaryApi.getTestimonials.url}?featured=true&limit=6`, {
+        const response = await fetch(`${SummaryApi.getTestimonials.url}?limit=6`, {
           method: SummaryApi.getTestimonials.method,
           headers: {
             'Content-Type': 'application/json'
