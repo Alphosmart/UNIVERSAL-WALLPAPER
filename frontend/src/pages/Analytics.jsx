@@ -12,6 +12,7 @@ import {
 import AdvancedCalendarPicker from '../components/AdvancedCalendarPicker';
 import SummaryApi from '../common';
 import { toast } from 'react-toastify';
+import productCategory from '../helper/productCategory';
 
 const Analytics = () => {
     const [analyticsData, setAnalyticsData] = useState({
@@ -475,10 +476,11 @@ const Analytics = () => {
                                     className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="all">All Categories</option>
-                                    <option value="electronics">Electronics</option>
-                                    <option value="clothing">Clothing</option>
-                                    <option value="home">Home & Garden</option>
-                                    <option value="sports">Sports</option>
+                                    {productCategory.map(category => (
+                                        <option key={category.value} value={category.value}>
+                                            {category.label}
+                                        </option>
+                                    ))}
                                 </select>
 
                                 {/* Price Range Filter */}
