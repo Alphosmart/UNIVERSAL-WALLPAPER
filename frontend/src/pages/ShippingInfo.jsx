@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FaShippingFast, FaGlobe, FaClock, FaCheckCircle, FaInfoCircle } from 'react-icons/fa';
+import { FaShippingFast, FaGlobe, FaClock, FaCheckCircle, FaInfoCircle, FaTruck } from 'react-icons/fa';
 import SummaryApi from '../common';
 
 const ShippingInfo = () => {
@@ -102,17 +102,15 @@ const ShippingInfo = () => {
                     </p>
                 </div>
 
-                {/* Free Shipping Banner */}
-                {shippingData?.global?.freeShippingGlobal > 0 && (
-                    <div className="bg-green-100 border border-green-400 rounded-lg p-6 mb-8">
-                        <div className="flex items-center justify-center">
-                            <FaCheckCircle className="text-green-600 text-2xl mr-3" />
-                            <h2 className="text-2xl font-semibold text-green-800">
-                                Free Shipping on orders over ${shippingData.global.freeShippingGlobal}!
-                            </h2>
-                        </div>
+                {/* Fast Shipping Banner */}
+                <div className="bg-blue-100 border border-blue-400 rounded-lg p-6 mb-8">
+                    <div className="flex items-center justify-center">
+                        <FaTruck className="text-blue-600 text-2xl mr-3" />
+                        <h2 className="text-2xl font-semibold text-blue-800">
+                            Fast Shipping Available Nationwide!
+                        </h2>
                     </div>
-                )}
+                </div>
 
                 {/* Shipping Options */}
                 <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-8 mb-12">

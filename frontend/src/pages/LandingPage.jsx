@@ -212,7 +212,7 @@ const LandingPage = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <FaTruck className="text-blue-300" />
-                  <span className="text-sm">Free Shipping</span>
+                  <span className="text-sm">Fast Shipping</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <FaAward className="text-yellow-300" />
@@ -229,9 +229,6 @@ const LandingPage = () => {
                   alt="Beautiful wallpaper interior" 
                   className="rounded-xl w-full h-80 object-cover"
                 />
-                <div className="absolute -bottom-4 -right-4 bg-yellow-400 text-black px-4 py-2 rounded-lg font-bold">
-                  30% OFF Launch Special!
-                </div>
               </div>
             </div>
           </div>
@@ -298,9 +295,6 @@ const LandingPage = () => {
                     alt={product.name}
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className="absolute top-4 right-4 bg-red-500 text-white px-2 py-1 rounded-md text-sm font-bold">
-                    SALE
-                  </div>
                 </div>
                 
                 <div className="p-6">
@@ -400,7 +394,7 @@ const LandingPage = () => {
                   "Premium quality products from verified sellers worldwide",
                   "Professional installation and design consultation services",
                   "30-day money-back guarantee on all purchases",
-                  "Free shipping on orders over $100",
+                  "Fast and reliable shipping nationwide",
                   "24/7 customer support from design experts",
                   "Secure payment processing with buyer protection"
                 ].map((feature, index) => (
@@ -540,22 +534,6 @@ const LandingPage = () => {
             >
               Get Consultation
             </Link>
-          </div>
-          
-          <div className="mt-8 p-6 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl border-2 border-yellow-300">
-            <div className="flex items-center justify-center gap-4 text-center">
-              <span className="text-2xl">🎉</span>
-              <div>
-                <p className="font-bold text-gray-800 text-lg">Limited Time Offer!</p>
-                <p className="text-gray-600">30% OFF on all wallpapers + Free installation consultation</p>
-              </div>
-              <Link 
-                to="/search" 
-                className="bg-yellow-500 text-black px-6 py-3 rounded-lg font-bold hover:bg-yellow-400 transition-colors"
-              >
-                Shop Sale
-              </Link>
-            </div>
           </div>
         </div>
       </section>

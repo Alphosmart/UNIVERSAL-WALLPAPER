@@ -82,8 +82,8 @@ const SiteContentManagement = () => {
             announcements: [
                 {
                     id: 1,
-                    enabled: true,
-                    text: "🎉 Free shipping on orders over $100! Use code: FREESHIP",
+                    enabled: false,
+                    text: "🚀 Fast shipping available nationwide! Order today",
                     link: "/products",
                     backgroundColor: "#3B82F6",
                     textColor: "#FFFFFF",
