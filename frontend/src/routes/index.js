@@ -23,6 +23,7 @@ import Analytics from '../pages/Analytics';
 import Settings from '../pages/Settings';
 import SiteContentManagement from '../pages/SiteContentManagement';
 import BannerManagement from '../pages/BannerManagement';
+import TestimonialsManagement from '../pages/TestimonialsManagement';
 // SellerOrders removed - single company model
 import OrderTracking from '../pages/OrderTracking';
 import TrackByNumber from '../pages/TrackByNumber';
@@ -256,6 +257,10 @@ const router = createBrowserRouter([
                     {
                         path: "banners",
                         element: <BannerManagement />
+                    },
+                    {
+                        path: "testimonials",
+                        element: <TestimonialsManagement />
                     },
                     {
                         path: "analytics",

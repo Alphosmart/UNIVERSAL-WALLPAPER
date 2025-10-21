@@ -71,6 +71,15 @@ const {
     updateAdminSettings
 } = require('../controller/settingsController');
 const {
+    getTestimonials,
+    getAllTestimonialsAdmin,
+    addTestimonial,
+    updateTestimonial,
+    deleteTestimonial,
+    toggleTestimonialStatus,
+    updateTestimonialsOrder
+} = require('../controller/testimonialController');
+const {
     getUserPreferences,
     updateUserPreferences
 } = require('../controller/userPreferences');
@@ -232,6 +241,15 @@ router.get('/admin/contact-messages', authToken, getContactMessages);
 router.get('/admin/contact-messages/:messageId', authToken, getContactMessage);
 router.put('/admin/contact-messages/:messageId/status', authToken, updateContactMessageStatus);
 router.delete('/admin/contact-messages/:messageId', authToken, deleteContactMessage);
+
+// Testimonials routes
+router.get('/testimonials', checkMaintenanceMode, getTestimonials);
+router.get('/admin/testimonials', authToken, getAllTestimonialsAdmin);
+router.post('/admin/testimonials', authToken, addTestimonial);
+router.put('/admin/testimonials/:testimonialId', authToken, updateTestimonial);
+router.delete('/admin/testimonials/:testimonialId', authToken, deleteTestimonial);
+router.put('/admin/testimonials/:testimonialId/toggle', authToken, toggleTestimonialStatus);
+router.put('/admin/testimonials/reorder', authToken, updateTestimonialsOrder);
 
 // Database backup routes (admin only)
 router.post('/admin/backup/create', authToken, createDatabaseBackup);

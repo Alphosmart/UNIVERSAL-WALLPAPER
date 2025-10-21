@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { trackLandingPageInteraction, trackShopButtonClick, trackNewsletterSignup, trackUserEngagement } from '../utils/analytics';
+import SummaryApi from '../common';
 import { 
   FaPlay, 
   FaStar, 
@@ -20,8 +21,63 @@ import {
 } from 'react-icons/fa';
 
 const LandingPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('wallpapers');
   const [email, setEmail] = useState('');
+  const [testimonials, setTestimonials] = useState([]);
+
+  // Fetch testimonials on component mount
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch(`${SummaryApi.getTestimonials.url}?featured=true&limit=6`, {
+          method: SummaryApi.getTestimonials.method,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const data = await response.json();
+        if (data.success && data.data.length > 0) {
+          setTestimonials(data.data);
+        } else {
+          // Fallback testimonials if none exist in database
+          setFallbackTestimonials();
+        }
+      } catch (error) {
+        console.error('Error fetching testimonials:', error);
+        // Use fallback testimonials on error
+        setFallbackTestimonials();
+      }
+    };
+    
+    const setFallbackTestimonials = () => {
+      setTestimonials([
+        {
+          name: "Sarah Johnson",
+          role: "Interior Designer",
+          image: "https://images.unsplash.com/photo-1494790108755-2616b612b788?w=100&h=100&fit=crop&crop=face",
+          rating: 5,
+          text: "Universal Wallpaper has transformed my design business. The quality and variety are unmatched, and my clients are always thrilled with the results."
+        },
+        {
+          name: "Michael Chen",
+          role: "Homeowner",
+          image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+          rating: 5,
+          text: "I renovated my entire home using products from this platform. The customer service was exceptional and the shipping was incredibly fast."
+        },
+        {
+          name: "Emma Rodriguez",
+          role: "Business Owner",
+          image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+          rating: 5,
+          text: "As a seller on this platform, I've been able to reach customers worldwide. The tools and support provided are fantastic."
+        }
+      ]);
+    };
+    
+    fetchTestimonials();
+  }, []);
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
@@ -34,29 +90,7 @@ const LandingPage = () => {
     }
   };
 
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Interior Designer",
-      image: "https://images.unsplash.com/photo-1494790108755-2616b612b788?w=100&h=100&fit=crop&crop=face",
-      rating: 5,
-      text: "Universal Wallpaper has transformed my design business. The quality and variety are unmatched, and my clients are always thrilled with the results."
-    },
-    {
-      name: "Michael Chen",
-      role: "Homeowner",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-      rating: 5,
-      text: "I renovated my entire home using products from this platform. The customer service was exceptional and the shipping was incredibly fast."
-    },
-    {
-      name: "Emma Rodriguez",
-      role: "Business Owner",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-      rating: 5,
-      text: "As a seller on this platform, I've been able to reach customers worldwide. The tools and support provided are fantastic."
-    }
-  ];
+
 
   const services = [
     {
