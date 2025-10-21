@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Outlet, Link } from 'react-router-dom';
-import { FaHome, FaUsers, FaBoxOpen, FaChartBar, FaCog, FaImage, FaEnvelope, FaUserCog, FaTags } from 'react-icons/fa';
+import { FaHome, FaUsers, FaBoxOpen, FaChartBar, FaCog, FaImage, FaEnvelope, FaUserCog, FaTags, FaCreditCard } from 'react-icons/fa';
 
 const AdminPanel = () => {
   const user = useSelector(state => state?.user?.user);
@@ -58,6 +58,11 @@ const AdminPanel = () => {
       label: 'Email Templates',
       path: '/admin-panel/email-templates',
       icon: <FaEnvelope />
+    },
+    {
+      label: 'Payment Config',
+      path: '/admin-panel/payment-config',
+      icon: <FaCreditCard />
     },
     {
       label: 'Settings',
