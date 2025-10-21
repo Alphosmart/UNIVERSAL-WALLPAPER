@@ -102,34 +102,9 @@ const settingsSchema = new mongoose.Schema({
         }
     },
     
-    // Payment settings
+    // Comprehensive Payment Configuration (consolidated from 3 duplicate structures)
     payment: {
-        enablePayPal: {
-            type: Boolean,
-            default: true
-        },
-        enableStripe: {
-            type: Boolean,
-            default: true
-        },
-        enableCashOnDelivery: {
-            type: Boolean,
-            default: true
-        },
-        enableBankTransfer: {
-            type: Boolean,
-            default: false
-        },
-        enableCryptocurrency: {
-            type: Boolean,
-            default: false
-        },
-        commissionRate: {
-            type: Number,
-            default: 3.0,
-            min: 0,
-            max: 50
-        },
+        // Business payment settings (single-seller model)
         minimumPayout: {
             type: Number,
             default: 25.0,
@@ -140,20 +115,41 @@ const settingsSchema = new mongoose.Schema({
             enum: ['daily', 'weekly', 'monthly'],
             default: 'weekly'
         },
-        // Payment method specific settings
-        paymentMethodSettings: {
+        
+        // Consolidated payment method configurations
+        methods: {
             stripe: {
                 enabled: {
                     type: Boolean,
                     default: true
                 },
-                description: {
+                publishableKey: {
                     type: String,
-                    default: 'Pay securely with your credit or debit card'
+                    default: ''
                 },
-                processingFee: {
-                    type: Number,
-                    default: 2.9
+                secretKey: {
+                    type: String,
+                    default: ''
+                },
+                webhookSecret: {
+                    type: String,
+                    default: ''
+                },
+                testMode: {
+                    type: Boolean,
+                    default: true
+                },
+                supportedCountries: {
+                    type: [String],
+                    default: ['US', 'CA', 'GB', 'AU', 'IN', 'NG']
+                },
+                supportedCurrencies: {
+                    type: [String],
+                    default: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'INR', 'NGN']
+                },
+                fees: {
+                    percentage: { type: Number, default: 2.9 },
+                    fixed: { type: Number, default: 0.30 }
                 }
             },
             paypal: {
@@ -161,13 +157,93 @@ const settingsSchema = new mongoose.Schema({
                     type: Boolean,
                     default: true
                 },
-                description: {
+                clientId: {
                     type: String,
-                    default: 'Pay with your PayPal account'
+                    default: ''
                 },
-                processingFee: {
-                    type: Number,
-                    default: 3.4
+                clientSecret: {
+                    type: String,
+                    default: ''
+                },
+                testMode: {
+                    type: Boolean,
+                    default: true
+                },
+                supportedCountries: {
+                    type: [String],
+                    default: ['US', 'CA', 'GB', 'AU', 'IN', 'NG', 'DE', 'FR']
+                },
+                supportedCurrencies: {
+                    type: [String],
+                    default: ['USD', 'EUR', 'GBP', 'CAD', 'AUD']
+                },
+                fees: {
+                    percentage: { type: Number, default: 3.4 },
+                    fixed: { type: Number, default: 0.30 }
+                }
+            },
+            paystack: {
+                enabled: {
+                    type: Boolean,
+                    default: false
+                },
+                publicKey: {
+                    type: String,
+                    default: ''
+                },
+                secretKey: {
+                    type: String,
+                    default: ''
+                },
+                testMode: {
+                    type: Boolean,
+                    default: true
+                },
+                supportedCountries: {
+                    type: [String],
+                    default: ['NG', 'GH', 'ZA', 'KE']
+                },
+                supportedCurrencies: {
+                    type: [String],
+                    default: ['NGN', 'GHS', 'ZAR', 'KES']
+                },
+                fees: {
+                    percentage: { type: Number, default: 1.5 },
+                    fixed: { type: Number, default: 100 }
+                }
+            },
+            flutterwave: {
+                enabled: {
+                    type: Boolean,
+                    default: false
+                },
+                publicKey: {
+                    type: String,
+                    default: ''
+                },
+                secretKey: {
+                    type: String,
+                    default: ''
+                },
+                encryptionKey: {
+                    type: String,
+                    default: ''
+                },
+                testMode: {
+                    type: Boolean,
+                    default: true
+                },
+                supportedCountries: {
+                    type: [String],
+                    default: ['NG', 'GH', 'KE', 'UG', 'ZA']
+                },
+                supportedCurrencies: {
+                    type: [String],
+                    default: ['NGN', 'USD', 'GHS', 'KES', 'UGX', 'ZAR']
+                },
+                fees: {
+                    percentage: { type: Number, default: 1.4 },
+                    fixed: { type: Number, default: 0 }
                 }
             },
             cashOnDelivery: {
@@ -175,31 +251,42 @@ const settingsSchema = new mongoose.Schema({
                     type: Boolean,
                     default: true
                 },
-                description: {
-                    type: String,
-                    default: 'Pay when your order is delivered'
-                },
                 additionalFee: {
                     type: Number,
                     default: 0
                 },
-                availableCountries: {
+                supportedCountries: {
                     type: [String],
-                    default: ['United States', 'India', 'United Kingdom', 'Canada']
+                    default: ['NG', 'IN', 'PK', 'BD', 'EG']
+                },
+                maxOrderAmount: {
+                    type: Number,
+                    default: 500000
+                },
+                description: {
+                    type: String,
+                    default: 'Pay when your order is delivered'
                 }
             },
             bankTransfer: {
                 enabled: {
                     type: Boolean,
-                    default: false
+                    default: true
                 },
-                description: {
+                accountDetails: {
+                    bankName: { type: String, default: 'Access Bank' },
+                    accountNumber: { type: String, default: '1234567890' },
+                    accountName: { type: String, default: 'AshAmSmart Ltd' },
+                    routingNumber: { type: String, default: '' },
+                    swiftCode: { type: String, default: '' }
+                },
+                processingTime: {
                     type: String,
-                    default: 'Transfer directly to our bank account'
+                    default: '1-2 business days'
                 },
-                processingDays: {
-                    type: Number,
-                    default: 2
+                instructions: {
+                    type: String,
+                    default: 'Please use your order number as the transfer reference'
                 }
             },
             cryptocurrency: {
@@ -207,13 +294,23 @@ const settingsSchema = new mongoose.Schema({
                     type: Boolean,
                     default: false
                 },
-                description: {
-                    type: String,
-                    default: 'Pay with Bitcoin, Ethereum, or other cryptocurrencies'
-                },
                 supportedCoins: {
                     type: [String],
-                    default: ['BTC', 'ETH', 'USDC']
+                    default: ['BTC', 'ETH', 'USDT', 'USDC']
+                },
+                walletAddresses: {
+                    BTC: { type: String, default: '' },
+                    ETH: { type: String, default: '' },
+                    USDT: { type: String, default: '' },
+                    USDC: { type: String, default: '' }
+                },
+                processingTime: {
+                    type: String,
+                    default: '10-30 minutes'
+                },
+                minimumAmount: {
+                    type: Number,
+                    default: 10
                 }
             }
         }

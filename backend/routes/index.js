@@ -100,6 +100,11 @@ const {
     processPayment
 } = require('../controller/stripePaymentController');
 const {
+    getPaymentConfiguration,
+    updatePaymentConfiguration,
+    testPaymentMethod
+} = require('../controller/paymentConfigController');
+const {
     getOrderTracking,
     getBuyerOrdersWithTracking,
     updateOrderTracking,
@@ -259,6 +264,11 @@ router.put('/admin/banners/order', authToken, updateBannersOrder);
 
 // Payment method routes - Block during maintenance
 router.post('/payment-methods/available', checkMaintenanceMode, getAvailablePaymentMethods);
+
+// Payment configuration routes (Admin only)
+router.get('/admin/payment-config', authToken, getPaymentConfiguration);
+router.post('/admin/payment-config', authToken, updatePaymentConfiguration);
+router.post('/admin/payment-config/test', authToken, testPaymentMethod);
 
 // Stripe payment processing routes
 router.post('/create-payment-intent', checkMaintenanceMode, authToken, createPaymentIntent);
