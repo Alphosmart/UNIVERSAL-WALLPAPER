@@ -137,7 +137,7 @@ async function getAllProductsAdmin(req, res) {
 
         // Fetch all products with seller information
         const allProducts = await productModel.find({})
-            .populate('seller', 'name email')
+            .populate('uploadedBy', 'name email role')
             .sort({ createdAt: -1 });
 
         res.json({
@@ -244,7 +244,7 @@ async function updateProductStatus(req, res) {
             productId,
             { status },
             { new: true }
-        ).populate('seller', 'name email');
+        ).populate('uploadedBy', 'name email role');
 
         if (!updatedProduct) {
             return res.status(404).json({

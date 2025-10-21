@@ -10,7 +10,7 @@ async function getOrderTracking(request, response) {
         // Find order and ensure it belongs to the current user (buyer)
         const order = await orderModel.findById(orderId)
             .populate('product', 'productName brandName category productImage')
-            .populate('seller', 'name email')
+            .populate('uploadedBy', 'name email role')
             .populate('buyer', 'name email');
 
         if (!order) {
@@ -69,7 +69,7 @@ async function getBuyerOrdersWithTracking(request, response) {
             buyer: currentUserId
         })
         .populate('product', 'productName brandName category productImage')
-        .populate('seller', 'name email')
+        .populate('uploadedBy', 'name email role')
         .sort({ createdAt: -1 }); // Latest orders first
 
         const ordersWithTracking = orders.map(order => ({

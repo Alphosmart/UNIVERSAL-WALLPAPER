@@ -22,12 +22,12 @@ const getProductController = async(req, res) => {
             }
         }
 
-        // Get only active products from database with seller information
+        // Get only active products from database with uploader information
         const allProducts = await productModel.find({ 
             status: 'ACTIVE',
             stock: { $gt: 0 } // Only products with stock > 0
         })
-        .populate('seller', 'name email')
+        .populate('uploadedBy', 'name email role')
         .sort({ createdAt: -1 });
 
         // Convert prices to buyer's currency

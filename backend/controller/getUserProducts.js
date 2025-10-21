@@ -54,7 +54,7 @@ async function getUserProductsController(req, res) {
         // Get company products
         const products = await Product.find(filter)
             .sort({ createdAt: -1 })
-            .populate('seller', 'name email');
+            .populate('uploadedBy', 'name email role');
 
         // Convert prices if currency is specified
         let processedProducts = products;

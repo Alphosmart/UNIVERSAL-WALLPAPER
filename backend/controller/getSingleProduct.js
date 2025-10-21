@@ -25,7 +25,7 @@ const getSingleProductController = async (req, res) => {
 
         // Find the specific product by ID
         const product = await productModel.findById(productId)
-            .populate('seller', 'name email')
+            .populate('uploadedBy', 'name email role')
             .populate('likes', 'name')
             .populate('reviews.user', 'name')
             .populate('ratings.user', 'name');

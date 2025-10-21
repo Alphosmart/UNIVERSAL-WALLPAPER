@@ -8,7 +8,7 @@ async function updateOrderStatusController(req, res) {
         // Find the order
         const order = await Order.findById(orderId)
             .populate('product', 'productName')
-            .populate('seller', 'name email')
+            .populate('uploadedBy', 'name email role')
             .populate('buyer', 'name email');
 
         if (!order) {
@@ -73,7 +73,7 @@ async function updateOrderStatusController(req, res) {
             { new: true, runValidators: true }
         )
         .populate('product', 'productName brandName category')
-        .populate('seller', 'name email')
+        .populate('uploadedBy', 'name email role')
         .populate('buyer', 'name email');
 
         res.status(200).json({

@@ -22,7 +22,7 @@ async function buyProductController(req, res) {
         }
 
         // Get product details
-        const product = await Product.findById(productId).populate('seller', 'name email');
+        const product = await Product.findById(productId).populate('uploadedBy', 'name email role');
         if (!product) {
             return res.status(404).json({
                 message: "Product not found",
@@ -109,7 +109,7 @@ async function buyProductController(req, res) {
         // Populate the order with product and seller details for response
         const populatedOrder = await Order.findById(savedOrder._id)
             .populate('product', 'productName brandName category')
-            .populate('seller', 'name email')
+            .populate('uploadedBy', 'name email role')
             .populate('buyer', 'name email');
 
         // Send order confirmation email with tracking ID

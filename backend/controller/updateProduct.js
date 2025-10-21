@@ -86,7 +86,8 @@ async function updateProductController(req, res) {
                 }
             },
             { new: true, runValidators: true }
-        ).populate('seller', 'name email');
+        )
+        .populate('uploadedBy', 'name email role');
 
         res.status(200).json({
             message: "Product updated successfully",

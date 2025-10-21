@@ -90,6 +90,20 @@ async function addProductController(req, res) {
                 });
             }
 
+            // Find the company seller (single company model)
+            const companySeller = await User.findOne({ 
+                email: 'alpho4luv@gmail.com',
+                role: 'ADMIN'
+            });
+
+            if (!companySeller) {
+                return res.status(500).json({
+                    message: "Company seller not found",
+                    error: true,
+                    success: false
+                });
+            }
+
             // Check if user has admin privileges or staff product upload permissions
             const canUpload = currentUser.role === 'ADMIN' || 
                              (currentUser.role === 'STAFF' && currentUser.permissions?.canUploadProducts);
@@ -180,6 +194,9 @@ async function addProductController(req, res) {
                     role: currentUser.role,
                     uploadedAt: new Date()
                 },
+                
+                // Company reference - use the designated company seller
+                companyId: companySeller._id,
                 
                 stock: parseInt(stock) || 1,
                 condition: condition || 'new',

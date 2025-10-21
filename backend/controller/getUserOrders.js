@@ -23,7 +23,7 @@ async function getUserOrdersController(req, res) {
         const orders = await Order.find(filter)
             .sort({ createdAt: -1 })
             .populate('product', 'productName brandName category productImage')
-            .populate('seller', 'name email')
+            .populate('uploadedBy', 'name email role')
             .populate('buyer', 'name email');
 
         res.status(200).json({
