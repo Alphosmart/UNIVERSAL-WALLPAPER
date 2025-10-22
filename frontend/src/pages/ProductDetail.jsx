@@ -481,46 +481,45 @@ const ProductDetail = () => {
                             ))}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
                             {relatedProducts.map((relatedProduct) => (
                                 <div
                                     key={relatedProduct._id}
                                     onClick={() => navigate(`/product/${relatedProduct._id}`)}
-                                    className="bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
+                                    className="w-full max-w-[280px] bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
                                 >
-                                    <div className="aspect-square overflow-hidden rounded-t-lg">
+                                    <div className="aspect-square overflow-hidden rounded-t-lg bg-slate-200 p-4 flex justify-center items-center">
                                         <img
                                             src={relatedProduct.productImage?.[0] || '/api/placeholder/300/300'}
                                             alt={relatedProduct.productName}
-                                            className="w-full h-full object-cover hover:scale-110 transition-transform"
+                                            className="max-w-full max-h-full object-scale-down hover:scale-110 transition-transform mix-blend-multiply"
                                         />
                                     </div>
-                                    <div className="p-4">
-                                        <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2 text-sm">
+                                    <div className="p-4 space-y-3">
+                                        <h3 className="font-medium text-base text-gray-800 line-clamp-1">
                                             {relatedProduct.productName}
                                         </h3>
-                                        <p className="text-xs text-gray-600 mb-2">{relatedProduct.brandName}</p>
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <p className="text-lg font-bold text-red-600">
-                                                    ${relatedProduct.sellingPrice || relatedProduct.price}
+                                        <p className="capitalize text-slate-500 text-sm">{relatedProduct.category}</p>
+                                        <div className="flex gap-3">
+                                            <p className="text-red-600 font-medium">
+                                                ${relatedProduct.sellingPrice || relatedProduct.price}
+                                            </p>
+                                            {relatedProduct.price && relatedProduct.sellingPrice && relatedProduct.price > relatedProduct.sellingPrice && (
+                                                <p className="text-slate-500 line-through">
+                                                    ${relatedProduct.price}
                                                 </p>
-                                                {relatedProduct.price && relatedProduct.sellingPrice && relatedProduct.price > relatedProduct.sellingPrice && (
-                                                    <p className="text-xs text-gray-500 line-through">
-                                                        ${relatedProduct.price}
-                                                    </p>
-                                                )}
-                                            </div>
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    addToCart(relatedProduct._id, 1);
-                                                }}
-                                                className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full transition-colors"
-                                            >
-                                                Add to Cart
-                                            </button>
+                                            )}
                                         </div>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                addToCart(relatedProduct._id, 1);
+                                                toast.success('Added to cart!');
+                                            }}
+                                            className="w-full text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-full transition-colors"
+                                        >
+                                            Add to Cart
+                                        </button>
                                     </div>
                                 </div>
                             ))}
