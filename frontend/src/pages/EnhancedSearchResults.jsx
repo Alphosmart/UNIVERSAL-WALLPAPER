@@ -639,44 +639,60 @@ const EnhancedSearchResults = () => {
                     {/* Products Grid/List */}
                     <div className={`${
                         viewMode === 'grid' 
-                            ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center' 
+                            ? 'flex overflow-x-auto gap-3 pb-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4 md:gap-6 sm:justify-items-center scrollbar-hide' 
                             : 'space-y-4'
                     }`}>
                         {products.map((product) => (
                             <div
                                 key={product._id}
                                 className={`bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer ${
-                                    viewMode === 'list' ? 'flex items-center p-4 gap-4' : ''
+                                    viewMode === 'list' 
+                                        ? 'flex items-center p-4 gap-4' 
+                                        : 'flex-shrink-0 w-[160px] sm:w-auto'
                                 }`}
                                 onClick={() => navigate(`/product/${product._id}`)}
                             >
                                 {/* Product Image */}
                                 <div className={`${
-                                    viewMode === 'list' ? 'w-24 h-24 flex-shrink-0' : 'aspect-square'
+                                    viewMode === 'list' 
+                                        ? 'w-24 h-24 flex-shrink-0' 
+                                        : 'h-32 sm:aspect-square bg-slate-200 p-2 sm:p-4 flex justify-center items-center'
                                 } overflow-hidden`}>
                                     <img
                                         src={product.productImage?.[0] || '/api/placeholder/300/300'}
                                         alt={product.productName}
-                                        className="w-full h-full object-cover hover:scale-105 transition-transform"
+                                        className={`${
+                                            viewMode === 'list'
+                                                ? 'w-full h-full object-cover'
+                                                : 'max-w-full max-h-full object-scale-down mix-blend-multiply'
+                                        } hover:scale-105 transition-transform`}
                                     />
                                 </div>
 
                                 {/* Product Info */}
-                                <div className={`${viewMode === 'list' ? 'flex-1' : 'p-4'}`}>
-                                    <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2 hover:text-blue-600">
+                                <div className={`${viewMode === 'list' ? 'flex-1' : 'p-2 sm:p-4'}`}>
+                                    <h3 className={`font-semibold text-gray-800 mb-1 line-clamp-2 hover:text-blue-600 ${
+                                        viewMode === 'grid' ? 'text-xs sm:text-base' : ''
+                                    }`}>
                                         {product.productName}
                                     </h3>
-                                    <p className="text-sm text-gray-600 mb-2">{product.brandName}</p>
+                                    {viewMode === 'list' && (
+                                        <p className="text-sm text-gray-600 mb-2">{product.brandName}</p>
+                                    )}
                                     
                                     {/* Price and Discount */}
-                                    <div className="flex items-center justify-between">
+                                    <div className={`${viewMode === 'list' ? 'flex items-center justify-between' : 'space-y-2'}`}>
                                         <div>
-                                            <p className="text-lg font-bold text-red-600">
+                                            <p className={`font-bold text-red-600 ${
+                                                viewMode === 'grid' ? 'text-sm sm:text-lg' : 'text-lg'
+                                            }`}>
                                                 ${product.sellingPrice || product.price}
                                             </p>
                                             {product.price && product.sellingPrice && product.price > product.sellingPrice && (
                                                 <div className="flex items-center gap-2">
-                                                    <p className="text-sm text-gray-500 line-through">
+                                                    <p className={`text-gray-500 line-through ${
+                                                        viewMode === 'grid' ? 'text-xs sm:text-sm' : 'text-sm'
+                                                    }`}>
                                                         ${product.price}
                                                     </p>
                                                     <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
