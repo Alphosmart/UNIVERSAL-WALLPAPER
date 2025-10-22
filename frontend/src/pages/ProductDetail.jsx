@@ -6,6 +6,7 @@ import SummaryApi from '../common';
 import { useCart } from '../context/CartContext';
 import SocialFeatures from '../components/SocialFeatures';
 import EnhancedReviews from '../components/EnhancedReviews';
+import VerticalCardProduct from '../components/VerticalCardProduct';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -17,7 +18,36 @@ const ProductDetail = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [relatedProducts, setRelatedProducts] = useState([]);
+    const [loadingRelated, setLoadingRelated] = useState(false);
     const { addToCart, isInCart, getCartItem } = useCart();
+
+    const fetchRelatedProducts = useCallback(async (category, currentProductId) => {
+        if (!category) return;
+        
+        setLoadingRelated(true);
+        try {
+            // Search for products in the same category
+            const response = await fetch(`${SummaryApi.allProduct.url}`, {
+                method: SummaryApi.allProduct.method
+            });
+            const data = await response.json();
+
+            if (data.success && data.data) {
+                // Filter products by same category, exclude current product, and limit to 8
+                const related = data.data
+                    .filter(p => p.category === category && p._id !== currentProductId && p.status === 'ACTIVE')
+                    .sort(() => Math.random() - 0.5) // Randomize
+                    .slice(0, 8);
+                
+                setRelatedProducts(related);
+            }
+        } catch (error) {
+            console.error('Error fetching related products:', error);
+        } finally {
+            setLoadingRelated(false);
+        }
+    }, []);
 
     const fetchProductDetails = useCallback(async () => {
         try {
@@ -30,6 +60,8 @@ const ProductDetail = () => {
                 setProduct(data.data);
                 setSelectedImage(data.data.productImage[0] || '');
                 setCurrentImageIndex(0);
+                // Fetch related products after getting main product
+                fetchRelatedProducts(data.data.category, data.data._id);
             } else {
                 toast.error(data.message || 'Product not found');
                 navigate('/');
@@ -41,7 +73,7 @@ const ProductDetail = () => {
         } finally {
             setLoading(false);
         }
-    }, [id, navigate]);
+    }, [id, navigate, fetchRelatedProducts]);
 
     useEffect(() => {
         if (id) {
@@ -421,6 +453,81 @@ const ProductDetail = () => {
             <div className="mt-8">
                 <EnhancedReviews productId={product._id} />
             </div>
+            
+            {/* Related Products Section */}
+            {relatedProducts.length > 0 && (
+                <div className="mt-12">
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-2xl font-bold text-gray-800">You May Also Like</h2>
+                        <button 
+                            onClick={() => navigate(`/search?category=${product.category}`)}
+                            className="text-blue-600 hover:text-blue-800 font-medium"
+                        >
+                            View All in {product.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </button>
+                    </div>
+                    
+                    {loadingRelated ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {[1,2,3,4].map((item) => (
+                                <div key={item} className='w-full bg-white rounded-lg shadow animate-pulse'>
+                                    <div className='bg-slate-200 h-48 rounded-t-lg'></div>
+                                    <div className='p-4 space-y-3'>
+                                        <div className='h-4 bg-slate-300 rounded w-full'></div>
+                                        <div className='h-3 bg-slate-300 rounded w-3/4'></div>
+                                        <div className='h-4 bg-slate-300 rounded w-1/2'></div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {relatedProducts.map((relatedProduct) => (
+                                <div
+                                    key={relatedProduct._id}
+                                    onClick={() => navigate(`/product/${relatedProduct._id}`)}
+                                    className="bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
+                                >
+                                    <div className="aspect-square overflow-hidden rounded-t-lg">
+                                        <img
+                                            src={relatedProduct.productImage?.[0] || '/api/placeholder/300/300'}
+                                            alt={relatedProduct.productName}
+                                            className="w-full h-full object-cover hover:scale-110 transition-transform"
+                                        />
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2 text-sm">
+                                            {relatedProduct.productName}
+                                        </h3>
+                                        <p className="text-xs text-gray-600 mb-2">{relatedProduct.brandName}</p>
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-lg font-bold text-red-600">
+                                                    ${relatedProduct.sellingPrice || relatedProduct.price}
+                                                </p>
+                                                {relatedProduct.price && relatedProduct.sellingPrice && relatedProduct.price > relatedProduct.sellingPrice && (
+                                                    <p className="text-xs text-gray-500 line-through">
+                                                        ${relatedProduct.price}
+                                                    </p>
+                                                )}
+                                            </div>
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    addToCart(relatedProduct._id, 1);
+                                                }}
+                                                className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-full transition-colors"
+                                            >
+                                                Add to Cart
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
             
             {/* Fullscreen Image Modal */}
             {isFullscreen && (
