@@ -37,10 +37,11 @@ const LandingPage = () => {
         });
         
         const data = await response.json();
-        if (data.success && data.data.length > 0) {
+        if (data.success) {
+          // Always use API data, even if empty (respects admin's inactive settings)
           setTestimonials(data.data);
         } else {
-          // Fallback testimonials if none exist in database
+          // Fallback testimonials only if API call fails
           setFallbackTestimonials();
         }
       } catch (error) {
@@ -473,45 +474,47 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">What Our Customers Say</h2>
-            <p className="text-xl text-gray-600">
-              Join thousands of satisfied customers who have transformed their spaces
-            </p>
-          </div>
+      {/* Testimonials Section - Only show if testimonials exist */}
+      {testimonials.length > 0 && (
+        <section className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">What Our Customers Say</h2>
+              <p className="text-xl text-gray-600">
+                Join thousands of satisfied customers who have transformed their spaces
+              </p>
+            </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="bg-white rounded-xl p-8 shadow-lg relative">
-                <FaQuoteLeft className="text-blue-200 text-3xl mb-4" />
-                
-                <p className="text-gray-700 mb-6 leading-relaxed">"{testimonial.text}"</p>
-                
-                <div className="flex items-center gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <FaStar key={i} className="text-yellow-400" />
-                  ))}
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <div className="font-semibold text-gray-800">{testimonial.name}</div>
-                    <div className="text-gray-600 text-sm">{testimonial.role}</div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <div key={index} className="bg-white rounded-xl p-8 shadow-lg relative">
+                  <FaQuoteLeft className="text-blue-200 text-3xl mb-4" />
+                  
+                  <p className="text-gray-700 mb-6 leading-relaxed">"{testimonial.text}"</p>
+                  
+                  <div className="flex items-center gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <FaStar key={i} className="text-yellow-400" />
+                    ))}
+                  </div>
+                  
+                  <div className="flex items-center gap-4">
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <div className="font-semibold text-gray-800">{testimonial.name}</div>
+                      <div className="text-gray-600 text-sm">{testimonial.role}</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Newsletter Section */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
