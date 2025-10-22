@@ -72,8 +72,8 @@ export const ProductProvider = ({ children }) => {
     loadUserCurrency();
   }, [user]);
 
-  const fetchAllProducts = useCallback(async (forceRefresh = false, currency = null) => {
-    console.log('🔍 ProductContext: fetchAllProducts called', { forceRefresh, currency, currentProducts: allProductsRef.current.length });
+  const fetchAllProducts = useCallback(async (forceRefresh = false, currency = null, useLite = true) => {
+    console.log('🔍 ProductContext: fetchAllProducts called', { forceRefresh, currency, useLite, currentProducts: allProductsRef.current.length });
     
     // Get user's preferred currency
     const userCurrency = currency || currentCurrency;
@@ -90,15 +90,22 @@ export const ProductProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      // Add currency parameter to API call
-      const url = new URL(SummaryApi.allProduct.url);
+      // Use lite endpoint for faster loading by default
+      const apiEndpoint = useLite ? SummaryApi.allProductsLite : SummaryApi.allProduct;
+      const url = new URL(apiEndpoint.url);
+      
+      // Add parameters
       if (userCurrency) {
         url.searchParams.append('currency', userCurrency);
+      }
+      if (useLite) {
+        url.searchParams.append('limit', '50'); // Load first 50 products quickly
+        url.searchParams.append('page', '1');
       }
       
       console.log('🔍 ProductContext: Fetching from URL:', url.toString());
       const response = await fetch(url.toString(), {
-        method: SummaryApi.allProduct.method,
+        method: apiEndpoint.method,
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
@@ -130,7 +137,7 @@ export const ProductProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [lastFetch, CACHE_DURATION, currentCurrency]); // Removed allProducts to prevent infinite loop
+  }, [lastFetch, CACHE_DURATION, currentCurrency]);
 
   const getProductsByCategory = useCallback((category) => {
     console.log('🔍 ProductContext: getProductsByCategory called', { category, totalProducts: allProductsRef.current.length });
@@ -170,33 +177,49 @@ export const ProductProvider = ({ children }) => {
     }
   }, [fetchAllProducts]);
 
-  const changeCurrency = useCallback(async (newCurrency) => {
-    if (newCurrency !== currentCurrency) {
-      setCurrentCurrency(newCurrency);
+  const loadMoreProducts = useCallback(async (page = 2) => {
+    try {
+      setLoading(true);
       
-      // Save to localStorage for immediate persistence
-      localStorage.setItem('userCurrency', newCurrency);
+      const url = new URL(SummaryApi.allProductsLite.url);
+      url.searchParams.append('currency', currentCurrency);
+      url.searchParams.append('limit', '20');
+      url.searchParams.append('page', page.toString());
       
-      // Save to database
-      try {
-        await fetch(SummaryApi.updateUserPreferences.url, {
-          method: SummaryApi.updateUserPreferences.method,
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            currency: newCurrency
-          })
-        });
-      } catch (error) {
-        console.log('Could not save currency preference to database:', error);
+      const response = await fetch(url.toString(), {
+        method: SummaryApi.allProductsLite.method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const dataResponse = await response.json();
+      
+      if (dataResponse.success && dataResponse.data.length > 0) {
+        // Append new products to existing ones
+        const updatedProducts = [...allProductsRef.current, ...dataResponse.data];
+        setAllProducts(updatedProducts);
+        allProductsRef.current = updatedProducts;
+        console.log('🔍 ProductContext: Loaded', dataResponse.data.length, 'more products. Total:', updatedProducts.length);
+        return dataResponse.pagination;
       }
-      
-      // Refresh products with new currency
-      fetchAllProducts(true, newCurrency);
+      return null;
+    } catch (error) {
+      console.error('🔍 ProductContext: Error loading more products:', error);
+      setError(error.message);
+      return null;
+    } finally {
+      setLoading(false);
     }
-  }, [currentCurrency, fetchAllProducts]);
+  }, [currentCurrency]);
+
+  const changeCurrency = useCallback((newCurrency) => {
+    console.log('🔍 ProductContext: changeCurrency called', newCurrency);
+    setCurrentCurrency(newCurrency);
+    // Force refresh with new currency
+    fetchAllProducts(true, newCurrency);
+  }, [fetchAllProducts]);
 
   const value = {
     allProducts,
@@ -207,6 +230,7 @@ export const ProductProvider = ({ children }) => {
     getProductsByCategory,
     getProductById,
     changeCurrency,
+    loadMoreProducts,
     refreshProducts: () => fetchAllProducts(true)
   };
 

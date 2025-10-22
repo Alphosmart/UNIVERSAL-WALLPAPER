@@ -4,6 +4,11 @@ const settingsModel = require("../models/settingsModel");
 
 const getProductController = async(req, res) => {
     try {
+        // Get pagination parameters
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20; // Default to 20 products per page
+        const skip = (page - 1) * limit;
+
         // Get buyer's preferred currency from query params or default settings
         let buyerCurrency = req.query.currency;
         
@@ -22,40 +27,74 @@ const getProductController = async(req, res) => {
             }
         }
 
-        // Get only active products from database with uploader information
+        // Get total count for pagination
+        const totalProducts = await productModel.countDocuments({ 
+            status: 'ACTIVE',
+            stock: { $gt: 0 }
+        });
+
+        // Get paginated products with essential fields only
         const allProducts = await productModel.find({ 
             status: 'ACTIVE',
             stock: { $gt: 0 } // Only products with stock > 0
+        }, {
+            // Select only essential fields for better performance
+            productName: 1,
+            brandName: 1,
+            category: 1,
+            productImage: 1,
+            description: 1,
+            pricing: 1,
+            price: 1, // legacy field
+            sellingPrice: 1, // legacy field
+            stock: 1,
+            condition: 1,
+            status: 1,
+            uploadedByInfo: 1, // Use embedded info instead of populate
+            likes: 1,
+            ratings: 1,
+            reviews: 1,
+            createdAt: 1,
+            updatedAt: 1
         })
-        .populate('uploadedBy', 'name email role')
-        .sort({ createdAt: -1 });
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean(); // Use lean() for better performance
 
-        // Convert prices to buyer's currency
+        // Process products more efficiently
         const productsWithConvertedPrices = allProducts.map(product => {
-            const productObj = product.toObject();
-            
             // Add converted pricing for buyer
-            const convertedPricing = CurrencyService.convertProductPricing(productObj, buyerCurrency);
+            const convertedPricing = CurrencyService.convertProductPricing(product, buyerCurrency);
             
-            // Calculate basic social features statistics
-            const totalLikes = product.likes ? product.likes.length : 0;
-            const totalRatings = product.ratings ? product.ratings.length : 0;
-            const averageRating = totalRatings > 0 
-                ? product.ratings.reduce((sum, r) => sum + r.rating, 0) / totalRatings 
+            // Calculate social features efficiently
+            const likes = product.likes?.length || 0;
+            const ratingsArray = product.ratings || [];
+            const reviewsArray = product.reviews || [];
+            const averageRating = ratingsArray.length > 0 
+                ? ratingsArray.reduce((sum, r) => sum + (r.rating || 0), 0) / ratingsArray.length 
                 : 0;
-            const totalReviews = product.reviews ? product.reviews.length : 0;
             
             return {
-                ...productObj,
+                _id: product._id,
+                productName: product.productName,
+                brandName: product.brandName,
+                category: product.category,
+                productImage: product.productImage,
+                description: product.description,
+                stock: product.stock,
+                condition: product.condition,
+                status: product.status,
                 displayPricing: convertedPricing,
-                // Keep original pricing for reference
-                originalCurrency: productObj.pricing?.originalPrice?.currency || 'NGN',
+                originalCurrency: product.pricing?.originalPrice?.currency || 'NGN',
                 socialFeatures: {
-                    likes: totalLikes,
-                    averageRating: parseFloat(averageRating.toFixed(1)),
-                    totalRatings: totalRatings,
-                    totalReviews: totalReviews
-                }
+                    likes,
+                    averageRating: Math.round(averageRating * 10) / 10,
+                    totalRatings: ratingsArray.length,
+                    totalReviews: reviewsArray.length
+                },
+                createdAt: product.createdAt,
+                updatedAt: product.updatedAt
             };
         });
 
@@ -64,7 +103,15 @@ const getProductController = async(req, res) => {
             success: true,
             error: false,
             data: productsWithConvertedPrices,
-            currency: buyerCurrency
+            currency: buyerCurrency,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalProducts / limit),
+                totalProducts: totalProducts,
+                hasNextPage: page < Math.ceil(totalProducts / limit),
+                hasPrevPage: page > 1,
+                limit: limit
+            }
         });
 
     } catch (err) {

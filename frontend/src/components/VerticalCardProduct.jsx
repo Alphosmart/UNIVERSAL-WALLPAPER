@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useProducts } from '../context/ProductContext'
 import { formatCurrency } from '../helper/settingsUtils'
 import SocialFeatures from './SocialFeatures'
+import LazyImage from './LazyImage'
 
 const VerticalCardProduct = memo(({ category, heading }) => {
     console.log('🔍 VerticalCardProduct: Rendered with category:', category, 'heading:', heading);
@@ -46,20 +47,21 @@ const VerticalCardProduct = memo(({ category, heading }) => {
         return (
             <div className='container mx-auto px-4 my-6 relative'>
                 <h2 className='text-2xl font-semibold py-4'>{heading}</h2>
-                <div className='flex overflow-x-auto gap-3 pb-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4 md:gap-6 sm:justify-items-center scrollbar-hide'>
+                <div className='flex gap-2 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4'>
                     {[1,2,3,4,5].map((item) => (
-                        <div key={item} className='flex-shrink-0 w-[160px] sm:w-full sm:max-w-[280px] bg-white rounded-lg shadow'>
-                            <div className='bg-slate-200 h-32 sm:h-48 p-2 sm:p-4 flex justify-center items-center rounded-t-lg'>
-                                <div className='w-full h-full bg-slate-300 rounded animate-pulse'></div>
+                        <div key={item} className='flex-shrink-0 w-[160px] sm:w-full sm:max-w-[280px] bg-white rounded-lg shadow animate-pulse'>
+                            <div className='bg-gray-200 h-32 sm:h-48 p-2 sm:p-4 flex justify-center items-center rounded-t-lg'>
+                                <div className='w-full h-full bg-gray-300 rounded'></div>
                             </div>
                             <div className='p-2 sm:p-4 grid gap-1 sm:gap-3'>
-                                <div className='h-3 sm:h-4 bg-slate-300 rounded w-full animate-pulse'></div>
-                                <div className='h-2 sm:h-3 bg-slate-300 rounded w-3/4 animate-pulse'></div>
+                                <div className='h-3 sm:h-4 bg-gray-300 rounded w-full'></div>
+                                <div className='h-2 sm:h-3 bg-gray-300 rounded w-3/4'></div>
                                 <div className='flex gap-1 sm:gap-3'>
-                                    <div className='h-3 sm:h-4 bg-slate-300 rounded w-1/3 animate-pulse'></div>
-                                    <div className='h-3 sm:h-4 bg-slate-300 rounded w-1/3 animate-pulse'></div>
+                                    <div className='h-3 sm:h-4 bg-gray-300 rounded w-1/3'></div>
+                                    <div className='h-3 sm:h-4 bg-gray-300 rounded w-1/3'></div>
                                 </div>
-                                <div className='h-6 sm:h-8 bg-slate-300 rounded w-full animate-pulse'></div>
+                                <div className='h-1 bg-gray-300 rounded w-full'></div>
+                                <div className='h-6 sm:h-8 bg-gray-300 rounded w-full'></div>
                             </div>
                         </div>
                     ))}
@@ -92,17 +94,20 @@ const VerticalCardProduct = memo(({ category, heading }) => {
                             onMouseEnter={() => setHoveredProduct(product._id)}
                             onMouseLeave={() => setHoveredProduct(null)}
                         >
-                            <img 
-                                src={hoveredProduct === product._id && product.productImage.length > 1 
+                            {/* Discount badge like in the image */}
+                            {product.price && product.sellingPrice && product.price > product.sellingPrice && (
+                                <div className='absolute top-1 left-1 bg-red-600 text-white text-xs px-1 py-0.5 rounded z-10'>
+                                    -{Math.round(((product.price - product.sellingPrice) / product.price) * 100)}%
+                                </div>
+                            )}
+                            <LazyImage 
+                                src={hoveredProduct === product._id && product.productImage?.length > 1 
                                     ? product.productImage[currentImageIndex[product._id] || 1] || product.productImage[0]
-                                    : product.productImage[0]
+                                    : product.productImage?.[0]
                                 } 
                                 alt={product.productName}
-                                loading="lazy"
                                 className='object-scale-down h-full hover:scale-110 transition-all mix-blend-multiply'
-                                onError={(e) => {
-                                    e.target.src = '/placeholder-image.png'; // Fallback image
-                                }}
+                                fallbackSrc='/api/placeholder/300/300'
                             />
                             
                             {/* Image indicators for products with multiple images */}
@@ -147,10 +152,22 @@ const VerticalCardProduct = memo(({ category, heading }) => {
                                 )}
                             </div>
                             
-                            {/* Stock indicator like in the image */}
-                            <p className='text-xs text-orange-600 font-medium'>
-                                {product.stock > 0 ? `${product.stock} items left` : 'In Stock'}
-                            </p>
+                            {/* Stock indicator with progress bar like in the image */}
+                            <div className='space-y-1'>
+                                <p className='text-xs text-orange-600 font-medium'>
+                                    {product.stock > 0 ? `${product.stock} items left` : 'In Stock'}
+                                </p>
+                                {/* Stock progress bar */}
+                                <div className='w-full bg-gray-200 rounded-full h-1'>
+                                    <div 
+                                        className={`h-1 rounded-full ${
+                                            product.stock > 20 ? 'bg-green-500' : 
+                                            product.stock > 10 ? 'bg-yellow-500' : 'bg-red-500'
+                                        }`}
+                                        style={{ width: `${Math.min((product.stock / 50) * 100, 100)}%` }}
+                                    ></div>
+                                </div>
+                            </div>
                             
                             {/* Mobile: Compact social features, Desktop: Full */}
                             <div className='hidden sm:block'>

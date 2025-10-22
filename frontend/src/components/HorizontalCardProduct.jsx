@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useProducts } from '../context/ProductContext'
 import { formatCurrency } from '../helper/settingsUtils'
 import SocialFeatures from './SocialFeatures'
+import LazyImage from './LazyImage'
 
 const HorizontalCardProduct = memo(({ category, heading }) => {
     const { getProductsByCategory, loading: globalLoading, allProducts } = useProducts()
@@ -72,17 +73,14 @@ const HorizontalCardProduct = memo(({ category, heading }) => {
                             onMouseEnter={() => setHoveredProduct(product._id)}
                             onMouseLeave={() => setHoveredProduct(null)}
                         >
-                            <img 
-                                src={hoveredProduct === product._id && product.productImage.length > 1 
+                            <LazyImage 
+                                src={hoveredProduct === product._id && product.productImage?.length > 1 
                                     ? product.productImage[currentImageIndex[product._id] || 1] || product.productImage[0]
-                                    : product.productImage[0]
+                                    : product.productImage?.[0]
                                 } 
                                 alt={product.productName}
-                                loading="lazy"
                                 className='object-scale-down h-full hover:scale-105 transition-all mix-blend-multiply'
-                                onError={(e) => {
-                                    e.target.src = '/placeholder-image.png';
-                                }}
+                                fallbackSrc='/api/placeholder/300/300'
                             />
                             
                             {/* Image indicators for products with multiple images */}
