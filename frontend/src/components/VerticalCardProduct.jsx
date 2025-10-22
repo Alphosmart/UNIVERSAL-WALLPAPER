@@ -46,10 +46,10 @@ const VerticalCardProduct = memo(({ category, heading }) => {
         return (
             <div className='container mx-auto px-4 my-6 relative'>
                 <h2 className='text-2xl font-semibold py-4'>{heading}</h2>
-                <div className='grid grid-cols-[repeat(auto-fit,minmax(260px,300px))] justify-center md:justify-between md:gap-4 overflow-x-scroll scrollbar-none transition-all'>
-                    {[1,2,3].map((item) => (
-                        <div key={item} className='w-full min-w-[260px] md:min-w-[300px] max-w-[260px] md:max-w-[300px] bg-white rounded-sm shadow'>
-                            <div className='bg-slate-200 h-48 p-4 min-w-[260px] md:min-w-[300px] flex justify-center items-center'>
+                <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center'>
+                    {[1,2,3,4,5].map((item) => (
+                        <div key={item} className='w-full max-w-[280px] bg-white rounded-lg shadow'>
+                            <div className='bg-slate-200 h-48 p-4 flex justify-center items-center rounded-t-lg'>
                                 <div className='w-full h-full bg-slate-300 rounded animate-pulse'></div>
                             </div>
                             <div className='p-4 grid gap-3'>
@@ -83,11 +83,11 @@ const VerticalCardProduct = memo(({ category, heading }) => {
         <div className='container mx-auto px-4 my-6 relative'>
             <h2 className='text-2xl font-semibold py-4'>{heading}</h2>
             
-            <div className='grid grid-cols-[repeat(auto-fit,minmax(260px,300px))] justify-center md:justify-between md:gap-4 overflow-x-scroll scrollbar-none transition-all'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center'>
                 {data.map((product, index) => (
-                    <Link key={product._id} to={`/product/${product._id}`} className='w-full min-w-[260px] md:min-w-[300px] max-w-[260px] md:max-w-[300px] bg-white rounded-sm shadow hover:shadow-lg transition-shadow'>
+                    <Link key={product._id} to={`/product/${product._id}`} className='w-full max-w-[280px] bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 transform hover:scale-105'>
                         <div 
-                            className='bg-slate-200 h-48 p-4 min-w-[260px] md:min-w-[300px] flex justify-center items-center relative group'
+                            className='bg-slate-200 h-48 p-4 flex justify-center items-center relative group rounded-t-lg'
                             onMouseEnter={() => setHoveredProduct(product._id)}
                             onMouseLeave={() => setHoveredProduct(null)}
                         >
