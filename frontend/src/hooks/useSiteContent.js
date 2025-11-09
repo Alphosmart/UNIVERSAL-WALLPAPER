@@ -13,11 +13,21 @@ const useSiteContent = () => {
                 setLoading(true);
                 
                 // Try to get content from public endpoint first
-                const response = await fetch(SummaryApi.getSiteContent.url);
+                // usePublicSiteContent endpoint is the unauthenticated route; previously this used the admin endpoint
+                // Add cache busting to ensure fresh content
+                const response = await fetch(SummaryApi.getPublicSiteContent.url, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    },
+                    cache: 'no-store'
+                });
                 
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success) {
+                        console.log('✅ Site content loaded:', data.data);
                         setContent(data.data);
                     } else {
                         // Fallback to default content
@@ -38,8 +48,18 @@ const useSiteContent = () => {
 
         fetchContent();
         
-        // Return fetchContent for manual refetch
-        return fetchContent;
+        // Listen for site content updates from admin panel
+        const handleContentUpdate = () => {
+            console.log('🔄 Site content updated, refetching...');
+            fetchContent();
+        };
+        
+        window.addEventListener('siteContentUpdated', handleContentUpdate);
+        
+        // Cleanup listener on unmount
+        return () => {
+            window.removeEventListener('siteContentUpdated', handleContentUpdate);
+        };
     }, []);
 
     const refetch = async () => {
@@ -47,11 +67,19 @@ const useSiteContent = () => {
             setLoading(true);
             
             const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-            const response = await fetch(`${baseUrl}/api/site-content`);
+            const response = await fetch(`${baseUrl}/api/site-content`, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                },
+                cache: 'no-store'
+            });
             
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
+                    console.log('✅ Site content refetched:', data.data);
                     setContent(data.data);
                 }
             }

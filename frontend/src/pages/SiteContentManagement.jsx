@@ -223,6 +223,11 @@ const SiteContentManagement = () => {
             if (result.success) {
                 toast.success(`${section} content updated successfully!`);
                 console.log(`Saved ${section}:`, result.data);
+                
+                // Dispatch custom event to notify all components using useSiteContent to refetch
+                window.dispatchEvent(new CustomEvent('siteContentUpdated', { 
+                    detail: { section, data: result.data } 
+                }));
             } else {
                 toast.error(result.message || 'Failed to save content');
             }
