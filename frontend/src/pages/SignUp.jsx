@@ -23,7 +23,7 @@ const SignUp = () => {
     const location = useLocation()
     
     // Get the page user was trying to access before signup
-    const from = location.state?.from?.pathname || '/';
+    // const from = location.state?.from?.pathname || '/'; // Prepared for future redirect feature
   
     const handleOnChange = (e) => {
       const {name, value} = e.target
