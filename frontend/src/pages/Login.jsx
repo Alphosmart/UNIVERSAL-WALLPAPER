@@ -30,20 +30,15 @@ const Login = () => {
   // Effect to handle navigation after successful login and Redux state update
   useEffect(() => {
     if (loginSuccess && user && user._id) {
-      console.log('🔑 User state updated in Redux, proceeding with navigation')
-      console.log('🔑 Current user in Redux:', user)
-      
       // Small delay to ensure all components have re-rendered
       setTimeout(async () => {
         try {
           // Refresh cart for the logged-in user
           await refreshCart()
-          console.log('🔑 Cart refreshed after login')
         } catch (cartError) {
-          console.log('🔑 Cart refresh failed, but continuing:', cartError)
+          // Cart refresh failed, but continuing
         }
         
-        console.log('🔑 Navigating to:', from)
         navigate(from, { replace: true })
         setIsLoggingIn(false)
         setLoginSuccess(false) // Reset flag
@@ -66,8 +61,6 @@ const Login = () => {
   const handleSubmit = async(e) => {
     e.preventDefault()
     
-    console.log('🔑 Login attempt starting...')
-    
     const dataResponse = await fetch(SummaryApi.signIn.url, {
       method: SummaryApi.signIn.method,
       credentials: 'include',
@@ -78,33 +71,23 @@ const Login = () => {
     })
 
     const dataApi = await dataResponse.json()
-    console.log('🔑 Login response:', dataApi)
-    console.log('🔑 Login response data structure:', JSON.stringify(dataApi, null, 2))
 
     if(dataApi.success){
       toast.success(dataApi.message)
       
-      console.log('🔑 Login successful, updating Redux state immediately')
       setIsLoggingIn(true)
-      
-      // Debug the data structure
-      console.log('🔑 dataApi.data:', dataApi.data)
-      console.log('🔑 dataApi.data.user:', dataApi.data?.user)
       
       // Immediately update Redux state with user data from login response
       if (dataApi.data && dataApi.data.user) {
-        console.log('🔑 Setting user details in Redux immediately:', dataApi.data.user)
         dispatch(setUserDetails(dataApi.data.user))
         setLoginSuccess(true) // Trigger useEffect to handle navigation
         
       } else if (dataApi.data) {
         // Maybe the user data is directly in dataApi.data
-        console.log('🔑 Setting user details from dataApi.data directly:', dataApi.data)
         dispatch(setUserDetails(dataApi.data))
         setLoginSuccess(true) // Trigger useEffect to handle navigation
         
       } else {
-        console.log('🔑 No user data found in login response')
         setIsLoggingIn(false)
       }
     }

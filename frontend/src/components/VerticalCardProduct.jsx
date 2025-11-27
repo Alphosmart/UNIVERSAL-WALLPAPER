@@ -5,30 +5,17 @@ import { formatCurrency } from '../helper/settingsUtils'
 import SocialFeatures from './SocialFeatures'
 
 const VerticalCardProduct = memo(({ category, heading }) => {
-    console.log('🔍 VerticalCardProduct: Rendered with category:', category, 'heading:', heading);
-    console.log('🔍 VerticalCardProduct: Component mounted/updated at:', new Date().toISOString());
-    
-    const { getProductsByCategory, loading: globalLoading, allProducts, error } = useProducts()
+    const { getProductsByCategory, loading: globalLoading, allProducts } = useProducts()
     const [loading, setLoading] = useState(true)
     const [hoveredProduct, setHoveredProduct] = useState(null)
     const [currentImageIndex, setCurrentImageIndex] = useState({})
 
-    console.log('🔍 VerticalCardProduct: Context state:', { 
-        globalLoading, 
-        allProductsLength: allProducts.length,
-        category,
-        error,
-        allProductsSample: allProducts.slice(0, 2).map(p => ({ id: p._id, name: p.productName }))
-    });
-
     // Get filtered products from context instead of making API call
     const data = useMemo(() => {
         if (globalLoading || allProducts.length === 0) {
-            console.log('🔍 VerticalCardProduct: No data available - globalLoading:', globalLoading, 'allProducts:', allProducts.length);
             return []
         }
         const products = getProductsByCategory(category);
-        console.log('🔍 VerticalCardProduct: Got', products.length, 'products for category:', category);
         return products;
     }, [getProductsByCategory, category, globalLoading, allProducts.length])
 

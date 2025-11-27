@@ -13,8 +13,6 @@ export const useProducts = () => {
 };
 
 export const ProductProvider = ({ children }) => {
-  console.log('🔍 ProductProvider: Initializing at', new Date().toISOString());
-  
   const user = useSelector(state => state?.user?.user);
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,8 +20,6 @@ export const ProductProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const allProductsRef = useRef([]);
   const [currentCurrency, setCurrentCurrency] = useState('NGN');
-
-  console.log('🔍 ProductProvider: Initial state set. User:', user?.name || 'Not logged in');
 
   // Cache products for 5 minutes
   const CACHE_DURATION = 5 * 60 * 1000;
@@ -73,20 +69,16 @@ export const ProductProvider = ({ children }) => {
   }, [user]);
 
   const fetchAllProducts = useCallback(async (forceRefresh = false, currency = null) => {
-    console.log('🔍 ProductContext: fetchAllProducts called', { forceRefresh, currency, currentProducts: allProductsRef.current.length });
-    
     // Get user's preferred currency
     const userCurrency = currency || currentCurrency;
     
     // Check if we have recent data and don't need to refetch
     if (!forceRefresh && allProductsRef.current.length > 0 && lastFetch && 
         (Date.now() - lastFetch < CACHE_DURATION)) {
-      console.log('🔍 ProductContext: Using cached data', allProductsRef.current.length, 'products');
       return allProductsRef.current;
     }
 
     try {
-      console.log('🔍 ProductContext: Starting API fetch');
       setLoading(true);
       setError(null);
       
@@ -96,7 +88,6 @@ export const ProductProvider = ({ children }) => {
         url.searchParams.append('currency', userCurrency);
       }
       
-      console.log('🔍 ProductContext: Fetching from URL:', url.toString());
       const response = await fetch(url.toString(), {
         method: SummaryApi.allProduct.method,
         credentials: 'include',
@@ -105,12 +96,9 @@ export const ProductProvider = ({ children }) => {
         }
       });
 
-      console.log('🔍 ProductContext: API response status:', response.status);
       const dataResponse = await response.json();
-      console.log('🔍 ProductContext: API response data:', { success: dataResponse.success, count: dataResponse.data?.length });
 
       if (dataResponse.success) {
-        console.log('🔍 ProductContext: Success! Setting', dataResponse.data.length, 'products');
         setAllProducts(dataResponse.data);
         allProductsRef.current = dataResponse.data;
         setLastFetch(Date.now());
@@ -119,7 +107,6 @@ export const ProductProvider = ({ children }) => {
         }
         return dataResponse.data;
       } else {
-        console.log('🔍 ProductContext: API returned error:', dataResponse.message);
         setError(dataResponse.message || 'Failed to fetch products');
         return [];
       }
@@ -133,17 +120,13 @@ export const ProductProvider = ({ children }) => {
   }, [lastFetch, CACHE_DURATION, currentCurrency]); // Removed allProducts to prevent infinite loop
 
   const getProductsByCategory = useCallback((category) => {
-    console.log('🔍 ProductContext: getProductsByCategory called', { category, totalProducts: allProductsRef.current.length });
-    
     if (!category || category === 'all') {
-      console.log('🔍 ProductContext: Returning all products:', allProductsRef.current.length);
       return allProductsRef.current;
     }
     
     const filtered = allProductsRef.current.filter(product => 
       product.category?.toLowerCase() === category?.toLowerCase()
     );
-    console.log('🔍 ProductContext: Filtered products for category', category, ':', filtered.length);
     return filtered;
   }, []); // No dependencies needed since we use ref
 
@@ -153,20 +136,12 @@ export const ProductProvider = ({ children }) => {
 
   // Auto-fetch on mount and when currency changes
   useEffect(() => {
-    console.log('🔍 ProductContext: useEffect triggered', { 
-      currentProducts: allProductsRef.current.length,
-      timestamp: new Date().toISOString(),
-      fetchAllProductsRef: !!fetchAllProducts
-    });
     if (allProductsRef.current.length === 0) {
-      console.log('🔍 ProductContext: No products found, calling fetchAllProducts...');
       fetchAllProducts().then((products) => {
-        console.log('🔍 ProductContext: fetchAllProducts completed with', products?.length || 0, 'products');
+        // Products fetched
       }).catch((error) => {
         console.error('🔍 ProductContext: fetchAllProducts failed:', error);
       });
-    } else {
-      console.log('🔍 ProductContext: Already have', allProductsRef.current.length, 'products, skipping fetch');
     }
   }, [fetchAllProducts]);
 

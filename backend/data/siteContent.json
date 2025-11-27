@@ -8,22 +8,22 @@
       "secondaryButtonText": "Learn More",
       "secondaryButtonLink": "/about-us"
     },
-    "lastUpdated": "2025-11-27T22:10:45.992Z"
+    "lastUpdated": "2025-11-27T22:22:05.922Z"
   },
   "aboutUs": {
     "hero": {
       "title": "About Universal Wallpaper",
       "subtitle": "Your premier destination for high-quality wallpapers and home décor solutions",
-      "description": "We give you the best always"
+      "description": "We give you the best always.."
     },
-    "lastUpdated": "2025-11-27T21:54:44.059Z"
+    "lastUpdated": "2025-11-27T22:22:33.226Z"
   },
   "footer": {
     "companyInfo": {
       "name": "Universal Wallpaper",
       "description": "Your premier destination for high-quality wallpapers and home décor solutions. We give you the best Always",
       "address": "1234 Design Street, Creative District, NY 10001",
-      "phone": "+1 (555) 123-456091",
+      "phone": "+1 (555) 123-456089",
       "email": "info@universalwallpaper.com"
     },
     "businessHours": {
@@ -171,7 +171,7 @@
         }
       ]
     },
-    "lastUpdated": "2025-11-27T21:57:57.419Z"
+    "lastUpdated": "2025-11-27T22:21:42.210Z"
   },
   "header": {
     "announcementBanners": [
@@ -270,10 +270,10 @@
   },
   "siteSettings": {
     "siteName": "Universal Wallpaper",
-    "siteDescription": "Your premier destination for high-quality wallpapers and home décor solutions",
+    "siteDescription": "Your premier destination for high-quality wallpapers and home décor solutions.",
     "supportEmail": "support@universalwallpaper.com",
     "maintenanceMode": false,
-    "lastUpdated": "2025-09-27T18:00:00.000Z"
+    "lastUpdated": "2025-11-27T22:21:15.152Z"
   },
   "errorPage": {
     "title": "404",
@@ -303,7 +303,7 @@
     "title": "Contact Us",
     "subtitle": "We're here to help! Get in touch with our team for any questions, support, or feedback...",
     "businessInfo": {
-      "address": "123 E-Commerce Street\nBusiness District\nCity, State 12345",
+      "address": "1234 E-Commerce Street\nBusiness District\nCity, State 1234",
       "phone": "+2348067895548",
       "email": "support@universalwallpaper.com",
       "hours": "Mon-Fri 9am-6pm"
@@ -313,7 +313,7 @@
       "phoneHours": "Mon-Fri 9AM-6PM",
       "liveChatHours": "Mon-Fri 9AM-6PM"
     },
-    "lastUpdated": "2025-11-27T22:08:12.731Z"
+    "lastUpdated": "2025-11-27T22:21:30.346Z"
   },
   "maintenancePage": {
     "title": "Under Maintenance",

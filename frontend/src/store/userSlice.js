@@ -9,7 +9,6 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUserDetails: (state, action) => {
-      console.log('🔄 Redux setUserDetails called with:', action.payload?.name || 'null');
       state.user = action.payload
     },
   },

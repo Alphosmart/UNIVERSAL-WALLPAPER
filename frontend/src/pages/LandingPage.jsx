@@ -96,7 +96,6 @@ const LandingPage = () => {
     if (email.trim()) {
       trackNewsletterSignup('landing_page');
       // Here you would typically send the email to your backend
-      console.log('Newsletter signup:', email);
       setEmail('');
       alert('Thank you for subscribing!');
     }
