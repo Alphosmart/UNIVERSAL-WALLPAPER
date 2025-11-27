@@ -11,13 +11,13 @@ const Home = () => {
   console.log('🔍 Home component: Rendering at', new Date().toISOString());
   
   const user = useSelector(state => state?.user?.user)
-  const { content: homeContent } = useSiteContent('homePage')
+  const { content: siteContent } = useSiteContent()
 
   console.log('🔍 Home component: User state:', user?.name || 'Not logged in');
   console.log('🔍 Home component: Site content loading...');
 
   // Default content fallback
-  const heroContent = homeContent?.hero || {
+  const heroContent = siteContent?.homePage?.hero || {
     title: "Transform Your Space with Premium Wallpapers",
     subtitle: "Discover thousands of high-quality wallpapers from trusted sellers worldwide. From modern minimalist to classic elegant designs.",
     primaryButtonText: "Shop Now",

@@ -3,10 +3,10 @@ import { FaUsers, FaGlobe, FaAward, FaShieldAlt, FaHeart, FaClock, FaTruck, FaHe
 import useSiteContent from '../hooks/useSiteContent';
 
 const AboutUs = () => {
-  const { content: aboutContent } = useSiteContent('aboutUs');
+  const { content: siteContent } = useSiteContent();
 
   // Default content fallback
-  const heroContent = aboutContent?.hero || {
+  const heroContent = siteContent?.aboutUs?.hero || {
     title: "About Universal Wallpaper",
     subtitle: "Your premier destination for high-quality wallpapers and home décor solutions",
     description: "Transforming spaces worldwide with premium wallpapers and interior decoration solutions through our innovative e-commerce marketplace."

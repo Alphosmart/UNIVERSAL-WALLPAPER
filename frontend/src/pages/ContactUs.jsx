@@ -13,7 +13,7 @@ const ContactUs = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
 
-    const { content, loading } = useSiteContent('contactUs');
+    const { content: siteContent, loading } = useSiteContent();
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -77,14 +77,14 @@ const ContactUs = () => {
 
     const pageContent = {
         ...defaultContent,
-        ...content,
+        ...(siteContent?.contactUs || {}),
         businessInfo: {
             ...defaultContent.businessInfo,
-            ...(content?.businessInfo || {})
+            ...(siteContent?.contactUs?.businessInfo || {})
         },
         responseInfo: {
             ...defaultContent.responseInfo,
-            ...(content?.responseInfo || {})
+            ...(siteContent?.contactUs?.responseInfo || {})
         }
     };
 
