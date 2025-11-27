@@ -92,9 +92,16 @@ const EditProduct = () => {
 
     const handleOnChange = (e) => {
         const { name, value } = e.target;
+        
+        // Convert numeric fields to numbers
+        let processedValue = value;
+        if (name === 'price' || name === 'sellingPrice' || name === 'stock') {
+            processedValue = value === '' ? '' : Number(value);
+        }
+        
         setData(prev => ({
             ...prev,
-            [name]: value
+            [name]: processedValue
         }));
     };
 
@@ -142,13 +149,21 @@ const EditProduct = () => {
         try {
             setLoading(true);
             
+            // Ensure numeric fields are numbers
+            const submitData = {
+                ...data,
+                price: Number(data.price),
+                sellingPrice: Number(data.sellingPrice),
+                stock: Number(data.stock ?? 0)
+            };
+            
             const response = await fetch(`${SummaryApi.updateProduct.url}/${id}`, {
                 method: SummaryApi.updateProduct.method,
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(submitData)
             });
 
             const result = await response.json();
@@ -382,7 +397,7 @@ const EditProduct = () => {
                             type="number"
                             id="stock"
                             name="stock"
-                            value={data.stock || 0}
+                            value={data.stock ?? 0}
                             onChange={handleOnChange}
                             placeholder="Enter available quantity"
                             min="0"

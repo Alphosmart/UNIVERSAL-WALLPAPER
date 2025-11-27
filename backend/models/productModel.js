@@ -151,7 +151,8 @@ const productSchema = new mongoose.Schema({
     },
     stock: {
         type: Number,
-        default: 1
+        default: 0,
+        min: 0
     },
     condition: {
         type: String,

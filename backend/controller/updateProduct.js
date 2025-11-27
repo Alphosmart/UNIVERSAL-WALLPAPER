@@ -72,6 +72,17 @@ async function updateProductController(req, res) {
         
         protectedFields.forEach(field => delete updateData[field]);
 
+        // Ensure numeric fields are properly typed (important for 0 values)
+        if (updateData.stock !== undefined) {
+            updateData.stock = Number(updateData.stock);
+        }
+        if (updateData.price !== undefined) {
+            updateData.price = Number(updateData.price);
+        }
+        if (updateData.sellingPrice !== undefined) {
+            updateData.sellingPrice = Number(updateData.sellingPrice);
+        }
+
         // Add edit tracking information
         const editInfo = {
             editedBy: req.userId,
