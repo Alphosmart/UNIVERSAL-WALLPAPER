@@ -53,12 +53,24 @@ async function updateProductController(req, res) {
         });
 
         // Remove fields that shouldn't be updated directly
-        delete updateData.seller;
-        delete updateData.sellerInfo;
-        delete updateData.createdAt;
-        delete updateData.updatedAt;
-        delete updateData.uploadedBy;
-        delete updateData.uploadedByInfo;
+        const protectedFields = [
+            '_id',
+            '__v',
+            'seller',
+            'sellerInfo',
+            'createdAt',
+            'updatedAt',
+            'uploadedBy',
+            'uploadedByInfo',
+            'editHistory',
+            'lastEditedBy',
+            'lastEditedAt',
+            'reviews',
+            'averageRating',
+            'totalReviews'
+        ];
+        
+        protectedFields.forEach(field => delete updateData[field]);
 
         // Add edit tracking information
         const editInfo = {
@@ -72,19 +84,26 @@ async function updateProductController(req, res) {
             changes: previousValues
         };
 
+        // Build update operation separately to avoid conflicts
+        const updateOperation = {
+            $set: {
+                ...updateData,
+                lastEditedBy: req.userId,
+                lastEditedAt: new Date()
+            }
+        };
+        
+        // Only add to editHistory if there were actual changes
+        if (Object.keys(previousValues).length > 0) {
+            updateOperation.$push = {
+                editHistory: editInfo
+            };
+        }
+
         // Update the product with edit tracking
         const updatedProduct = await Product.findByIdAndUpdate(
             productId,
-            { 
-                $set: {
-                    ...updateData,
-                    lastEditedBy: req.userId,
-                    lastEditedAt: new Date()
-                },
-                $push: {
-                    editHistory: editInfo
-                }
-            },
+            updateOperation,
             { new: true, runValidators: true }
         )
         .populate('uploadedBy', 'name email role');
