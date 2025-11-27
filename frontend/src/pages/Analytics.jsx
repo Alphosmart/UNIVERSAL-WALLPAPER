@@ -208,27 +208,26 @@ const Analytics = () => {
         })).sort((a, b) => b.totalSales - a.totalSales);
     };
 
-    // Generate top products data
+    // Generate top products data from actual sales data
     const generateTopProductsData = (stats) => {
-        const products = [
-            { name: 'Premium Vinyl Wallpaper', category: 'Wallpapers', image: '/api/placeholder/80/80' },
-            { name: 'Eggshell Wall Paint', category: 'Wall Paint', image: '/api/placeholder/80/80' },
-            { name: '3D Decorative Panels', category: 'Decorative Panels', image: '/api/placeholder/80/80' },
-            { name: 'Ceramic Floor Tiles', category: 'Tiles', image: '/api/placeholder/80/80' },
-            { name: 'LED Pendant Lights', category: 'Lighting', image: '/api/placeholder/80/80' },
-            { name: 'Luxury Vinyl Flooring', category: 'Flooring', image: '/api/placeholder/80/80' }
-        ];
-
-        return products.slice(0, 6).map((product, index) => ({
-            id: index + 1,
-            ...product,
-            totalSales: Math.floor(Math.random() * 2000) + 500,
-            revenue: Math.floor(Math.random() * 50000) + 10000,
-            averageRating: (Math.random() * 1.5 + 3.5).toFixed(1),
-            reviewsCount: Math.floor(Math.random() * 200) + 50,
-            price: Math.floor(Math.random() * 200) + 20,
-            inStock: Math.floor(Math.random() * 100) + 10
-        })).sort((a, b) => b.totalSales - a.totalSales);
+        // Use real product data from stats if available
+        if (stats && stats.topProducts && stats.topProducts.length > 0) {
+            return stats.topProducts.slice(0, 6).map((product, index) => ({
+                id: product._id || index + 1,
+                name: product.productName || product.name || 'Unknown Product',
+                category: product.category || 'Uncategorized',
+                image: product.productImage?.[0] || product.image || '/api/placeholder/80/80',
+                totalSales: product.totalSales || product.salesCount || 0,
+                revenue: product.revenue || product.totalRevenue || 0,
+                averageRating: product.averageRating || 0,
+                reviewsCount: product.reviewsCount || product.totalReviews || 0,
+                price: product.sellingPrice || product.price || 0,
+                inStock: product.stock || 0
+            })).sort((a, b) => b.totalSales - a.totalSales);
+        }
+        
+        // Return empty array if no real data available
+        return [];
     };
 
     // Calculate revenue metrics
