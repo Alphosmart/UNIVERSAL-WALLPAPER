@@ -1,5 +1,6 @@
 const Product = require("../models/productModel");
 const Order = require("../models/orderModel");
+const User = require("../models/userModel");
 
 async function deleteProductController(req, res) {
     try {
@@ -15,10 +16,24 @@ async function deleteProductController(req, res) {
             });
         }
 
-        // Check if user is the seller
-        if (product.seller.toString() !== req.userId) {
+        // Get current user information
+        const currentUser = await User.findById(req.userId);
+        if (!currentUser) {
+            return res.status(404).json({
+                message: "User not found",
+                error: true,
+                success: false
+            });
+        }
+
+        // Check if user has permission to delete
+        const canDelete = currentUser.role === 'ADMIN' || 
+                         (currentUser.role === 'STAFF' && currentUser.permissions?.canDeleteProducts) ||
+                         product.uploadedBy?.toString() === req.userId;
+
+        if (!canDelete) {
             return res.status(403).json({
-                message: "You can only delete your own products",
+                message: "You don't have permission to delete this product",
                 error: true,
                 success: false
             });
