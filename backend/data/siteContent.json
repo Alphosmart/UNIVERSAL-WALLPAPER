@@ -1,28 +1,29 @@
 {
   "homePage": {
     "hero": {
-      "title": "Your trusted source on all kinds of  home decors",
-      "subtitle": "Discover thousands of high-quality wallpapers from trusted sellers worldwide. From modern minimalist to classic elegant designs.",
+      "title": "Your trusted source on all kinds of  home decors.",
+      "subtitle": "Discover thousands of high-quality wallpapers from our collection of premium wallpapers around the world. From modern minimalist to classic, elegant designs.",
       "primaryButtonText": "Shop Now",
       "primaryButtonLink": "/products",
       "secondaryButtonText": "Learn More",
       "secondaryButtonLink": "/about-us"
     },
-    "lastUpdated": "2025-11-27T21:03:55.487Z"
+    "lastUpdated": "2025-11-27T22:10:45.992Z"
   },
   "aboutUs": {
     "hero": {
       "title": "About Universal Wallpaper",
       "subtitle": "Your premier destination for high-quality wallpapers and home décor solutions",
-      "description": "We connect homeowners with the world's finest wallpaper creators and suppliers, making it easy to transform any space into something extraordinary."
-    }
+      "description": "We give you the best always"
+    },
+    "lastUpdated": "2025-11-27T21:54:44.059Z"
   },
   "footer": {
     "companyInfo": {
       "name": "Universal Wallpaper",
-      "description": "Your premier destination for high-quality wallpapers and home décor solutions.",
-      "address": "123 Design Street, Creative District, NY 10001",
-      "phone": "+1 (555) 123-4567",
+      "description": "Your premier destination for high-quality wallpapers and home décor solutions. We give you the best Always",
+      "address": "1234 Design Street, Creative District, NY 10001",
+      "phone": "+1 (555) 123-456091",
       "email": "info@universalwallpaper.com"
     },
     "businessHours": {
@@ -169,7 +170,8 @@
           "icon": "support"
         }
       ]
-    }
+    },
+    "lastUpdated": "2025-11-27T21:57:57.419Z"
   },
   "header": {
     "announcementBanners": [
@@ -299,10 +301,10 @@
   },
   "contactUs": {
     "title": "Contact Us",
-    "subtitle": "We're here to help! Get in touch with our team for any questions, support, or feedback.",
+    "subtitle": "We're here to help! Get in touch with our team for any questions, support, or feedback...",
     "businessInfo": {
       "address": "123 E-Commerce Street\nBusiness District\nCity, State 12345",
-      "phone": "+1 (555) 123-4567",
+      "phone": "+2348067895548",
       "email": "support@universalwallpaper.com",
       "hours": "Mon-Fri 9am-6pm"
     },
@@ -310,7 +312,8 @@
       "emailResponse": "24-48 hours",
       "phoneHours": "Mon-Fri 9AM-6PM",
       "liveChatHours": "Mon-Fri 9AM-6PM"
-    }
+    },
+    "lastUpdated": "2025-11-27T22:08:12.731Z"
   },
   "maintenancePage": {
     "title": "Under Maintenance",

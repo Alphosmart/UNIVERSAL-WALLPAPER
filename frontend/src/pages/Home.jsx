@@ -1,5 +1,4 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
 // import BannerProduct from '../components/BannerProduct.jsx'
 // import HorizontalCardProduct from '../components/HorizontalCardProduct.jsx'
 import VerticalCardProduct from '../components/VerticalCardProduct.jsx'
@@ -8,15 +7,7 @@ import useSiteContent from '../hooks/useSiteContent'
 import { Link } from 'react-router-dom'
 
 const Home = () => {
-  console.log('🔍 Home component: Rendering at', new Date().toISOString());
-  
-  const user = useSelector(state => state?.user?.user)
   const { content: siteContent } = useSiteContent()
-
-  console.log('🔍 Home component: User state:', user?.name || 'Not logged in');
-  console.log('🔍 Home component: Full site content:', siteContent);
-  console.log('🔍 Home component: HomePage section:', siteContent?.homePage);
-  console.log('🔍 Home component: Hero content:', siteContent?.homePage?.hero);
 
   // Default content fallback
   const heroContent = siteContent?.homePage?.hero || {
@@ -31,8 +22,6 @@ const Home = () => {
   return (
     <div>
       <BackendStatus />
-      
-      <p className="text-center p-4 text-red-600 font-bold">🔍 DEBUG: Title = {heroContent.title}</p>
       
       {/* Dynamic Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 px-4">

@@ -15,7 +15,6 @@ const useSiteContent = () => {
                 // Check if content was recently updated in admin panel
                 const contentUpdatedFlag = sessionStorage.getItem('siteContentJustUpdated');
                 if (contentUpdatedFlag) {
-                    console.log('🔄 Detected recent admin update, forcing fresh fetch...');
                     sessionStorage.removeItem('siteContentJustUpdated');
                 }
                 
@@ -36,7 +35,6 @@ const useSiteContent = () => {
                 if (response.ok) {
                     const data = await response.json();
                     if (data.success) {
-                        console.log('✅ Site content loaded:', data.data);
                         setContent(data.data);
                     } else {
                         // Fallback to default content
@@ -59,7 +57,6 @@ const useSiteContent = () => {
         
         // Listen for site content updates from admin panel
         const handleContentUpdate = () => {
-            console.log('🔄 Site content updated, refetching...');
             fetchContent();
         };
         
@@ -88,7 +85,6 @@ const useSiteContent = () => {
             if (response.ok) {
                 const data = await response.json();
                 if (data.success) {
-                    console.log('✅ Site content refetched:', data.data);
                     setContent(data.data);
                 }
             }
