@@ -1,14 +1,14 @@
 {
   "homePage": {
     "hero": {
-      "title": "Your trusted source on all kinds of  home decors.",
+      "title": "Your trusted source on all kinds of  home decors",
       "subtitle": "Discover thousands of high-quality wallpapers from our collection of premium wallpapers around the world. From modern minimalist to classic, elegant designs.",
       "primaryButtonText": "Shop Now",
       "primaryButtonLink": "/products",
       "secondaryButtonText": "Learn More",
       "secondaryButtonLink": "/about-us"
     },
-    "lastUpdated": "2025-11-27T22:22:05.922Z"
+    "lastUpdated": "2025-11-27T22:26:49.874Z"
   },
   "aboutUs": {
     "hero": {
