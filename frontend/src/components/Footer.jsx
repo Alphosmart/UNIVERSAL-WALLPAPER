@@ -15,10 +15,10 @@ import {
 import useSiteContent from '../hooks/useSiteContent';
 
 const Footer = () => {
-  const { content: footerContent } = useSiteContent('footer');
+  const { content: siteContent } = useSiteContent();
 
   // Default content fallback
-  const companyInfo = footerContent?.companyInfo || {
+  const companyInfo = siteContent?.footer?.companyInfo || {
     name: "Universal Wallpaper",
     description: "Your premier destination for high-quality wallpapers and home décor solutions. Transform your space with our extensive collection from trusted sellers worldwide.",
     address: "123 Design Street, Creative District, NY 10001",
