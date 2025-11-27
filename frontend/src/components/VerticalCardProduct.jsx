@@ -138,11 +138,33 @@ const VerticalCardProduct = memo(({ category, heading }) => {
                                 </p>
                             )}
                             
+                            {/* Stock indicator */}
+                            {product.stock !== undefined && (
+                                <div className="text-xs">
+                                    {product.stock === 0 ? (
+                                        <span className="text-red-600 font-semibold">⚠️ Out of Stock</span>
+                                    ) : product.stock <= 5 ? (
+                                        <span className="text-orange-600 font-semibold">🔥 Only {product.stock} left!</span>
+                                    ) : product.stock <= 10 ? (
+                                        <span className="text-yellow-600 font-medium">⚡ {product.stock} in stock</span>
+                                    ) : (
+                                        <span className="text-green-600">✓ In Stock</span>
+                                    )}
+                                </div>
+                            )}
+                            
                             {/* Social features */}
                             <SocialFeatures product={product} compact={true} />
                             
-                            <button className='text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-0.5 rounded-full'>
-                                Add to Cart
+                            <button 
+                                className={`text-sm px-3 py-0.5 rounded-full transition-colors ${
+                                    product.stock === 0 
+                                        ? 'bg-gray-400 cursor-not-allowed text-white' 
+                                        : 'bg-red-600 hover:bg-red-700 text-white'
+                                }`}
+                                disabled={product.stock === 0}
+                            >
+                                {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
                             </button>
                         </div>
                     </Link>

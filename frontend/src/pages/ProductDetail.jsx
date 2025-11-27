@@ -329,9 +329,28 @@ const ProductDetail = () => {
                                 </>
                             )}
                         </div>
-                        <p className="text-sm text-gray-600">
-                            Stock: <span className="font-semibold">{product.stock} available</span>
-                        </p>
+                        
+                        {/* Stock Availability - Color coded */}
+                        <div className="mt-2">
+                            {product.stock === 0 ? (
+                                <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-bold">⚠️ OUT OF STOCK</span>
+                                </div>
+                            ) : product.stock <= 5 ? (
+                                <div className="bg-orange-100 border border-orange-300 text-orange-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-semibold">🔥 Only {product.stock} left in stock!</span>
+                                    <span className="text-sm">- Order soon</span>
+                                </div>
+                            ) : product.stock <= 10 ? (
+                                <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-semibold">⚡ Low Stock: {product.stock} available</span>
+                                </div>
+                            ) : (
+                                <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-semibold">✓ In Stock: {product.stock} available</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Seller Info */}
@@ -395,10 +414,20 @@ const ProductDetail = () => {
                                     <FaPlus className="text-sm" />
                                 </button>
                             </div>
-                            <span className="text-sm text-gray-600">
-                                {product.stock} available
+                            <span className={`text-sm font-medium ${
+                                product.stock <= 5 ? 'text-orange-600' : 'text-gray-600'
+                            }`}>
+                                {product.stock <= 5 && '⚠️ '}{product.stock} available
                             </span>
                         </div>
+                        
+                        {/* Additional low stock warning */}
+                        {product.stock > 0 && product.stock <= 3 && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                                <strong>⚠️ Almost gone!</strong> Only {product.stock} {product.stock === 1 ? 'item' : 'items'} remaining. Others are viewing this product.
+                            </div>
+                        )}
+
 
                         <div className="flex gap-4">
                             <button 
