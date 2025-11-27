@@ -12,14 +12,23 @@ const useSiteContent = () => {
             try {
                 setLoading(true);
                 
+                // Check if content was recently updated in admin panel
+                const contentUpdatedFlag = sessionStorage.getItem('siteContentJustUpdated');
+                if (contentUpdatedFlag) {
+                    console.log('🔄 Detected recent admin update, forcing fresh fetch...');
+                    sessionStorage.removeItem('siteContentJustUpdated');
+                }
+                
                 // Try to get content from public endpoint first
                 // usePublicSiteContent endpoint is the unauthenticated route; previously this used the admin endpoint
                 // Add cache busting to ensure fresh content
-                const response = await fetch(SummaryApi.getPublicSiteContent.url, {
+                const timestamp = Date.now();
+                const response = await fetch(`${SummaryApi.getPublicSiteContent.url}?_=${timestamp}`, {
                     method: 'GET',
                     headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
                     },
                     cache: 'no-store'
                 });

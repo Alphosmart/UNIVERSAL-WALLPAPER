@@ -224,6 +224,9 @@ const SiteContentManagement = () => {
                 toast.success(`${section} content updated successfully!`);
                 console.log(`Saved ${section}:`, result.data);
                 
+                // Set flag in sessionStorage to force refetch when navigating to public pages
+                sessionStorage.setItem('siteContentJustUpdated', 'true');
+                
                 // Dispatch custom event to notify all components using useSiteContent to refetch
                 window.dispatchEvent(new CustomEvent('siteContentUpdated', { 
                     detail: { section, data: result.data } 
