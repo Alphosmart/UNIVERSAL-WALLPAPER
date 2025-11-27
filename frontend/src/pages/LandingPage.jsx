@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { trackLandingPageInteraction, trackShopButtonClick, trackNewsletterSignup } from '../utils/analytics';
 import SummaryApi from '../common';
+import useSiteContent from '../hooks/useSiteContent';
 import { 
   FaPlay, 
   FaStar, 
@@ -21,6 +22,16 @@ import {
 } from 'react-icons/fa';
 
 const LandingPage = () => {
+  const { content: siteContent } = useSiteContent();
+  
+  // Default hero content
+  const heroContent = siteContent?.homePage?.hero || {
+    title: "Transform Your Space with Premium Wallpapers",
+    subtitle: "Discover thousands of high-quality wallpapers from trusted sellers worldwide. From modern minimalist to classic elegant designs.",
+    primaryButtonText: "Shop Now",
+    primaryButtonLink: "/products"
+  };
+  
   const [selectedCategory, setSelectedCategory] = useState('wallpapers');
   const [email, setEmail] = useState('');
   const [testimonials, setTestimonials] = useState([]);
@@ -213,14 +224,10 @@ const LandingPage = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                Transform Your Space with 
-                <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                  {" "}Premium Wallpapers
-                </span>
+                {heroContent.title}
               </h1>
               <p className="text-xl lg:text-2xl text-gray-100 leading-relaxed">
-                Discover thousands of high-quality wallpapers, paints, and décor items from trusted sellers worldwide. 
-                Professional installation and design consultation included.
+                {heroContent.subtitle}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
