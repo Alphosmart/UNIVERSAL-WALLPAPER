@@ -14,7 +14,9 @@ const Home = () => {
   const { content: siteContent } = useSiteContent()
 
   console.log('🔍 Home component: User state:', user?.name || 'Not logged in');
-  console.log('🔍 Home component: Site content loading...');
+  console.log('🔍 Home component: Full site content:', siteContent);
+  console.log('🔍 Home component: HomePage section:', siteContent?.homePage);
+  console.log('🔍 Home component: Hero content:', siteContent?.homePage?.hero);
 
   // Default content fallback
   const heroContent = siteContent?.homePage?.hero || {
@@ -30,7 +32,7 @@ const Home = () => {
     <div>
       <BackendStatus />
       
-      <p className="text-center p-4 text-red-600 font-bold">🔍 DEBUG: Home component is rendering successfully!</p>
+      <p className="text-center p-4 text-red-600 font-bold">🔍 DEBUG: Title = {heroContent.title}</p>
       
       {/* Dynamic Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16 px-4">
