@@ -4,6 +4,9 @@ import SummaryApi from '../common';
 
 const SiteContentManagement = () => {
     const isLoadingData = useRef(false);
+    const [allProducts, setAllProducts] = useState([]);
+    const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+    const [productSearch, setProductSearch] = useState('');
     const [contentData, setContentData] = useState({
         homePage: {
             hero: {
@@ -13,6 +16,10 @@ const SiteContentManagement = () => {
                 primaryButtonLink: "/products",
                 secondaryButtonText: "Learn More",
                 secondaryButtonLink: "/about-us"
+            },
+            featuredProducts: {
+                title: "Featured Products",
+                productIds: []
             }
         },
         aboutUs: {
@@ -146,10 +153,10 @@ const SiteContentManagement = () => {
         const savedTab = localStorage.getItem('siteContentActiveTab');
         
         // Priority: URL param > saved preference > default
-        if (tabParam && ['homePage', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(tabParam)) {
+        if (tabParam && ['homePage', 'featuredProducts', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(tabParam)) {
             return tabParam;
         }
-        if (savedTab && ['homePage', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(savedTab)) {
+        if (savedTab && ['homePage', 'featuredProducts', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(savedTab)) {
             return savedTab;
         }
         return 'homePage';
@@ -190,7 +197,7 @@ const SiteContentManagement = () => {
         const handlePopState = () => {
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab');
-            if (tabParam && ['homePage', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(tabParam)) {
+            if (tabParam && ['homePage', 'featuredProducts', 'aboutUs', 'footer', 'contactUs', 'header', 'siteSettings', 'maintenancePage'].includes(tabParam)) {
                 setActiveTab(tabParam);
                 localStorage.setItem('siteContentActiveTab', tabParam);
             }
@@ -258,6 +265,71 @@ const SiteContentManagement = () => {
         }));
     };
 
+    const updateFeaturedProductIds = (value) => {
+        const productIds = value
+            .split(/\n|,/)
+            .map((id) => id.trim())
+            .filter(Boolean);
+
+        setContentData((prev) => ({
+            ...prev,
+            homePage: {
+                ...prev.homePage,
+                featuredProducts: {
+                    ...(prev.homePage?.featuredProducts || {}),
+                    productIds
+                }
+            }
+        }));
+    };
+
+    const toggleFeaturedProduct = (productId) => {
+        const currentProductIds = contentData.homePage?.featuredProducts?.productIds || [];
+        const isAlreadyFeatured = currentProductIds.includes(productId);
+
+        const productIds = isAlreadyFeatured
+            ? currentProductIds.filter((id) => id !== productId)
+            : [...currentProductIds, productId];
+
+        setContentData((prev) => ({
+            ...prev,
+            homePage: {
+                ...prev.homePage,
+                featuredProducts: {
+                    ...(prev.homePage?.featuredProducts || {}),
+                    productIds
+                }
+            }
+        }));
+    };
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                setIsLoadingProducts(true);
+                const response = await fetch(SummaryApi.allProduct.url, {
+                    method: SummaryApi.allProduct.method
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    setAllProducts(data.data || []);
+                } else {
+                    toast.error(data.message || 'Failed to fetch products');
+                }
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                toast.error('Failed to fetch products');
+            } finally {
+                setIsLoadingProducts(false);
+            }
+        };
+
+        if (activeTab === 'featuredProducts' && allProducts.length === 0) {
+            fetchProducts();
+        }
+    }, [activeTab, allProducts.length]);
+
     const updateQuickLink = (index, field, value) => {
         setContentData(prev => ({
             ...prev,
@@ -304,6 +376,7 @@ const SiteContentManagement = () => {
 
     const tabs = [
         { id: 'homePage', label: 'Home Page', icon: '🏠' },
+        { id: 'featuredProducts', label: 'Featured Products', icon: '⭐' },
         { id: 'aboutUs', label: 'About Us', icon: 'ℹ️' },
         { id: 'footer', label: 'Footer', icon: '📄' },
         { id: 'header', label: 'Header & Navigation', icon: '🧭' },
@@ -325,12 +398,13 @@ const SiteContentManagement = () => {
                 {/* Tabs */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
                     <div className="border-b border-gray-200">
-                        <nav className="flex space-x-8 px-6">
+                        <div className="overflow-x-auto">
+                        <nav className="flex flex-nowrap space-x-4 px-4 md:px-6 min-w-max">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
                                     onClick={() => handleTabChange(tab.id)}
-                                    className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
+                                    className={`py-4 px-2 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
                                         activeTab === tab.id
                                             ? 'border-blue-500 text-blue-600'
                                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -341,6 +415,7 @@ const SiteContentManagement = () => {
                                 </button>
                             ))}
                         </nav>
+                        </div>
                     </div>
 
                     {/* Tab Content */}
@@ -861,12 +936,151 @@ const SiteContentManagement = () => {
                                     </div>
                                 </div>
 
+                                <div className="border rounded-lg p-4">
+                                    <h3 className="text-lg font-medium text-gray-800 mb-4">Featured Products</h3>
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Featured Section Title</label>
+                                            <input
+                                                type="text"
+                                                value={contentData.homePage?.featuredProducts?.title || ''}
+                                                onChange={(e) => updateNestedContentData('homePage', 'featuredProducts', 'title', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="Featured Products"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Featured Product IDs</label>
+                                            <textarea
+                                                value={(contentData.homePage?.featuredProducts?.productIds || []).join('\n')}
+                                                onChange={(e) => updateFeaturedProductIds(e.target.value)}
+                                                rows={6}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                placeholder="One product ID per line (or comma-separated)"
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Add products you want to show in Featured Products on the home page.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <button
                                     onClick={() => handleSave('homePage')}
                                     disabled={isLoading}
                                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
                                 >
                                     {isLoading ? 'Saving...' : 'Save Home Page Content'}
+                                </button>
+                            </div>
+                        )}
+
+                        {activeTab === 'featuredProducts' && (
+                            <div className="space-y-6">
+                                <h2 className="text-xl font-semibold text-gray-900">Featured Products Management</h2>
+
+                                <div className="border rounded-lg p-4">
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Featured Section Title</label>
+                                        <input
+                                            type="text"
+                                            value={contentData.homePage?.featuredProducts?.title || ''}
+                                            onChange={(e) => updateNestedContentData('homePage', 'featuredProducts', 'title', e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            placeholder="Featured Products"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">Search Products</label>
+                                        <input
+                                            type="text"
+                                            value={productSearch}
+                                            onChange={(e) => setProductSearch(e.target.value)}
+                                            placeholder="Search by product name or category"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div className="border rounded-lg p-4">
+                                        <h3 className="text-lg font-medium text-gray-800 mb-3">Currently Featured</h3>
+                                        <div className="space-y-2 max-h-96 overflow-y-auto">
+                                            {(contentData.homePage?.featuredProducts?.productIds || []).length === 0 ? (
+                                                <p className="text-sm text-gray-500">No featured products selected yet.</p>
+                                            ) : (
+                                                (contentData.homePage?.featuredProducts?.productIds || []).map((productId) => {
+                                                    const product = allProducts.find((item) => item._id === productId);
+                                                    return (
+                                                        <div key={productId} className="flex items-center justify-between border rounded p-2">
+                                                            <div>
+                                                                <p className="font-medium text-sm text-gray-900">{product?.productName || 'Unknown Product'}</p>
+                                                                <p className="text-xs text-gray-500">{productId}</p>
+                                                            </div>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => toggleFeaturedProduct(productId)}
+                                                                className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    );
+                                                })
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="border rounded-lg p-4">
+                                        <h3 className="text-lg font-medium text-gray-800 mb-3">All Products</h3>
+                                        {isLoadingProducts ? (
+                                            <p className="text-sm text-gray-500">Loading products...</p>
+                                        ) : (
+                                            <div className="space-y-2 max-h-96 overflow-y-auto">
+                                                {allProducts
+                                                    .filter((product) => {
+                                                        if (!productSearch.trim()) return true;
+                                                        const query = productSearch.toLowerCase();
+                                                        return (
+                                                            product.productName?.toLowerCase().includes(query) ||
+                                                            product.category?.toLowerCase().includes(query)
+                                                        );
+                                                    })
+                                                    .map((product) => {
+                                                        const isFeatured = (contentData.homePage?.featuredProducts?.productIds || []).includes(product._id);
+                                                        return (
+                                                            <div key={product._id} className="flex items-center justify-between border rounded p-2">
+                                                                <div>
+                                                                    <p className="font-medium text-sm text-gray-900">{product.productName}</p>
+                                                                    <p className="text-xs text-gray-500 capitalize">{product.category} • {product._id}</p>
+                                                                </div>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => toggleFeaturedProduct(product._id)}
+                                                                    className={`px-2 py-1 text-xs rounded ${
+                                                                        isFeatured
+                                                                            ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                                                                            : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                                                    }`}
+                                                                >
+                                                                    {isFeatured ? 'Remove' : 'Add'}
+                                                                </button>
+                                                            </div>
+                                                        );
+                                                    })}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <button
+                                    onClick={() => handleSave('homePage')}
+                                    disabled={isLoading}
+                                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+                                >
+                                    {isLoading ? 'Saving...' : 'Save Featured Products'}
                                 </button>
                             </div>
                         )}

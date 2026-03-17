@@ -45,6 +45,10 @@ const getSiteContent = async (req, res) => {
                     secondaryButtonText: "Learn More",
                     secondaryButtonLink: "/about-us"
                 },
+                featuredProducts: {
+                    title: "Featured Products",
+                    productIds: []
+                },
                 featuredSection: {
                     title: "Featured Categories",
                     subtitle: "Explore our most popular wallpaper collections",

@@ -109,6 +109,10 @@ const getDefaultContent = () => {
                 primaryButtonLink: "/products",
                 secondaryButtonText: "Learn More",
                 secondaryButtonLink: "/about-us"
+            },
+            featuredProducts: {
+                title: "Featured Products",
+                productIds: []
             }
         },
         aboutUs: {
