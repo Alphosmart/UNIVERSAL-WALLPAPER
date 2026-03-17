@@ -6,7 +6,8 @@ import SummaryApi from '../common';
 import { useCart } from '../context/CartContext';
 import SocialFeatures from '../components/SocialFeatures';
 import EnhancedReviews from '../components/EnhancedReviews';
-import VerticalCardProduct from '../components/VerticalCardProduct';
+import useSiteContent from '../hooks/useSiteContent';
+import { openWhatsAppPropertyChat } from '../utils/whatsappContact';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -21,33 +22,7 @@ const ProductDetail = () => {
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [relatedLoading, setRelatedLoading] = useState(false);
     const { addToCart, isInCart, getCartItem } = useCart();
-
-    const fetchRelatedProducts = useCallback(async (category, currentProductId) => {
-        if (!category) return;
-        
-        setLoadingRelated(true);
-        try {
-            // Search for products in the same category
-            const response = await fetch(`${SummaryApi.allProduct.url}`, {
-                method: SummaryApi.allProduct.method
-            });
-            const data = await response.json();
-
-            if (data.success && data.data) {
-                // Filter products by same category, exclude current product, and limit to 8
-                const related = data.data
-                    .filter(p => p.category === category && p._id !== currentProductId && p.status === 'ACTIVE')
-                    .sort(() => Math.random() - 0.5) // Randomize
-                    .slice(0, 8);
-                
-                setRelatedProducts(related);
-            }
-        } catch (error) {
-            console.error('Error fetching related products:', error);
-        } finally {
-            setLoadingRelated(false);
-        }
-    }, []);
+    const { content: siteContent } = useSiteContent();
 
     const fetchProductDetails = useCallback(async () => {
         try {
@@ -60,8 +35,6 @@ const ProductDetail = () => {
                 setProduct(data.data);
                 setSelectedImage(data.data.productImage[0] || '');
                 setCurrentImageIndex(0);
-                // Fetch related products after getting main product
-                fetchRelatedProducts(data.data.category, data.data._id);
             } else {
                 toast.error(data.message || 'Product not found');
                 navigate('/');
@@ -73,7 +46,7 @@ const ProductDetail = () => {
         } finally {
             setLoading(false);
         }
-    }, [id, navigate, fetchRelatedProducts]);
+    }, [id, navigate]);
 
     const fetchRelatedProducts = useCallback(async (category, currentProductId) => {
         try {
@@ -174,6 +147,24 @@ const ProductDetail = () => {
 
     const toggleFullscreen = () => {
         setIsFullscreen(!isFullscreen);
+    };
+
+    const handleWhatsAppChat = () => {
+        if (!product) return;
+
+        const wasOpened = openWhatsAppPropertyChat({
+            siteContent,
+            item: product,
+            itemType: 'product',
+            itemId: product._id || id,
+            title: product.productName || product.name,
+            price: product.sellingPrice ?? product.price,
+            location: product.location
+        });
+
+        if (!wasOpened) {
+            toast.error('WhatsApp contact is not available at the moment');
+        }
     };
 
     // Keyboard navigation for fullscreen mode
@@ -359,9 +350,28 @@ const ProductDetail = () => {
                                 </>
                             )}
                         </div>
-                        <p className="text-sm text-gray-600">
-                            Stock: <span className="font-semibold">{product.stock} available</span>
-                        </p>
+                        
+                        {/* Stock Availability - Color coded */}
+                        <div className="mt-2">
+                            {product.stock === 0 ? (
+                                <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-bold">⚠️ OUT OF STOCK</span>
+                                </div>
+                            ) : product.stock <= 5 ? (
+                                <div className="bg-orange-100 border border-orange-300 text-orange-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-semibold">🔥 Only {product.stock} left in stock!</span>
+                                    <span className="text-sm">- Order soon</span>
+                                </div>
+                            ) : product.stock <= 10 ? (
+                                <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-semibold">⚡ Low Stock: {product.stock} available</span>
+                                </div>
+                            ) : (
+                                <div className="bg-green-100 border border-green-300 text-green-800 px-4 py-2 rounded-lg flex items-center gap-2">
+                                    <span className="font-semibold">✓ In Stock: {product.stock} available</span>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Seller Info */}
@@ -425,10 +435,20 @@ const ProductDetail = () => {
                                     <FaPlus className="text-sm" />
                                 </button>
                             </div>
-                            <span className="text-sm text-gray-600">
-                                {product.stock} available
+                            <span className={`text-sm font-medium ${
+                                product.stock <= 5 ? 'text-orange-600' : 'text-gray-600'
+                            }`}>
+                                {product.stock <= 5 && '⚠️ '}{product.stock} available
                             </span>
                         </div>
+                        
+                        {/* Additional low stock warning */}
+                        {product.stock > 0 && product.stock <= 3 && (
+                            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                                <strong>⚠️ Almost gone!</strong> Only {product.stock} {product.stock === 1 ? 'item' : 'items'} remaining. Others are viewing this product.
+                            </div>
+                        )}
+
 
                         <div className="flex gap-4">
                             <button 
@@ -457,6 +477,13 @@ const ProductDetail = () => {
                                 {isFavorite ? <FaHeart /> : <FaRegHeart />}
                             </button>
                         </div>
+
+                        <button
+                            className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                            onClick={handleWhatsAppChat}
+                        >
+                            Chat on WhatsApp
+                        </button>
 
                         {product.stock === 0 && (
                             <p className="text-red-600 text-center mt-2 font-medium">
@@ -552,80 +579,6 @@ const ProductDetail = () => {
                     </div>
                 )}
             </div>
-            
-            {/* Related Products Section */}
-            {relatedProducts.length > 0 && (
-                <div className="mt-12">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-gray-800">You May Also Like</h2>
-                        <button 
-                            onClick={() => navigate(`/search?category=${product.category}`)}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                            View All in {product.category.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        </button>
-                    </div>
-                    
-                    {loadingRelated ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {[1,2,3,4].map((item) => (
-                                <div key={item} className='w-full bg-white rounded-lg shadow animate-pulse'>
-                                    <div className='bg-slate-200 h-48 rounded-t-lg'></div>
-                                    <div className='p-4 space-y-3'>
-                                        <div className='h-4 bg-slate-300 rounded w-full'></div>
-                                        <div className='h-3 bg-slate-300 rounded w-3/4'></div>
-                                        <div className='h-4 bg-slate-300 rounded w-1/2'></div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6 justify-items-center">
-                            {relatedProducts.map((relatedProduct) => (
-                                <div
-                                    key={relatedProduct._id}
-                                    onClick={() => navigate(`/product/${relatedProduct._id}`)}
-                                    className="w-full max-w-[280px] bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105"
-                                >
-                                    <div className="aspect-square overflow-hidden rounded-t-lg bg-slate-200 p-4 flex justify-center items-center">
-                                        <img
-                                            src={relatedProduct.productImage?.[0] || '/api/placeholder/300/300'}
-                                            alt={relatedProduct.productName}
-                                            className="max-w-full max-h-full object-scale-down hover:scale-110 transition-transform mix-blend-multiply"
-                                        />
-                                    </div>
-                                    <div className="p-4 space-y-3">
-                                        <h3 className="font-medium text-base text-gray-800 line-clamp-1">
-                                            {relatedProduct.productName}
-                                        </h3>
-                                        <p className="capitalize text-slate-500 text-sm">{relatedProduct.category}</p>
-                                        <div className="flex gap-3">
-                                            <p className="text-red-600 font-medium">
-                                                ${relatedProduct.sellingPrice || relatedProduct.price}
-                                            </p>
-                                            {relatedProduct.price && relatedProduct.sellingPrice && relatedProduct.price > relatedProduct.sellingPrice && (
-                                                <p className="text-slate-500 line-through">
-                                                    ${relatedProduct.price}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <button 
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                addToCart(relatedProduct._id, 1);
-                                                toast.success('Added to cart!');
-                                            }}
-                                            className="w-full text-sm bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-full transition-colors"
-                                        >
-                                            Add to Cart
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
             
             {/* Fullscreen Image Modal */}
             {isFullscreen && (

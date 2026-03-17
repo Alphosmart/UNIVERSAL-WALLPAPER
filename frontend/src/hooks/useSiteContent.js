@@ -12,8 +12,25 @@ const useSiteContent = () => {
             try {
                 setLoading(true);
                 
+                // Check if content was recently updated in admin panel
+                const contentUpdatedFlag = sessionStorage.getItem('siteContentJustUpdated');
+                if (contentUpdatedFlag) {
+                    sessionStorage.removeItem('siteContentJustUpdated');
+                }
+                
                 // Try to get content from public endpoint first
-                const response = await fetch(SummaryApi.getSiteContent.url);
+                // usePublicSiteContent endpoint is the unauthenticated route; previously this used the admin endpoint
+                // Add cache busting to ensure fresh content
+                const timestamp = Date.now();
+                const response = await fetch(`${SummaryApi.getPublicSiteContent.url}?_=${timestamp}`, {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    },
+                    cache: 'no-store'
+                });
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -38,16 +55,31 @@ const useSiteContent = () => {
 
         fetchContent();
         
-        // Return fetchContent for manual refetch
-        return fetchContent;
+        // Listen for site content updates from admin panel
+        const handleContentUpdate = () => {
+            fetchContent();
+        };
+        
+        window.addEventListener('siteContentUpdated', handleContentUpdate);
+        
+        // Cleanup listener on unmount
+        return () => {
+            window.removeEventListener('siteContentUpdated', handleContentUpdate);
+        };
     }, []);
 
     const refetch = async () => {
         try {
             setLoading(true);
             
-            const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-            const response = await fetch(`${baseUrl}/api/site-content`);
+            const response = await fetch(SummaryApi.getPublicSiteContent.url, {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache'
+                },
+                cache: 'no-store'
+            });
             
             if (response.ok) {
                 const data = await response.json();
@@ -137,6 +169,7 @@ const getDefaultContent = () => {
             businessInfo: {
                 address: "123 E-Commerce Street\nBusiness District\nCity, State 12345",
                 phone: "+1 (555) 123-4567",
+                whatsapp: "",
                 email: "support@universalwallpaper.com",
                 hours: "Mon-Fri 9am-6pm"
             },

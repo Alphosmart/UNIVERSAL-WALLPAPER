@@ -26,6 +26,7 @@ const getSiteContent = async (req, res) => {
                 businessInfo: {
                     address: "123 E-Commerce Street\\nBusiness District\\nCity, State 12345",
                     phone: "+1 (555) 123-4567",
+                    whatsapp: "",
                     email: "support@ashamsmart.com",
                     hours: "Mon-Fri 9am-6pm"
                 },
