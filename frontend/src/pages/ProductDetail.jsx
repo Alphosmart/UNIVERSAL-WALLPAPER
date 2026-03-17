@@ -7,7 +7,7 @@ import { useCart } from '../context/CartContext';
 import SocialFeatures from '../components/SocialFeatures';
 import EnhancedReviews from '../components/EnhancedReviews';
 import useSiteContent from '../hooks/useSiteContent';
-import { openWhatsAppPropertyChat } from '../utils/whatsappContact';
+import { openWhatsAppProductChat } from '../utils/whatsappContact';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -152,7 +152,7 @@ const ProductDetail = () => {
     const handleWhatsAppChat = () => {
         if (!product) return;
 
-        const wasOpened = openWhatsAppPropertyChat({
+        const wasOpened = openWhatsAppProductChat({
             siteContent,
             item: product,
             itemType: 'product',

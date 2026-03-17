@@ -59,7 +59,7 @@ const getCanonicalOrigin = () => {
     return origin;
 };
 
-export const buildPropertyUrl = ({ itemType, itemId }) => {
+export const buildProductUrl = ({ itemType, itemId }) => {
     const baseOrigin = getCanonicalOrigin();
     if (itemType === 'property') {
         return `${baseOrigin}/property/${itemId}`;
@@ -68,10 +68,10 @@ export const buildPropertyUrl = ({ itemType, itemId }) => {
     return `${baseOrigin}/product/${itemId}`;
 };
 
-export const buildWhatsAppPropertyMessage = ({ title, price, location, propertyUrl }) => {
+export const buildWhatsAppProductMessage = ({ title, price, location, productUrl }) => {
     const lines = [
-        'Hello, I am interested in this property.',
-        `Property: ${title || ''}`,
+        'Hello, I am interested in this product.',
+        `Product: ${title || ''}`,
         `Price: ${formatPriceWithThousandsSeparator(price)}`
     ];
 
@@ -79,23 +79,23 @@ export const buildWhatsAppPropertyMessage = ({ title, price, location, propertyU
         lines.push(`Location: ${location}`);
     }
 
-    lines.push('', propertyUrl);
+    lines.push('', productUrl);
 
     return lines.join('\n');
 };
 
-export const openWhatsAppPropertyChat = ({ siteContent, item, itemType = 'product', itemId, title, price, location }) => {
+export const openWhatsAppProductChat = ({ siteContent, item, itemType = 'product', itemId, title, price, location }) => {
     const phoneNumber = resolveWhatsAppNumber({ siteContent, item });
     if (!phoneNumber) {
         return false;
     }
 
-    const propertyUrl = buildPropertyUrl({ itemType, itemId });
-    const message = buildWhatsAppPropertyMessage({
+    const productUrl = buildProductUrl({ itemType, itemId });
+    const message = buildWhatsAppProductMessage({
         title,
         price,
         location,
-        propertyUrl
+        productUrl
     });
 
     const encodedMessage = encodeURIComponent(message);
