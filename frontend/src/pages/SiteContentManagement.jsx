@@ -109,6 +109,7 @@ const SiteContentManagement = () => {
             businessInfo: {
                 address: "123 E-Commerce Street\nBusiness District\nCity, State 12345",
                 phone: "+1 (555) 123-4567",
+                whatsapp: "",
                 email: "support@ashamsmart.com",
                 hours: "Mon-Fri 9am-6pm"
             },
@@ -506,6 +507,18 @@ const SiteContentManagement = () => {
                                                 type="tel"
                                                 value={contentData.contactUs.businessInfo.phone}
                                                 onChange={(e) => updateNestedContentData('contactUs', 'businessInfo', 'phone', e.target.value)}
+                                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                WhatsApp Number
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                value={contentData.contactUs.businessInfo.whatsapp || ''}
+                                                onChange={(e) => updateNestedContentData('contactUs', 'businessInfo', 'whatsapp', e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                             />
                                         </div>

@@ -6,6 +6,8 @@ import SummaryApi from '../common';
 import { useCart } from '../context/CartContext';
 import SocialFeatures from '../components/SocialFeatures';
 import EnhancedReviews from '../components/EnhancedReviews';
+import useSiteContent from '../hooks/useSiteContent';
+import { openWhatsAppPropertyChat } from '../utils/whatsappContact';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -20,6 +22,7 @@ const ProductDetail = () => {
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [relatedLoading, setRelatedLoading] = useState(false);
     const { addToCart, isInCart, getCartItem } = useCart();
+    const { content: siteContent } = useSiteContent();
 
     const fetchProductDetails = useCallback(async () => {
         try {
@@ -144,6 +147,24 @@ const ProductDetail = () => {
 
     const toggleFullscreen = () => {
         setIsFullscreen(!isFullscreen);
+    };
+
+    const handleWhatsAppChat = () => {
+        if (!product) return;
+
+        const wasOpened = openWhatsAppPropertyChat({
+            siteContent,
+            item: product,
+            itemType: 'product',
+            itemId: product._id || id,
+            title: product.productName || product.name,
+            price: product.sellingPrice ?? product.price,
+            location: product.location
+        });
+
+        if (!wasOpened) {
+            toast.error('WhatsApp contact is not available at the moment');
+        }
     };
 
     // Keyboard navigation for fullscreen mode
@@ -456,6 +477,13 @@ const ProductDetail = () => {
                                 {isFavorite ? <FaHeart /> : <FaRegHeart />}
                             </button>
                         </div>
+
+                        <button
+                            className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                            onClick={handleWhatsAppChat}
+                        >
+                            Chat on WhatsApp
+                        </button>
 
                         {product.stock === 0 && (
                             <p className="text-red-600 text-center mt-2 font-medium">

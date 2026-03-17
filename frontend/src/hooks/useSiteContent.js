@@ -72,8 +72,7 @@ const useSiteContent = () => {
         try {
             setLoading(true);
             
-            const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-            const response = await fetch(`${baseUrl}/api/site-content`, {
+            const response = await fetch(SummaryApi.getPublicSiteContent.url, {
                 method: 'GET',
                 headers: {
                     'Cache-Control': 'no-cache',
@@ -170,6 +169,7 @@ const getDefaultContent = () => {
             businessInfo: {
                 address: "123 E-Commerce Street\nBusiness District\nCity, State 12345",
                 phone: "+1 (555) 123-4567",
+                whatsapp: "",
                 email: "support@universalwallpaper.com",
                 hours: "Mon-Fri 9am-6pm"
             },

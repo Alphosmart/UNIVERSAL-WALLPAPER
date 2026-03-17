@@ -305,6 +305,7 @@
     "businessInfo": {
       "address": "1234 E-Commerce Street\nBusiness District\nCity, State 1234",
       "phone": "+2348067895548",
+      "whatsapp": "07036111707",
       "email": "support@universalwallpaper.com",
       "hours": "Mon-Fri 9am-6pm"
     },
@@ -313,7 +314,7 @@
       "phoneHours": "Mon-Fri 9AM-6PM",
       "liveChatHours": "Mon-Fri 9AM-6PM"
     },
-    "lastUpdated": "2025-11-27T22:21:30.346Z"
+    "lastUpdated": "2026-03-17T22:34:48.488Z"
   },
   "maintenancePage": {
     "title": "Under Maintenance",
