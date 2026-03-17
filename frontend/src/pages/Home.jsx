@@ -5,9 +5,11 @@ import VerticalCardProduct from '../components/VerticalCardProduct.jsx'
 import BackendStatus from '../components/BackendStatus'
 import useSiteContent from '../hooks/useSiteContent'
 import { Link } from 'react-router-dom'
+import { useProducts } from '../context/ProductContext'
 
 const Home = () => {
   const { content: siteContent } = useSiteContent()
+  const { allProducts, loading: productsLoading } = useProducts()
 
   // Default content fallback
   const heroContent = siteContent?.homePage?.hero || {
@@ -18,6 +20,19 @@ const Home = () => {
     secondaryButtonText: "Learn More",
     secondaryButtonLink: "/about-us"
   }
+
+  const featuredProductsContent = siteContent?.homePage?.featuredProducts || {
+    title: 'Featured Products',
+    productIds: []
+  }
+
+  const featuredProductIds = Array.isArray(featuredProductsContent.productIds)
+    ? featuredProductsContent.productIds
+    : []
+
+  const featuredProducts = featuredProductIds
+    .map((productId) => allProducts.find((product) => product._id === productId))
+    .filter(Boolean)
 
   return (
     <div>
@@ -49,10 +64,41 @@ const Home = () => {
         </div>
       </div>
       
-      {/* Temporarily commenting out product components to debug */}
-      {/* <BannerProduct /> */}
-      
-      <p className="text-center p-4 text-blue-600 font-bold">🔍 DEBUG: About to load VerticalCardProduct...</p>
+      {!productsLoading && featuredProductIds.length > 0 && (
+        <div className="container mx-auto px-4 my-8">
+          <h2 className="text-2xl font-semibold py-4">{featuredProductsContent.title || 'Featured Products'}</h2>
+
+          {featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {featuredProducts.map((product) => (
+                <Link
+                  key={product._id}
+                  to={`/product/${product._id}`}
+                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden"
+                >
+                  <div className="h-44 bg-slate-100 p-3 flex items-center justify-center">
+                    <img
+                      src={product.productImage?.[0]}
+                      alt={product.productName}
+                      className="max-h-full object-contain"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-medium text-gray-900 line-clamp-1">{product.productName}</h3>
+                    <p className="text-sm text-gray-500 capitalize line-clamp-1">{product.category}</p>
+                    <p className="text-red-600 font-semibold mt-2">
+                      {product.displayPricing?.formatted?.sellingPrice || `$${Number(product.sellingPrice || 0).toLocaleString('en-US')}`}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">Selected featured product IDs are not available in current product list.</p>
+          )}
+        </div>
+      )}
       
       {/* Show all products from our company */}
       <VerticalCardProduct category={"all"} heading={"All Interior Decoration Products"} />

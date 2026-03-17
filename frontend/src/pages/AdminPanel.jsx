@@ -80,10 +80,10 @@ const AdminPanel = () => {
     <div className="min-h-screen bg-gray-100">
       <div className="flex">
         {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen">
-          <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6">Admin Panel</h1>
-            <nav className="space-y-2">
+        <div className="w-64 bg-white shadow-lg min-h-screen h-screen flex flex-col">
+          <div className="p-6 flex-1 min-h-0 overflow-y-auto">
+            <h1 className="text-2xl font-bold text-gray-800 mb-6 sticky top-0 bg-white py-1">Admin Panel</h1>
+            <nav className="space-y-2 pb-4">
               {adminMenuItems.map((item, index) => (
                 <Link
                   key={index}
@@ -98,7 +98,7 @@ const AdminPanel = () => {
           </div>
           
           {/* User Info */}
-          <div className="absolute bottom-0 w-64 p-6 border-t bg-gray-50">
+          <div className="w-full p-6 border-t bg-gray-50">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
                 <span className="text-white font-semibold">

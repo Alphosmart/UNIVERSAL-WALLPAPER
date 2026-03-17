@@ -8,6 +8,10 @@
       "secondaryButtonText": "Learn More",
       "secondaryButtonLink": "/about-us"
     },
+    "featuredProducts": {
+      "title": "Featured Products",
+      "productIds": []
+    },
     "lastUpdated": "2025-11-27T22:26:49.874Z"
   },
   "aboutUs": {
