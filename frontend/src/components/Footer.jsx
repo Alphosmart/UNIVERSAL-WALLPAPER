@@ -23,6 +23,7 @@ const Footer = () => {
     description: "Your premier destination for high-quality wallpapers and home décor solutions. Transform your space with our extensive collection from trusted sellers worldwide.",
     address: "123 Design Street, Creative District, NY 10001",
     phone: "+1 (555) 123-4567",
+    whatsapp: "08038429541",
     email: "info@universalwallpaper.com"
   };
 
@@ -52,6 +53,12 @@ const Footer = () => {
                 <FaPhone className='text-green-400 flex-shrink-0' />
                 <span className='text-sm'>{companyInfo.phone}</span>
               </div>
+              {companyInfo.whatsapp && (
+              <div className='flex items-center space-x-3 text-gray-300'>
+                <FaPhone className='text-green-400 flex-shrink-0' />
+                <span className='text-sm'>WhatsApp: {companyInfo.whatsapp}</span>
+              </div>
+              )}
               <div className='flex items-center space-x-3 text-gray-300'>
                 <FaEnvelope className='text-purple-400 flex-shrink-0' />
                 <span className='text-sm'>{companyInfo.email}</span>
@@ -235,10 +242,9 @@ const Footer = () => {
             </p>
             <div className='mt-2 md:mt-0'>
               <p className='text-gray-500 text-xs'>
-                Developed with ❤️ by{' '}
-                <span className='text-blue-400 font-medium' title="YouTube Channel">
-                  Dynamic Coding with Alphonsus
-                </span>
+                build by Alphomsus<br />
+                Phone: 08033670770<br />
+                email: ashamsmart1@gmail.com
               </p>
             </div>
           </div>
