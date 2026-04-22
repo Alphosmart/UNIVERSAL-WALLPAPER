@@ -6,7 +6,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import MaintenanceGuard from './components/MaintenanceGuard';
 import SecurityProvider from './components/SecurityProvider';
 import PageTracker from './components/PageTracker';
-import RefreshDebugger from './components/RefreshDebugger';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect, useCallback, useState, useRef } from 'react';
@@ -18,28 +17,19 @@ import Loading from './components/Loading';
 import { CartProvider } from './context/CartContext';
 import { ProductProvider } from './context/ProductContext';
 
-// Debug logging
-console.log('🔍 App.jsx loaded at:', new Date().toISOString());
-
 function App() {
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
   const userDetailsCachedRef = useRef(false)
 
-  console.log('🔍 App component rendered. Loading:', loading, 'UserCached:', userDetailsCachedRef.current);
-
   const fetchUserDetails = useCallback(async(retryCount = 0) => {
-    console.log('🔍 fetchUserDetails called. RetryCount:', retryCount, 'UserCached:', userDetailsCachedRef.current);
-    
     // Skip if already cached and not explicitly requested
     if (userDetailsCachedRef.current && retryCount === 0) {
-      console.log('🔍 Skipping fetch - already cached and no refresh requested');
       setLoading(false)
       return
     }
 
     try {
-      console.log('🔍 Starting user details fetch...');
       setLoading(true)
       
       // Add timeout for user details - longer timeout for initial load
@@ -56,32 +46,25 @@ function App() {
       })
 
       clearTimeout(timeoutId)
-      console.log('🔍 User details response status:', dataResponse.status);
 
       if (dataResponse.ok) {
         const dataApi = await dataResponse.json()
-        console.log('🔍 User details API response:', dataApi);
         
         if (dataApi.success) {
-          console.log('🔍 Setting user details in Redux:', dataApi.data);
           dispatch(setUserDetails(dataApi.data))
           userDetailsCachedRef.current = true
         } else {
-          console.log('🔍 User not logged in - this is normal');
           // User not logged in - this is normal
           userDetailsCachedRef.current = true
         }
       } else if (dataResponse.status === 401) {
-        console.log('🔍 401 response - user not authenticated (normal)');
         // 401 is expected when user is not authenticated - this is normal
         userDetailsCachedRef.current = true
       } else {
-        console.log('🔍 Non-200 response:', dataResponse.status);
         // Handle other non-200 responses
         userDetailsCachedRef.current = true
       }
     } catch (error) {
-      console.log('🔍 Error in fetchUserDetails:', error);
       if (error.name === 'AbortError') {
         // Retry once with shorter timeout if initial request times out
         if (retryCount === 0) {
@@ -98,13 +81,11 @@ function App() {
   }, [dispatch])
 
   useEffect(()=>{
-    console.log('🔍 App useEffect triggered. This should only run once on mount');
     /**user Details - only fetch once on app load */
     fetchUserDetails()
     
     // Failsafe: Don't let loading hang indefinitely
     const loadingTimeout = setTimeout(() => {
-      console.log('🔍 Loading timeout triggered - forcing completion');
       if (!userDetailsCachedRef.current) {
         setLoading(false)
         userDetailsCachedRef.current = true
@@ -112,19 +93,16 @@ function App() {
     }, 20000) // Increased to 20 seconds to reduce false triggers
     
     return () => {
-      console.log('🔍 App useEffect cleanup');
       clearTimeout(loadingTimeout);
     }
   },[fetchUserDetails]) // Now fetchUserDetails is stable
 
   // Create a refresh function for when login/logout occurs
   const refreshUserDetails = useCallback(async () => {
-    console.log('🔄 refreshUserDetails called - forcing refresh');
     userDetailsCachedRef.current = false
     setLoading(true)
     try {
       await fetchUserDetails(0) // Force fetch with retryCount 0
-      console.log('🔄 User details refresh completed');
     } catch (error) {
       console.error('🔄 Error in refreshUserDetails:', error);
     } finally {
@@ -134,35 +112,26 @@ function App() {
 
   // Create a truly silent refresh that only updates Redux without any loading states
   const silentRefreshUserDetails = useCallback(async () => {
-    console.log('🔄 silentRefreshUserDetails called - pure Redux update');
-    
     try {
       const dataResponse = await fetch(SummaryApi.current_user.url, {
         method: SummaryApi.current_user.method,
         credentials: 'include'
       })
       
-      console.log('🔄 Silent user details response status:', dataResponse.status)
-      
       if (dataResponse.status === 200) {
         const dataApi = await dataResponse.json()
-        console.log('🔄 Silent user details API response success:', !!dataApi.success)
         
         if (dataApi.success && dataApi.data) {
-          console.log('🔄 Setting user details in Redux (silent):', dataApi.data.name)
           dispatch(setUserDetails(dataApi.data))
           userDetailsCachedRef.current = true
           return dataApi.data
         } else {
-          console.log('🔄 API response not successful')
           return null
         }
       } else if (dataResponse.status === 401) {
-        console.log('🔄 User not authenticated (401)');
         dispatch(setUserDetails(null))
         return null
       } else {
-        console.log('🔄 Non-200 response:', dataResponse.status);
         return null
       }
     } catch (error) {
@@ -186,7 +155,6 @@ function App() {
           }}>
             <ProductProvider>
               <CartProvider>
-                <RefreshDebugger />
                 <PageTracker />
                 <ToastContainer 
                   position='top-center'

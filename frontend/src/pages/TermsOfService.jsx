@@ -246,6 +246,9 @@ const TermsOfService = () => {
                   <strong>Phone:</strong> +1 (555) 123-4567
                 </p>
                 <p className="text-gray-700">
+                  <strong>WhatsApp:</strong> 08038429541
+                </p>
+                <p className="text-gray-700">
                   <strong>Address:</strong> [Your Business Address]
                 </p>
               </div>

@@ -22,6 +22,7 @@ const EditProduct = () => {
         description: "",
         price: "",
         sellingPrice: "",
+        stock: 0,
         condition: "New"
     });
 
@@ -91,9 +92,16 @@ const EditProduct = () => {
 
     const handleOnChange = (e) => {
         const { name, value } = e.target;
+        
+        // Convert numeric fields to numbers
+        let processedValue = value;
+        if (name === 'price' || name === 'sellingPrice' || name === 'stock') {
+            processedValue = value === '' ? '' : Number(value);
+        }
+        
         setData(prev => ({
             ...prev,
-            [name]: value
+            [name]: processedValue
         }));
     };
 
@@ -141,13 +149,21 @@ const EditProduct = () => {
         try {
             setLoading(true);
             
+            // Ensure numeric fields are numbers
+            const submitData = {
+                ...data,
+                price: Number(data.price),
+                sellingPrice: Number(data.sellingPrice),
+                stock: Number(data.stock ?? 0)
+            };
+            
             const response = await fetch(`${SummaryApi.updateProduct.url}/${id}`, {
                 method: SummaryApi.updateProduct.method,
                 credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(submitData)
             });
 
             const result = await response.json();
@@ -370,6 +386,26 @@ const EditProduct = () => {
                             rows={4}
                             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
+                    </div>
+
+                    {/* Stock Quantity */}
+                    <div>
+                        <label htmlFor="stock" className="block text-sm font-medium text-gray-700 mb-2">
+                            Stock Quantity *
+                        </label>
+                        <input
+                            type="number"
+                            id="stock"
+                            name="stock"
+                            value={data.stock ?? 0}
+                            onChange={handleOnChange}
+                            placeholder="Enter available quantity"
+                            min="0"
+                            step="1"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Current stock level - customers will see low stock warnings</p>
                     </div>
 
                     {/* Submit Button */}

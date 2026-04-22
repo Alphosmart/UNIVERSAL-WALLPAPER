@@ -48,7 +48,7 @@ const SummaryApi = {
         method : 'put'
     },
     deleteProduct : {
-        url : `${backendDomain}/api/delete-product`,
+        url : `${backendDomain}/api/delete-product/:productId`,
         method : 'delete'
     },
     buyProduct : {

@@ -15,12 +15,39 @@ const AllProducts = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10);
+  const [siteHomePageContent, setSiteHomePageContent] = useState({});
+  const [featuredProductIds, setFeaturedProductIds] = useState([]);
+  const [featuredToggleLoadingId, setFeaturedToggleLoadingId] = useState('');
+  const [siteContentLoaded, setSiteContentLoaded] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchAllProducts();
     fetchCategories();
+    fetchFeaturedProducts();
   }, []);
+
+  const fetchFeaturedProducts = async () => {
+    try {
+      const response = await fetch(SummaryApi.getAllSiteContent.url, {
+        method: SummaryApi.getAllSiteContent.method,
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const homePageContent = result.data?.homePage || {};
+        const productIds = homePageContent?.featuredProducts?.productIds;
+
+        setSiteHomePageContent(homePageContent);
+        setFeaturedProductIds(Array.isArray(productIds) ? productIds : []);
+        setSiteContentLoaded(true);
+      }
+    } catch (error) {
+      console.error('Error fetching featured products:', error);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -84,6 +111,72 @@ const AllProducts = () => {
     } catch (error) {
       console.error('Error deleting product:', error);
       toast.error('Error deleting product');
+    }
+  };
+
+  const handleToggleFeaturedProduct = async (productId) => {
+    if (!siteContentLoaded) {
+      toast.error('Featured products are still loading. Please try again in a moment.');
+      return;
+    }
+
+    const product = products.find((item) => item._id === productId);
+    const normalizedStatus = String(product?.status || '').toUpperCase();
+    const hasStock = Number(product?.stock || 0) > 0;
+    const canAppearOnHome = normalizedStatus === 'ACTIVE' && hasStock;
+
+    const isCurrentlyFeatured = featuredProductIds.includes(productId);
+
+    if (!isCurrentlyFeatured && !canAppearOnHome) {
+      const reason = normalizedStatus !== 'ACTIVE'
+        ? 'only ACTIVE products can appear on Home page'
+        : 'product must have stock greater than 0 to appear on Home page';
+      toast.error(`Cannot feature this product: ${reason}.`);
+      return;
+    }
+
+    const updatedFeaturedProductIds = isCurrentlyFeatured
+      ? featuredProductIds.filter((id) => id !== productId)
+      : [...featuredProductIds, productId];
+
+    const updatedHomePageContent = {
+      ...siteHomePageContent,
+      featuredProducts: {
+        ...(siteHomePageContent?.featuredProducts || {}),
+        title: siteHomePageContent?.featuredProducts?.title || 'Featured Products',
+        productIds: updatedFeaturedProductIds
+      }
+    };
+
+    try {
+      setFeaturedToggleLoadingId(productId);
+
+      const response = await fetch(SummaryApi.updateSiteContent.url, {
+        method: SummaryApi.updateSiteContent.method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          section: 'homePage',
+          data: updatedHomePageContent
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSiteHomePageContent(updatedHomePageContent);
+        setFeaturedProductIds(updatedFeaturedProductIds);
+        toast.success(`Product ${isCurrentlyFeatured ? 'removed from' : 'added to'} featured products`);
+      } else {
+        toast.error(result.message || 'Failed to update featured products');
+      }
+    } catch (error) {
+      console.error('Error updating featured products:', error);
+      toast.error('Error updating featured products');
+    } finally {
+      setFeaturedToggleLoadingId('');
     }
   };
 
@@ -154,6 +247,9 @@ const AllProducts = () => {
 
       {/* Filters */}
       <div className="bg-white p-6 rounded-lg shadow">
+        <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          Home page Featured Products only displays items with <strong>ACTIVE</strong> status and stock greater than <strong>0</strong>.
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -274,6 +370,9 @@ const AllProducts = () => {
                   Seller
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Featured
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -281,13 +380,21 @@ const AllProducts = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {currentProducts.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan="8" className="px-6 py-12 text-center text-gray-500">
                     {products.length === 0 ? 'No products found' : 'No products match your filters'}
                   </td>
                 </tr>
               ) : (
                 currentProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-gray-50">
+                    {(() => {
+                      const normalizedStatus = String(product.status || '').toUpperCase();
+                      const hasStock = Number(product.stock || 0) > 0;
+                      const canAppearOnHome = normalizedStatus === 'ACTIVE' && hasStock;
+                      const isFeatured = featuredProductIds.includes(product._id);
+
+                      return (
+                        <>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-12 w-12">
@@ -337,8 +444,42 @@ const AllProducts = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {product.sellerInfo?.name || 'Unknown'}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {isFeatured ? (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                          Featured
+                        </span>
+                      ) : (
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-600">
+                          Not Featured
+                        </span>
+                      )}
+                      {!canAppearOnHome && (
+                        <p className="mt-1 text-xs text-red-600">Not eligible for Home</p>
+                      )}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleToggleFeaturedProduct(product._id)}
+                          disabled={featuredToggleLoadingId === product._id || (!canAppearOnHome && !isFeatured)}
+                          className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors disabled:opacity-50 ${
+                            isFeatured
+                              ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                              : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                          }`}
+                          title={!canAppearOnHome && !isFeatured
+                            ? 'Only ACTIVE and in-stock products can be featured on Home page'
+                            : isFeatured
+                            ? 'Remove from Featured Products'
+                            : 'Add to Featured Products'}
+                        >
+                          {featuredToggleLoadingId === product._id
+                            ? 'Saving...'
+                            : isFeatured
+                            ? 'Unfeature'
+                            : 'Feature'}
+                        </button>
                         <button 
                           onClick={() => navigate(`/product/${product._id}`)}
                           className="text-blue-600 hover:text-blue-900" 
@@ -362,6 +503,9 @@ const AllProducts = () => {
                         </button>
                       </div>
                     </td>
+                        </>
+                      );
+                    })()}
                   </tr>
                 ))
               )}

@@ -108,6 +108,25 @@ const Cart = () => {
                                     <p className="text-lg font-bold text-blue-600">
                                         {formatPrice(item.sellingPrice || item.price)}
                                     </p>
+                                    
+                                    {/* Stock availability warning */}
+                                    {item.stock !== undefined && (
+                                        <div className="mt-2">
+                                            {item.stock === 0 ? (
+                                                <span className="text-red-600 text-sm font-semibold">⚠️ Out of Stock</span>
+                                            ) : item.stock < item.quantity ? (
+                                                <span className="text-orange-600 text-sm font-semibold">
+                                                    ⚠️ Only {item.stock} available (you have {item.quantity} in cart)
+                                                </span>
+                                            ) : item.stock <= 5 ? (
+                                                <span className="text-orange-600 text-sm font-semibold">
+                                                    🔥 Only {item.stock} left in stock
+                                                </span>
+                                            ) : (
+                                                <span className="text-green-600 text-sm">✓ In stock ({item.stock} available)</span>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center gap-3">

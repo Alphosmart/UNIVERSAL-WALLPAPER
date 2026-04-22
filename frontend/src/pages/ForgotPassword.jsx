@@ -7,7 +7,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
-  const [resetUrl, setResetUrl] = useState('');
+  // const [resetUrl, setResetUrl] = useState(''); // Removed: not currently used in UI
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,7 +39,7 @@ const ForgotPassword = () => {
 
       if (data.success) {
         setEmailSent(true);
-        setResetUrl(data.data.resetUrl);
+        // setResetUrl(data.data.resetUrl); // Not displayed in UI
         toast.success('Password reset email sent successfully!');
       } else {
         toast.error(data.message || 'Failed to send reset email');
@@ -54,7 +54,7 @@ const ForgotPassword = () => {
 
   const handleResendEmail = () => {
     setEmailSent(false);
-    setResetUrl('');
+    // setResetUrl(''); // Not needed
     handleSubmit({ preventDefault: () => {} });
   };
 

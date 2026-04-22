@@ -269,6 +269,7 @@ const ReturnRefundPolicy = () => {
                   <ul className="text-sm text-blue-700 space-y-1">
                     <li><strong>Email:</strong> returns@universalwallpaper.com</li>
                     <li><strong>Phone:</strong> +1 (555) 123-4567</li>
+                    <li><strong>WhatsApp:</strong> 08038429541</li>
                     <li><strong>Hours:</strong> Mon-Fri 9AM-6PM EST</li>
                   </ul>
                 </div>

@@ -10,9 +10,14 @@
     },
     "featuredProducts": {
       "title": "Featured Products",
-      "productIds": []
+      "productIds": [
+        "68f72cda567439fda50421bd",
+        "68f730bdaa9c9cf1d4f476b6",
+        "68e9643d1e4bde44c809b358",
+        "68d942d3a003b5bb37a2189c"
+      ]
     },
-    "lastUpdated": "2025-11-27T22:26:49.874Z"
+    "lastUpdated": "2026-03-28T06:48:56.330Z"
   },
   "aboutUs": {
     "hero": {
@@ -28,6 +33,7 @@
       "description": "Your premier destination for high-quality wallpapers and home décor solutions. We give you the best Always",
       "address": "1234 Design Street, Creative District, NY 10001",
       "phone": "+1 (555) 123-456089",
+      "whatsapp": "08038429541",
       "email": "info@universalwallpaper.com"
     },
     "businessHours": {
@@ -309,7 +315,7 @@
     "businessInfo": {
       "address": "1234 E-Commerce Street\nBusiness District\nCity, State 1234",
       "phone": "+2348067895548",
-      "whatsapp": "07036111707",
+      "whatsapp": "08038429541",
       "email": "support@universalwallpaper.com",
       "hours": "Mon-Fri 9am-6pm"
     },

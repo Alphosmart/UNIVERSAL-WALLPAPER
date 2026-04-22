@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { trackLandingPageInteraction, trackShopButtonClick, trackNewsletterSignup, trackUserEngagement } from '../utils/analytics';
+import { trackLandingPageInteraction, trackShopButtonClick, trackNewsletterSignup } from '../utils/analytics';
 import SummaryApi from '../common';
+import useSiteContent from '../hooks/useSiteContent';
+import { useProducts } from '../context/ProductContext';
 import { 
   FaPlay, 
   FaStar, 
@@ -21,7 +23,17 @@ import {
 } from 'react-icons/fa';
 
 const LandingPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState('wallpapers');
+  const { content: siteContent } = useSiteContent();
+  const { allProducts } = useProducts();
+  
+  // Default hero content
+  const heroContent = siteContent?.homePage?.hero || {
+    title: "Transform Your Space with Premium Wallpapers",
+    subtitle: "Discover thousands of high-quality wallpapers for every style. From modern minimalist to classic elegant designs.",
+    primaryButtonText: "Shop Now",
+    primaryButtonLink: "/products"
+  };
+  
   const [email, setEmail] = useState('');
   const [testimonials, setTestimonials] = useState([]);
 
@@ -69,10 +81,10 @@ const LandingPage = () => {
         },
         {
           name: "Emma Rodriguez",
-          role: "Business Owner",
+          role: "Business Customer",
           image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
           rating: 5,
-          text: "As a seller on this platform, I've been able to reach customers worldwide. The tools and support provided are fantastic."
+          text: "We sourced wallpapers for multiple locations through this platform. Product quality and support have been consistently excellent."
         }
       ]);
     };
@@ -85,7 +97,6 @@ const LandingPage = () => {
     if (email.trim()) {
       trackNewsletterSignup('landing_page');
       // Here you would typically send the email to your backend
-      console.log('Newsletter signup:', email);
       setEmail('');
       alert('Thank you for subscribing!');
     }
@@ -116,82 +127,23 @@ const LandingPage = () => {
     }
   ];
 
-  const featuredProducts = {
-    wallpapers: [
-      {
-        id: 1,
-        name: "Luxury Floral Pattern",
-        price: "$45.99",
-        originalPrice: "$65.99",
-        image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=300&fit=crop",
-        rating: 4.8,
-        reviews: 127
-      },
-      {
-        id: 2,
-        name: "Modern Geometric Design",
-        price: "$38.50",
-        originalPrice: "$52.00",
-        image: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=300&h=300&fit=crop",
-        rating: 4.9,
-        reviews: 203
-      },
-      {
-        id: 3,
-        name: "Vintage Botanical Print",
-        price: "$42.75",
-        originalPrice: "$58.99",
-        image: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=300&h=300&fit=crop",
-        rating: 4.7,
-        reviews: 89
-      }
-    ],
-    paints: [
-      {
-        id: 4,
-        name: "Premium Matte Finish",
-        price: "$32.99",
-        originalPrice: "$45.99",
-        image: "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=300&h=300&fit=crop",
-        rating: 4.6,
-        reviews: 156
-      },
-      {
-        id: 5,
-        name: "Eco-Friendly Paint",
-        price: "$28.50",
-        originalPrice: "$39.99",
-        image: "https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=300&h=300&fit=crop",
-        rating: 4.8,
-        reviews: 94
-      }
-    ],
-    decor: [
-      {
-        id: 6,
-        name: "Wall Art Canvas Set",
-        price: "$89.99",
-        originalPrice: "$129.99",
-        image: "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=300&h=300&fit=crop",
-        rating: 4.9,
-        reviews: 78
-      },
-      {
-        id: 7,
-        name: "Decorative Mirror",
-        price: "$125.00",
-        originalPrice: "$175.00",
-        image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=300&h=300&fit=crop",
-        rating: 4.7,
-        reviews: 112
-      }
-    ]
+  const featuredProductsContent = siteContent?.homePage?.featuredProducts || {
+    title: 'Featured Products',
+    productIds: []
   };
+
+  const featuredProductIds = Array.isArray(featuredProductsContent.productIds)
+    ? featuredProductsContent.productIds
+    : [];
+
+  const featuredProducts = featuredProductIds
+    .map((productId) => allProducts.find((product) => product._id === productId))
+    .filter(Boolean);
 
   const stats = [
     { number: "50K+", label: "Happy Customers", icon: FaUsers },
     { number: "15K+", label: "Products Available", icon: FaHome },
-    { number: "500+", label: "Trusted Sellers", icon: FaAward },
+    { number: "1K+", label: "Design Collections", icon: FaAward },
     { number: "99.9%", label: "Customer Satisfaction", icon: FaHeart }
   ];
 
@@ -213,14 +165,10 @@ const LandingPage = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                Transform Your Space with 
-                <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
-                  {" "}Premium Wallpapers
-                </span>
+                {heroContent.title}
               </h1>
               <p className="text-xl lg:text-2xl text-gray-100 leading-relaxed">
-                Discover thousands of high-quality wallpapers, paints, and décor items from trusted sellers worldwide. 
-                Professional installation and design consultation included.
+                {heroContent.subtitle}
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -291,78 +239,74 @@ const LandingPage = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Featured Products</h2>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">{featuredProductsContent.title || 'Featured Products'}</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Discover our handpicked collection of premium wallpapers, paints, and décor items
+              Discover our handpicked collection of premium interior products
             </p>
-          </div>
-
-          {/* Category Tabs */}
-          <div className="flex justify-center mb-12">
-            <div className="bg-gray-100 rounded-lg p-1 flex">
-              {[
-                { key: 'wallpapers', label: 'Wallpapers' },
-                { key: 'paints', label: 'Paints' },
-                { key: 'decor', label: 'Home Décor' }
-              ].map((category) => (
-                <button
-                  key={category.key}
-                  onClick={() => setSelectedCategory(category.key)}
-                  className={`px-6 py-3 rounded-md font-medium transition-all ${
-                    selectedCategory === category.key
-                      ? 'bg-white text-blue-600 shadow-md'
-                      : 'text-gray-600 hover:text-blue-600'
-                  }`}
-                >
-                  {category.label}
-                </button>
-              ))}
-            </div>
           </div>
 
           {/* Product Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {featuredProducts[selectedCategory]?.map((product) => (
-              <div key={product.id} className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all transform hover:-translate-y-2">
+            {featuredProducts.map((product) => (
+              <div key={product._id} className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all transform hover:-translate-y-2">
                 <div className="relative">
                   <img 
-                    src={product.image} 
-                    alt={product.name}
+                    src={product.productImage?.[0]} 
+                    alt={product.productName}
                     className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                   />
                 </div>
                 
                 <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{product.name}</h3>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">{product.productName}</h3>
+                  <p className="text-sm text-gray-500 capitalize mb-3">{product.category}</p>
                   
                   <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center">
                       {[...Array(5)].map((_, i) => (
                         <FaStar 
                           key={i} 
-                          className={`text-sm ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}`} 
+                          className={`text-sm ${i < Math.floor(product.socialFeatures?.averageRating || 0) ? 'text-yellow-400' : 'text-gray-300'}`} 
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-600">({product.reviews} reviews)</span>
+                    <span className="text-sm text-gray-600">({product.socialFeatures?.totalReviews || 0} reviews)</span>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-blue-600">{product.price}</span>
-                      <span className="text-gray-500 line-through">{product.originalPrice}</span>
+                      <span className="text-2xl font-bold text-blue-600">
+                        {product.displayPricing?.formatted?.sellingPrice || `$${Number(product.sellingPrice || 0).toLocaleString('en-US')}`}
+                      </span>
+                      {product.price && product.price !== product.sellingPrice && (
+                        <span className="text-gray-500 line-through">
+                          {product.displayPricing?.formatted?.originalPrice || `$${Number(product.price || 0).toLocaleString('en-US')}`}
+                        </span>
+                      )}
                     </div>
                     <Link 
-                      to="/search" 
+                      to={`/product/${product._id}`} 
                       className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 font-medium"
                     >
-                      🛒 Shop
+                      View
                     </Link>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {featuredProductIds.length > 0 && featuredProducts.length === 0 && (
+            <p className="text-center text-sm text-gray-500 mt-8">
+              Featured products are selected but currently unavailable in active product listings.
+            </p>
+          )}
+
+          {featuredProductIds.length === 0 && (
+            <p className="text-center text-sm text-gray-500 mt-8">
+              No featured products selected yet.
+            </p>
+          )}
 
           <div className="text-center mt-12">
             <Link 
@@ -426,7 +370,7 @@ const LandingPage = () => {
               
               <div className="space-y-6">
                 {[
-                  "Premium quality products from verified sellers worldwide",
+                  "Premium quality products curated by our in-house team",
                   "Professional installation and design consultation services",
                   "30-day money-back guarantee on all purchases",
                   "Fast and reliable shipping nationwide",

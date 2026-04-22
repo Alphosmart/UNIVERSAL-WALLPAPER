@@ -20,7 +20,6 @@ const Analytics = () => {
         categoryPerformance: [],
         revenueMetrics: {},
         userGrowth: [],
-        topSellers: [],
         topProducts: [],
         newUserAnalytics: {
             registrationSources: [],
@@ -50,7 +49,6 @@ const Analytics = () => {
     const [comparisonMode, setComparisonMode] = useState(false);
     const [selectedFilters, setSelectedFilters] = useState({
         category: 'all',
-        seller: 'all',
         priceRange: 'all'
     });
 
@@ -110,217 +108,94 @@ const Analytics = () => {
     };
 
     // Generate mock sales trend data based on time period
+    // Generate sales trend data from real stats
     const generateSalesTrendData = (stats, period) => {
-        let dataPoints = [];
-        let count = 0;
-
-        switch (period) {
-            case 'hour':
-                count = 24;
-                dataPoints = Array.from({ length: count }, (_, i) => {
-                    const date = new Date();
-                    date.setHours(date.getHours() - (count - 1 - i));
-                    return {
-                        time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-                        sales: Math.floor(Math.random() * 5000) + 1000,
-                        revenue: Math.floor(Math.random() * 10000) + 2000,
-                        orders: Math.floor(Math.random() * 50) + 10,
-                        customers: Math.floor(Math.random() * 20) + 5
-                    };
-                });
-                break;
-            
-            case 'day':
-                count = 30;
-                dataPoints = Array.from({ length: count }, (_, i) => {
-                    const date = new Date();
-                    date.setDate(date.getDate() - (count - 1 - i));
-                    return {
-                        time: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                        sales: Math.floor(Math.random() * 20000) + 5000,
-                        revenue: Math.floor(Math.random() * 40000) + 10000,
-                        orders: Math.floor(Math.random() * 200) + 50,
-                        customers: Math.floor(Math.random() * 100) + 20
-                    };
-                });
-                break;
-            
-            case 'month':
-                count = 12;
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                dataPoints = months.map((month, index) => ({
-                    time: month,
-                    sales: Math.floor(Math.random() * 50000) + 10000,
-                    revenue: Math.floor(Math.random() * 100000) + 20000,
-                    orders: Math.floor(Math.random() * 500) + 100,
-                    customers: Math.floor(Math.random() * 200) + 50
-                }));
-                break;
-            
-            case 'year':
-                count = 5;
-                dataPoints = Array.from({ length: count }, (_, i) => {
-                    const year = new Date().getFullYear() - (count - 1 - i);
-                    return {
-                        time: year.toString(),
-                        sales: Math.floor(Math.random() * 500000) + 100000,
-                        revenue: Math.floor(Math.random() * 1000000) + 200000,
-                        orders: Math.floor(Math.random() * 5000) + 1000,
-                        customers: Math.floor(Math.random() * 2000) + 500
-                    };
-                });
-                break;
-            
-            default:
-                return [];
+        if (!stats || !stats.salesTrend) {
+            return [];
         }
-
-        return dataPoints;
-    };
-
-    // Generate category performance data
-    const generateCategoryData = (stats) => {
-        const categories = ['Wallpapers', 'Wall Paint', 'Decorative Panels', 'Tiles', 'Flooring', 'Lighting'];
-        return categories.map(category => ({
-            name: category,
-            sales: Math.floor(Math.random() * 15000) + 2000,
-            products: Math.floor(Math.random() * 50) + 10
-        }));
-    };
-
-    // Generate top sellers data
-    const generateTopSellersData = (stats) => {
-        const sellerNames = [
-            'Interior Pro', 'Decor Hub', 'Paint Masters', 'Wall Art Studio', 
-            'Design Centre', 'Home Accents', 'Color Works', 'Tile Gallery',
-            'Lighting Zone', 'Floor Central'
-        ];
         
-        return sellerNames.slice(0, 8).map((name, index) => ({
-            id: index + 1,
-            name,
-            totalSales: Math.floor(Math.random() * 150000) + 50000,
-            totalOrders: Math.floor(Math.random() * 500) + 100,
-            averageRating: (Math.random() * 1.5 + 3.5).toFixed(1),
-            productsCount: Math.floor(Math.random() * 50) + 10,
-            revenue: Math.floor(Math.random() * 200000) + 75000,
-            growth: (Math.random() * 50 - 10).toFixed(1)
-        })).sort((a, b) => b.totalSales - a.totalSales);
+        // Return the sales trend data from backend based on period
+        return stats.salesTrend[period] || [];
     };
 
-    // Generate top products data
+    // Generate category performance data from real stats
+    const generateCategoryData = (stats) => {
+        if (stats && stats.categoryPerformance && stats.categoryPerformance.length > 0) {
+            return stats.categoryPerformance;
+        }
+        return [];
+    };
+
+    // No longer using sellers - platform is direct sales only
+
+    // Generate top products data from actual sales data
     const generateTopProductsData = (stats) => {
-        const products = [
-            { name: 'Premium Vinyl Wallpaper', category: 'Wallpapers', image: '/api/placeholder/80/80' },
-            { name: 'Eggshell Wall Paint', category: 'Wall Paint', image: '/api/placeholder/80/80' },
-            { name: '3D Decorative Panels', category: 'Decorative Panels', image: '/api/placeholder/80/80' },
-            { name: 'Ceramic Floor Tiles', category: 'Tiles', image: '/api/placeholder/80/80' },
-            { name: 'LED Pendant Lights', category: 'Lighting', image: '/api/placeholder/80/80' },
-            { name: 'Luxury Vinyl Flooring', category: 'Flooring', image: '/api/placeholder/80/80' }
-        ];
-
-        return products.slice(0, 6).map((product, index) => ({
-            id: index + 1,
-            ...product,
-            totalSales: Math.floor(Math.random() * 2000) + 500,
-            revenue: Math.floor(Math.random() * 50000) + 10000,
-            averageRating: (Math.random() * 1.5 + 3.5).toFixed(1),
-            reviewsCount: Math.floor(Math.random() * 200) + 50,
-            price: Math.floor(Math.random() * 200) + 20,
-            inStock: Math.floor(Math.random() * 100) + 10
-        })).sort((a, b) => b.totalSales - a.totalSales);
+        // Use real product data from stats if available
+        if (stats && stats.topProducts && stats.topProducts.length > 0) {
+            return stats.topProducts.slice(0, 6).map((product, index) => ({
+                id: product._id || index + 1,
+                name: product.productName || product.name || 'Unknown Product',
+                category: product.category || 'Uncategorized',
+                image: product.productImage?.[0] || product.image || '/api/placeholder/80/80',
+                totalSales: product.totalSales || product.salesCount || 0,
+                revenue: product.revenue || product.totalRevenue || 0,
+                averageRating: product.averageRating || 0,
+                reviewsCount: product.reviewsCount || product.totalReviews || 0,
+                price: product.sellingPrice || product.price || 0,
+                inStock: product.stock || 0
+            })).sort((a, b) => b.totalSales - a.totalSales);
+        }
+        
+        // Return empty array if no real data available
+        return [];
     };
 
-    // Calculate revenue metrics
+    // Calculate revenue metrics from real data
     const calculateRevenueMetrics = (stats) => {
+        if (stats && stats.revenueMetrics) {
+            return {
+                totalRevenue: stats.revenueMetrics.totalRevenue || 0,
+                monthlyGrowth: stats.revenueMetrics.monthlyGrowth || 0,
+                averageOrderValue: stats.revenueMetrics.averageOrderValue || 0,
+                conversionRate: stats.revenueMetrics.conversionRate || 0
+            };
+        }
         return {
-            totalRevenue: 125680,
-            monthlyGrowth: 15.8,
-            averageOrderValue: 65.50,
-            conversionRate: 4.1
+            totalRevenue: 0,
+            monthlyGrowth: 0,
+            averageOrderValue: 0,
+            conversionRate: 0
         };
     };
 
-    // Generate new user analytics data
+    // Generate new user analytics from real data
     const generateNewUserAnalytics = (stats, period) => {
-        const registrationSources = [
-            { name: 'Direct', users: Math.floor(Math.random() * 300) + 200, percentage: 35 },
-            { name: 'Social Media', users: Math.floor(Math.random() * 200) + 150, percentage: 25 },
-            { name: 'Search Engine', users: Math.floor(Math.random() * 180) + 120, percentage: 20 },
-            { name: 'Email Campaign', users: Math.floor(Math.random() * 100) + 80, percentage: 12 },
-            { name: 'Referral', users: Math.floor(Math.random() * 80) + 40, percentage: 8 }
-        ];
-
-        const userDemographics = [
-            { ageGroup: '18-24', users: Math.floor(Math.random() * 150) + 100, percentage: 22 },
-            { ageGroup: '25-34', users: Math.floor(Math.random() * 200) + 180, percentage: 35 },
-            { ageGroup: '35-44', users: Math.floor(Math.random() * 120) + 100, percentage: 20 },
-            { ageGroup: '45-54', users: Math.floor(Math.random() * 80) + 60, percentage: 13 },
-            { ageGroup: '55+', users: Math.floor(Math.random() * 60) + 40, percentage: 10 }
-        ];
-
-        const conversionMetrics = {
-            signupToFirstPurchase: (Math.random() * 15 + 10).toFixed(1),
-            averageTimeToFirstPurchase: Math.floor(Math.random() * 5) + 2,
-            userRetentionRate: (Math.random() * 20 + 70).toFixed(1),
-            averageLifetimeValue: Math.floor(Math.random() * 200) + 150
-        };
-
-        let dailyRegistrations = [];
-        switch (period) {
-            case 'hour':
-                dailyRegistrations = Array.from({ length: 24 }, (_, i) => {
-                    const date = new Date();
-                    date.setHours(date.getHours() - (23 - i));
-                    return {
-                        time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-                        registrations: Math.floor(Math.random() * 10) + 2,
-                        activations: Math.floor(Math.random() * 8) + 1
-                    };
-                });
-                break;
-            
-            case 'day':
-                dailyRegistrations = Array.from({ length: 30 }, (_, i) => {
-                    const date = new Date();
-                    date.setDate(date.getDate() - (29 - i));
-                    return {
-                        time: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                        registrations: Math.floor(Math.random() * 50) + 20,
-                        activations: Math.floor(Math.random() * 40) + 15
-                    };
-                });
-                break;
-            
-            case 'month':
-                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                dailyRegistrations = months.map((month) => ({
-                    time: month,
-                    registrations: Math.floor(Math.random() * 800) + 400,
-                    activations: Math.floor(Math.random() * 600) + 300
-                }));
-                break;
-            
-            case 'year':
-                dailyRegistrations = Array.from({ length: 5 }, (_, i) => {
-                    const year = new Date().getFullYear() - (4 - i);
-                    return {
-                        time: year.toString(),
-                        registrations: Math.floor(Math.random() * 8000) + 4000,
-                        activations: Math.floor(Math.random() * 6000) + 3000
-                    };
-                });
-                break;
-            
-            default:
-                dailyRegistrations = [];
+        if (!stats || !stats.userAnalytics) {
+            return {
+                registrationSources: [],
+                userDemographics: [],
+                conversionMetrics: {
+                    signupToFirstPurchase: 0,
+                    averageTimeToFirstPurchase: 0,
+                    userRetentionRate: 0,
+                    averageLifetimeValue: 0
+                },
+                dailyRegistrations: []
+            };
         }
 
+        const userAnalytics = stats.userAnalytics;
+        
         return {
-            registrationSources,
-            userDemographics,
-            conversionMetrics,
-            dailyRegistrations
+            registrationSources: userAnalytics.registrationSources || [],
+            userDemographics: userAnalytics.userDemographics || [],
+            conversionMetrics: userAnalytics.conversionMetrics || {
+                signupToFirstPurchase: 0,
+                averageTimeToFirstPurchase: 0,
+                userRetentionRate: 0,
+                averageLifetimeValue: 0
+            },
+            dailyRegistrations: userAnalytics.dailyRegistrations || []
         };
     };
 
@@ -359,7 +234,6 @@ const Analytics = () => {
                 if (data.success) {
                     const salesTrendData = generateSalesTrendData(data.data, timePeriod);
                     const categoryData = generateCategoryData(data.data);
-                    const topSellersData = generateTopSellersData(data.data);
                     const topProductsData = generateTopProductsData(data.data);
                     const newUserAnalyticsData = generateNewUserAnalytics(data.data, timePeriod);
 
@@ -368,7 +242,6 @@ const Analytics = () => {
                         categoryPerformance: categoryData,
                         revenueMetrics: calculateRevenueMetrics(data.data),
                         userGrowth: [],
-                        topSellers: topSellersData,
                         topProducts: topProductsData,
                         newUserAnalytics: newUserAnalyticsData,
                         loading: false
@@ -730,26 +603,26 @@ const Analytics = () => {
                     </div>
                 </div>
 
-                {/* Top Seller Revenue Card */}
+                {/* Top Product Revenue Card */}
                 <div className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Top Seller Revenue</p>
+                            <p className="text-sm font-medium text-gray-600">Top Product Revenue</p>
                             <p className="text-2xl font-bold text-purple-600">
-                                ${analyticsData.topSellers.length > 0 ? analyticsData.topSellers[0]?.totalSales?.toLocaleString() : '0'}
+                                ${analyticsData.topProducts.length > 0 ? (analyticsData.topProducts[0]?.revenue || 0).toLocaleString() : '0'}
                             </p>
                         </div>
                         <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
                             <svg className="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 100-8 4 4 0 000 8zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                             </svg>
                         </div>
                     </div>
                     <div className="mt-2">
                         <span className="text-sm text-purple-600">
-                            {analyticsData.topSellers.length > 0 ? analyticsData.topSellers[0]?.name : 'No data'}
+                            {analyticsData.topProducts.length > 0 ? analyticsData.topProducts[0]?.name : 'No data'}
                         </span>
-                        <span className="text-sm text-gray-500"> leading seller</span>
+                        <span className="text-sm text-gray-500"> top selling product</span>
                     </div>
                 </div>
 

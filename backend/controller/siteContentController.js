@@ -254,6 +254,14 @@ const getSiteContent = async (req, res) => {
             const data = await fs.readFile(contentFilePath, 'utf8');
             const content = JSON.parse(data);
             
+            // Prevent caching to ensure fresh content
+            res.set({
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+                'Surrogate-Control': 'no-store'
+            });
+            
             res.json({
                 success: true,
                 message: "Site content retrieved successfully",
@@ -261,6 +269,12 @@ const getSiteContent = async (req, res) => {
             });
         } catch (error) {
             // If file doesn't exist, return default content
+            res.set({
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            });
+            
             res.json({
                 success: true,
                 message: "Default site content returned",

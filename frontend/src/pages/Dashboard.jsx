@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaUsers, FaBoxOpen, FaShoppingCart, FaChartLine } from 'react-icons/fa';
 import SummaryApi from '../common';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     users: { total: 0, admin: 0, general: 0, recent: 0 },
     products: { total: 0, active: 0, sold: 0, recent: 0 }
@@ -203,15 +205,24 @@ const Dashboard = () => {
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button className="flex items-center justify-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+          <button 
+            onClick={() => navigate('/admin-panel/all-users')}
+            className="flex items-center justify-center px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+          >
             <FaUsers className="mr-2" />
             View All Users
           </button>
-          <button className="flex items-center justify-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors">
+          <button 
+            onClick={() => navigate('/admin-panel/all-products')}
+            className="flex items-center justify-center px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+          >
             <FaBoxOpen className="mr-2" />
             View All Products
           </button>
-          <button className="flex items-center justify-center px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+          <button 
+            onClick={() => navigate('/admin-panel/analytics')}
+            className="flex items-center justify-center px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+          >
             <FaChartLine className="mr-2" />
             View Analytics
           </button>
