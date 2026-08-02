@@ -3,19 +3,33 @@ import { Link } from 'react-router-dom'
 import { useProducts } from '../context/ProductContext'
 import { formatCurrency } from '../helper/settingsUtils'
 import SocialFeatures from './SocialFeatures'
+import LazyImage from './LazyImage'
 
 const VerticalCardProduct = memo(({ category, heading }) => {
-    const { getProductsByCategory, loading: globalLoading, allProducts } = useProducts()
+    console.log('🔍 VerticalCardProduct: Rendered with category:', category, 'heading:', heading);
+    console.log('🔍 VerticalCardProduct: Component mounted/updated at:', new Date().toISOString());
+    
+    const { getProductsByCategory, loading: globalLoading, allProducts, error } = useProducts()
     const [loading, setLoading] = useState(true)
     const [hoveredProduct, setHoveredProduct] = useState(null)
     const [currentImageIndex, setCurrentImageIndex] = useState({})
 
+    console.log('🔍 VerticalCardProduct: Context state:', { 
+        globalLoading, 
+        allProductsLength: allProducts.length,
+        category,
+        error,
+        allProductsSample: allProducts.slice(0, 2).map(p => ({ id: p._id, name: p.productName }))
+    });
+
     // Get filtered products from context instead of making API call
     const data = useMemo(() => {
         if (globalLoading || allProducts.length === 0) {
+            console.log('🔍 VerticalCardProduct: No data available - globalLoading:', globalLoading, 'allProducts:', allProducts.length);
             return []
         }
         const products = getProductsByCategory(category);
+        console.log('🔍 VerticalCardProduct: Got', products.length, 'products for category:', category);
         return products;
     }, [getProductsByCategory, category, globalLoading, allProducts.length])
 
@@ -33,20 +47,21 @@ const VerticalCardProduct = memo(({ category, heading }) => {
         return (
             <div className='container mx-auto px-4 my-6 relative'>
                 <h2 className='text-2xl font-semibold py-4'>{heading}</h2>
-                <div className='grid grid-cols-[repeat(auto-fit,minmax(260px,300px))] justify-center md:justify-between md:gap-4 overflow-x-scroll scrollbar-none transition-all'>
-                    {[1,2,3].map((item) => (
-                        <div key={item} className='w-full min-w-[260px] md:min-w-[300px] max-w-[260px] md:max-w-[300px] bg-white rounded-sm shadow'>
-                            <div className='bg-slate-200 h-48 p-4 min-w-[260px] md:min-w-[300px] flex justify-center items-center'>
-                                <div className='w-full h-full bg-slate-300 rounded animate-pulse'></div>
+                <div className='flex gap-2 overflow-x-auto scrollbar-hide sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4'>
+                    {[1,2,3,4,5].map((item) => (
+                        <div key={item} className='flex-shrink-0 w-[160px] sm:w-full sm:max-w-[280px] bg-white rounded-lg shadow animate-pulse'>
+                            <div className='bg-gray-200 h-32 sm:h-48 p-2 sm:p-4 flex justify-center items-center rounded-t-lg'>
+                                <div className='w-full h-full bg-gray-300 rounded'></div>
                             </div>
-                            <div className='p-4 grid gap-3'>
-                                <div className='h-4 bg-slate-300 rounded w-full animate-pulse'></div>
-                                <div className='h-3 bg-slate-300 rounded w-3/4 animate-pulse'></div>
-                                <div className='flex gap-3'>
-                                    <div className='h-4 bg-slate-300 rounded w-1/3 animate-pulse'></div>
-                                    <div className='h-4 bg-slate-300 rounded w-1/3 animate-pulse'></div>
+                            <div className='p-2 sm:p-4 grid gap-1 sm:gap-3'>
+                                <div className='h-3 sm:h-4 bg-gray-300 rounded w-full'></div>
+                                <div className='h-2 sm:h-3 bg-gray-300 rounded w-3/4'></div>
+                                <div className='flex gap-1 sm:gap-3'>
+                                    <div className='h-3 sm:h-4 bg-gray-300 rounded w-1/3'></div>
+                                    <div className='h-3 sm:h-4 bg-gray-300 rounded w-1/3'></div>
                                 </div>
-                                <div className='h-8 bg-slate-300 rounded w-full animate-pulse'></div>
+                                <div className='h-1 bg-gray-300 rounded w-full'></div>
+                                <div className='h-6 sm:h-8 bg-gray-300 rounded w-full'></div>
                             </div>
                         </div>
                     ))}
@@ -70,25 +85,29 @@ const VerticalCardProduct = memo(({ category, heading }) => {
         <div className='container mx-auto px-4 my-6 relative'>
             <h2 className='text-2xl font-semibold py-4'>{heading}</h2>
             
-            <div className='grid grid-cols-[repeat(auto-fit,minmax(260px,300px))] justify-center md:justify-between md:gap-4 overflow-x-scroll scrollbar-none transition-all'>
+            {/* Mobile: Horizontal scroll, Desktop: Grid */}
+            <div className='flex overflow-x-auto gap-3 pb-4 sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4 md:gap-6 sm:justify-items-center scrollbar-hide'>
                 {data.map((product, index) => (
-                    <Link key={product._id} to={`/product/${product._id}`} className='w-full min-w-[260px] md:min-w-[300px] max-w-[260px] md:max-w-[300px] bg-white rounded-sm shadow hover:shadow-lg transition-shadow'>
+                    <Link key={product._id} to={`/product/${product._id}`} className='flex-shrink-0 w-[160px] sm:w-full sm:max-w-[280px] bg-white rounded-lg shadow hover:shadow-lg transition-all duration-300 transform hover:scale-105'>
                         <div 
-                            className='bg-slate-200 h-48 p-4 min-w-[260px] md:min-w-[300px] flex justify-center items-center relative group'
+                            className='bg-slate-200 h-32 sm:h-48 p-2 sm:p-4 flex justify-center items-center relative group rounded-t-lg'
                             onMouseEnter={() => setHoveredProduct(product._id)}
                             onMouseLeave={() => setHoveredProduct(null)}
                         >
-                            <img 
-                                src={hoveredProduct === product._id && product.productImage.length > 1 
+                            {/* Discount badge like in the image */}
+                            {product.price && product.sellingPrice && product.price > product.sellingPrice && (
+                                <div className='absolute top-1 left-1 bg-red-600 text-white text-xs px-1 py-0.5 rounded z-10'>
+                                    -{Math.round(((product.price - product.sellingPrice) / product.price) * 100)}%
+                                </div>
+                            )}
+                            <LazyImage 
+                                src={hoveredProduct === product._id && product.productImage?.length > 1 
                                     ? product.productImage[currentImageIndex[product._id] || 1] || product.productImage[0]
-                                    : product.productImage[0]
+                                    : product.productImage?.[0]
                                 } 
                                 alt={product.productName}
-                                loading="lazy"
                                 className='object-scale-down h-full hover:scale-110 transition-all mix-blend-multiply'
-                                onError={(e) => {
-                                    e.target.src = '/placeholder-image.png'; // Fallback image
-                                }}
+                                fallbackSrc='/api/placeholder/300/300'
                             />
                             
                             {/* Image indicators for products with multiple images */}
@@ -118,53 +137,45 @@ const VerticalCardProduct = memo(({ category, heading }) => {
                                 </div>
                             )}
                         </div>
-                        <div className='p-4 grid gap-3'>
-                            <h2 className='font-medium text-base md:text-lg text-ellipsis line-clamp-1 text-black'>
+                        <div className='p-2 sm:p-4 grid gap-1 sm:gap-3'>
+                            <h2 className='font-medium text-xs sm:text-base md:text-lg text-ellipsis line-clamp-1 text-black'>
                                 {product.productName}
                             </h2>
-                            <p className='capitalize text-slate-500'>{product.category}</p>
-                            <div className='flex gap-3'>
-                                <p className='text-red-600 font-medium'>
+                            <div className='flex gap-1 sm:gap-3 flex-wrap'>
+                                <p className='text-red-600 font-medium text-xs sm:text-base'>
                                     {product.displayPricing?.formatted?.sellingPrice || formatPrice(product.sellingPrice)}
                                 </p>
-                                <p className='text-slate-500 line-through'>
-                                    {product.displayPricing?.formatted?.originalPrice || formatPrice(product.price)}
-                                </p>
+                                {product.price && product.sellingPrice && product.price > product.sellingPrice && (
+                                    <p className='text-slate-500 line-through text-xs sm:text-base'>
+                                        {product.displayPricing?.formatted?.originalPrice || formatPrice(product.price)}
+                                    </p>
+                                )}
                             </div>
-                            {product.originalCurrency && product.displayPricing?.currency && 
-                             product.originalCurrency !== product.displayPricing.currency && (
-                                <p className='text-xs text-gray-400'>
-                                    Original: {product.originalCurrency} • Converted from seller's local price
+                            
+                            {/* Stock indicator with progress bar like in the image */}
+                            <div className='space-y-1'>
+                                <p className='text-xs text-orange-600 font-medium'>
+                                    {product.stock > 0 ? `${product.stock} items left` : 'In Stock'}
                                 </p>
-                            )}
-                            
-                            {/* Stock indicator */}
-                            {product.stock !== undefined && (
-                                <div className="text-xs">
-                                    {product.stock === 0 ? (
-                                        <span className="text-red-600 font-semibold">⚠️ Out of Stock</span>
-                                    ) : product.stock <= 5 ? (
-                                        <span className="text-orange-600 font-semibold">🔥 Only {product.stock} left!</span>
-                                    ) : product.stock <= 10 ? (
-                                        <span className="text-yellow-600 font-medium">⚡ {product.stock} in stock</span>
-                                    ) : (
-                                        <span className="text-green-600">✓ In Stock</span>
-                                    )}
+                                {/* Stock progress bar */}
+                                <div className='w-full bg-gray-200 rounded-full h-1'>
+                                    <div 
+                                        className={`h-1 rounded-full ${
+                                            product.stock > 20 ? 'bg-green-500' : 
+                                            product.stock > 10 ? 'bg-yellow-500' : 'bg-red-500'
+                                        }`}
+                                        style={{ width: `${Math.min((product.stock / 50) * 100, 100)}%` }}
+                                    ></div>
                                 </div>
-                            )}
+                            </div>
                             
-                            {/* Social features */}
-                            <SocialFeatures product={product} compact={true} />
+                            {/* Mobile: Compact social features, Desktop: Full */}
+                            <div className='hidden sm:block'>
+                                <SocialFeatures product={product} compact={true} />
+                            </div>
                             
-                            <button 
-                                className={`text-sm px-3 py-0.5 rounded-full transition-colors ${
-                                    product.stock === 0 
-                                        ? 'bg-gray-400 cursor-not-allowed text-white' 
-                                        : 'bg-red-600 hover:bg-red-700 text-white'
-                                }`}
-                                disabled={product.stock === 0}
-                            >
-                                {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                            <button className='text-xs sm:text-sm bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-3 sm:py-0.5 rounded-full'>
+                                Add to Cart
                             </button>
                         </div>
                     </Link>

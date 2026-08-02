@@ -12,6 +12,7 @@ const { checkDatabaseConnection, handleDatabaseError } = require('../middleware/
 const { checkMaintenanceMode } = require('../middleware/maintenanceMiddleware');
 const { getMaintenanceStatus } = require('../controller/maintenanceController');
 const getProductController = require('../controller/getProduct');
+const getProductsLiteController = require('../controller/getProductsLite');
 const getSingleProductController = require('../controller/getSingleProduct');
 const addProductController = require('../controller/addProduct');
 const buyProductController = require('../controller/buyProduct');
@@ -170,6 +171,7 @@ router.post('/reset-password', resetPasswordController);
 
 // Product routes
 router.get('/get-product', checkMaintenanceMode, getProductController);
+router.get('/get-products-lite', checkMaintenanceMode, getProductsLiteController); // Fast loading endpoint
 router.get('/product/:productId', checkMaintenanceMode, getSingleProductController);
 router.post('/add-product', checkMaintenanceMode, authToken, addProductController);
 router.get('/user-products', checkMaintenanceMode, authToken, getUserProductsController);
