@@ -44,7 +44,10 @@ async function authToken(req, res, next) {
                 if (err.name !== 'TokenExpiredError') {
                     console.log("JWT auth error:", err.name, err.message);
                 }
-                
+
+                // Clear any invalid token cookie so the browser stops resending it.
+                res.clearCookie('token');
+
                 return res.status(401).json({
                     message: "Invalid authentication token. Please log in again to access your account.",
                     error: true,
