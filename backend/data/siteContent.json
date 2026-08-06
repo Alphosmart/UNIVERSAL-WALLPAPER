@@ -6,7 +6,31 @@
       "primaryButtonText": "Shop Now",
       "primaryButtonLink": "/products",
       "secondaryButtonText": "Learn More",
-      "secondaryButtonLink": "/about-us"
+      "secondaryButtonLink": "/about-us",
+      "slides": [
+        {
+          "type": "image",
+          "src": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1800&h=1000&fit=crop",
+          "alt": "Warm contemporary living room with a statement wall",
+          "label": "Rooms with character",
+          "isActive": true
+        },
+        {
+          "type": "video",
+          "src": "https://videos.pexels.com/video-files/7578552/7578552-hd_1920_1080_30fps.mp4",
+          "poster": "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=1800&h=1000&fit=crop",
+          "alt": "A refined modern interior",
+          "label": "See design come alive",
+          "isActive": true
+        },
+        {
+          "type": "image",
+          "src": "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=1800&h=1000&fit=crop",
+          "alt": "Elegant interior with patterned wall covering",
+          "label": "Made for your style",
+          "isActive": true
+        }
+      ]
     },
     "featuredProducts": {
       "title": "Featured Products",

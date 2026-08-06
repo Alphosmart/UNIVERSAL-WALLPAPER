@@ -8,16 +8,16 @@ const passwordResetTokens = new Map();
 
 // Configure email transporter (you'll need to update with your email service)
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // or your email service
+    service: 'gmail',
     auth: {
-        user: process.env.EMAIL_USER || 'your-email@gmail.com',
-        pass: process.env.EMAIL_PASS || 'your-app-password'
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
     }
 });
 
 async function forgotPasswordController(req, res) {
     try {
-        const { email } = req.body;
+        const email = req.body.email?.trim().toLowerCase();
 
         if (!email) {
             throw new Error("Please provide email");
@@ -47,15 +47,24 @@ async function forgotPasswordController(req, res) {
         const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}&email=${email}`;
 
         // Email content
+        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+            console.error('Password reset email is not configured: EMAIL_USER or EMAIL_PASSWORD is missing');
+            return res.status(503).json({
+                message: "Password reset email service is unavailable. Please contact support.",
+                error: true,
+                success: false
+            });
+        }
+
         const mailOptions = {
-            from: process.env.EMAIL_USER || 'your-email@gmail.com',
+            from: `Universal Wallpaper <${process.env.EMAIL_USER}>`,
             to: email,
-            subject: 'Password Reset Request - AshAmSmart',
+            subject: 'Reset your Universal Wallpaper password',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                     <h2 style="color: #333;">Password Reset Request</h2>
                     <p>Hello,</p>
-                    <p>We received a request to reset your password for your AshAmSmart account.</p>
+                    <p>We received a request to reset your Universal Wallpaper account password.</p>
                     <p>Click the button below to reset your password:</p>
                     <div style="text-align: center; margin: 30px 0;">
                         <a href="${resetUrl}" 
@@ -69,24 +78,19 @@ async function forgotPasswordController(req, res) {
                     <p>If you didn't request this password reset, please ignore this email.</p>
                     <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
                     <p style="color: #666; font-size: 12px;">
-                        This email was sent from AshAmSmart. Please do not reply to this email.
+                        This email was sent by Universal Wallpaper. If you did not request it, you can safely ignore it.
                     </p>
                 </div>
             `
         };
 
-        // Send email (for demo purposes, we'll just log it)
-        // In production, uncomment the line below:
-        // await transporter.sendMail(mailOptions);
-        
-        console.log('Password reset email would be sent to:', email);
-        console.log('Reset URL:', resetUrl);
+        // Only report success after the mail provider accepts the message.
+        await transporter.sendMail(mailOptions);
+        console.log('Password reset email accepted for delivery to:', email);
 
         res.json({
             data: {
-                message: "Password reset email sent successfully",
-                // For demo purposes, include the reset URL in response
-                resetUrl: resetUrl
+                message: "Password reset email sent successfully"
             },
             success: true,
             error: false,
@@ -94,8 +98,9 @@ async function forgotPasswordController(req, res) {
         });
 
     } catch (err) {
-        res.status(400).json({
-            message: err.message || err,
+        console.error('Unable to send password reset email:', err.message);
+        res.status(502).json({
+            message: "We could not send the reset email. Please try again or contact support.",
             error: true,
             success: false,
         });

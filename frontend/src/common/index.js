@@ -76,6 +76,10 @@ const SummaryApi = {
         url : `${backendDomain}/api/admin/update-user-role`,
         method : 'put'
     },
+    adminUser : { url : `${backendDomain}/api/admin/users`, method : 'get' },
+    adminUpdateUser : { url : `${backendDomain}/api/admin/users`, method : 'put' },
+    adminResetUserPassword : { url : `${backendDomain}/api/admin/users`, method : 'put' },
+    changeRequiredPassword : { url : `${backendDomain}/api/change-required-password`, method : 'put' },
     adminAllProducts : {
         url : `${backendDomain}/api/admin/all-products`,
         method : 'get'

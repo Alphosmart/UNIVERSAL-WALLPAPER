@@ -1,5 +1,5 @@
 import './App.css';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -18,6 +18,8 @@ import { CartProvider } from './context/CartContext';
 import { ProductProvider } from './context/ProductContext';
 
 function App() {
+  const location = useLocation()
+  const isAdminArea = location.pathname.startsWith('/admin-panel')
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(true)
   const userDetailsCachedRef = useRef(false)
@@ -161,10 +163,10 @@ function App() {
                 />
                 
                 <Header />
-                <main className='min-h-[calc(100vh-120px)] pt-16'>
+                <main className={isAdminArea ? 'h-screen overflow-hidden pt-16' : 'min-h-[calc(100vh-120px)] pt-16'}>
                   <Outlet />
                 </main>
-                <Footer />
+                {!isAdminArea && <Footer />}
               </CartProvider>
             </ProductProvider>
           </Context.Provider>

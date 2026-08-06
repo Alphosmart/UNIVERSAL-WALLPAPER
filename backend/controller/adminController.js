@@ -66,9 +66,9 @@ async function updateUserRole(req, res) {
         }
 
         // Validate role
-        if (!['GENERAL', 'ADMIN'].includes(role)) {
+        if (!['GENERAL', 'STAFF', 'ADMIN'].includes(role)) {
             return res.status(400).json({
-                message: "Invalid role. Must be GENERAL or ADMIN",
+                message: "Invalid role. Must be GENERAL, STAFF, or ADMIN",
                 error: true,
                 success: false
             });

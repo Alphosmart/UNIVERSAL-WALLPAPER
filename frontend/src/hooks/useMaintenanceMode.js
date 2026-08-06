@@ -1,14 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import SummaryApi from '../common';
 
 const useMaintenanceMode = () => {
     const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const isCheckingRef = useRef(false);
+    const hasLoadedRef = useRef(false);
 
-    const checkMaintenanceMode = useCallback(async () => {
+    const checkMaintenanceMode = useCallback(async (showLoading = false) => {
+        if (isCheckingRef.current) return;
+        isCheckingRef.current = true;
         try {
-            setIsLoading(true);
+            if (showLoading && !hasLoadedRef.current) setIsLoading(true);
             setError(null);
 
             // Add timeout for maintenance check
@@ -50,23 +54,25 @@ const useMaintenanceMode = () => {
             // On error, assume maintenance is off to prevent blocking users
             setIsMaintenanceMode(false);
         } finally {
+            hasLoadedRef.current = true;
+            isCheckingRef.current = false;
             setIsLoading(false);
         }
     }, []);
 
     useEffect(() => {
-        checkMaintenanceMode();
+        checkMaintenanceMode(true);
         
         // Check maintenance status every 5 minutes instead of 30 seconds to reduce API calls
         // and prevent potential refresh loops
-        const interval = setInterval(checkMaintenanceMode, 5 * 60 * 1000); // 5 minutes
+        const interval = setInterval(() => checkMaintenanceMode(false), 5 * 60 * 1000);
         
         return () => clearInterval(interval);
     }, [checkMaintenanceMode]);
 
     // Manual refresh function
     const refreshMaintenanceStatus = useCallback(() => {
-        checkMaintenanceMode();
+        checkMaintenanceMode(false);
     }, [checkMaintenanceMode]);
 
     return {

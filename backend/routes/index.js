@@ -6,6 +6,7 @@ const userSignUpController = require('../controller/userSignUp');
 const userSignInController = require('../controller/userSignin');
 const userDetailsController = require('../controller/userDetails');
 const updateProfile = require('../controller/updateProfile');
+const { getManagedUser, updateManagedUser, resetManagedUserPassword, changeRequiredPassword } = require('../controller/userManagementController');
 const authToken = require('../middleware/authToken');
 const userLogout = require('../controller/userLogout');
 const { checkDatabaseConnection, handleDatabaseError } = require('../middleware/databaseMiddleware');
@@ -157,6 +158,7 @@ router.post('/signin', checkDatabaseConnection, userSignInController);
 router.get('/user-details', checkDatabaseConnection, authToken, userDetailsController);
 // Profile routes - Protect during maintenance
 router.put('/update-profile', checkMaintenanceMode, checkDatabaseConnection, authToken, updateProfile);
+router.put('/change-required-password', checkDatabaseConnection, authToken, changeRequiredPassword);
 router.get('/user-preferences', checkMaintenanceMode, checkDatabaseConnection, authToken, getUserPreferences);
 router.put('/user-preferences', checkMaintenanceMode, checkDatabaseConnection, authToken, updateUserPreferences);
 router.get('/userLogout', userLogout);
@@ -211,6 +213,9 @@ router.post('/cart/sync', checkMaintenanceMode, authToken, syncCart);
 // Admin routes
 router.get('/admin/all-users', authToken, getAllUsers);
 router.put('/admin/update-user-role/:userId', authToken, updateUserRole);
+router.get('/admin/users/:userId', authToken, getManagedUser);
+router.put('/admin/users/:userId', authToken, updateManagedUser);
+router.put('/admin/users/:userId/reset-password', authToken, resetManagedUserPassword);
 router.get('/admin/all-products', authToken, getAllProductsAdmin);
 router.delete('/admin/delete-product/:productId', authToken, deleteProductAdmin);
 router.put('/admin/update-product-status/:productId', authToken, updateProductStatus);

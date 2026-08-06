@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FaPlus, FaEdit, FaTrash, FaEye, FaEyeSlash, FaArrowUp, FaArrowDown, FaImage } from 'react-icons/fa';
 import SummaryApi from '../common';
 import { toast } from 'react-toastify';
-import uploadImage from '../helper/uploadImage';
+import uploadHeroMedia from '../helper/uploadHeroMedia';
+import ExternalVideo from '../components/ExternalVideo';
 
 const BannerManagement = () => {
     const [banners, setBanners] = useState([]);
@@ -15,6 +16,8 @@ const BannerManagement = () => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
+        mediaType: 'image',
+        videoUrl: '',
         desktopImage: '',
         mobileImage: '',
         linkUrl: '',
@@ -46,6 +49,22 @@ const BannerManagement = () => {
         }
     };
 
+    const handleVideoUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            setUploading(true);
+            const videoUrl = await uploadHeroMedia(file);
+            setFormData(prev => ({ ...prev, mediaType: 'video', videoUrl }));
+            toast.success('Video uploaded successfully');
+        } catch (error) {
+            console.error('Video upload error:', error);
+            toast.error(error.message || 'Failed to upload video');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     useEffect(() => {
         fetchBanners();
     }, []);
@@ -57,7 +76,7 @@ const BannerManagement = () => {
 
         try {
             setUploading(true);
-            const uploadedImageUrl = await uploadImage(file);
+            const uploadedImageUrl = await uploadHeroMedia(file);
             
             setFormData(prev => ({
                 ...prev,
@@ -77,8 +96,8 @@ const BannerManagement = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        if (!formData.title || !formData.desktopImage || !formData.mobileImage) {
-            toast.error('Title, desktop image, and mobile image are required');
+        if (!formData.title || (formData.mediaType === 'image' && !formData.desktopImage) || (formData.mediaType === 'video' && !formData.videoUrl)) {
+            toast.error(formData.mediaType === 'video' ? 'Title and video are required' : 'Title and image are required');
             return;
         }
 
@@ -118,6 +137,8 @@ const BannerManagement = () => {
         setFormData({
             title: '',
             description: '',
+            mediaType: 'image',
+            videoUrl: '',
             desktopImage: '',
             mobileImage: '',
             linkUrl: '',
@@ -133,6 +154,8 @@ const BannerManagement = () => {
         setFormData({
             title: banner.title,
             description: banner.description || '',
+            mediaType: banner.mediaType || 'image',
+            videoUrl: banner.videoUrl || '',
             desktopImage: banner.desktopImage,
             mobileImage: banner.mobileImage,
             linkUrl: banner.linkUrl || '',
@@ -265,11 +288,11 @@ const BannerManagement = () => {
                 {banners.map((banner, index) => (
                     <div key={banner._id} className="bg-white rounded-lg shadow-md overflow-hidden">
                         <div className="relative">
-                            <img
-                                src={banner.desktopImage}
-                                alt={banner.title}
-                                className="w-full h-48 object-cover"
-                            />
+                            {banner.mediaType === 'video' ? (
+                                <ExternalVideo src={banner.videoUrl} poster={banner.desktopImage} controls className="w-full h-48 object-cover bg-black" title={banner.title} />
+                            ) : (
+                                <img src={banner.desktopImage} alt={banner.title} className="w-full h-48 object-cover" />
+                            )}
                             <div className="absolute top-2 right-2 flex space-x-2">
                                 <button
                                     onClick={() => toggleBannerStatus(banner._id)}
@@ -380,6 +403,18 @@ const BannerManagement = () => {
                     </div>
 
                     <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Media Type *</label>
+                        <select
+                            value={formData.mediaType}
+                            onChange={(e) => setFormData({...formData, mediaType: e.target.value})}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="image">Image</option>
+                            <option value="video">Video</option>
+                        </select>
+                    </div>
+
+                    <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Description
                         </label>
@@ -391,10 +426,11 @@ const BannerManagement = () => {
                         />
                     </div>
 
+                    {formData.mediaType === 'image' ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Desktop Image *
+                                Hero Image *
                             </label>
                             <input
                                 type="file"
@@ -413,7 +449,7 @@ const BannerManagement = () => {
 
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Mobile Image *
+                                Mobile Image (optional)
                             </label>
                             <input
                                 type="file"
@@ -430,6 +466,17 @@ const BannerManagement = () => {
                             )}
                         </div>
                     </div>
+                    ) : (
+                        <div className="space-y-3">
+                            <label className="block text-sm font-medium text-gray-700">Hero Video *</label>
+                            <input type="file" accept="video/mp4,video/webm,video/ogg" onChange={handleVideoUpload} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            <input type="url" value={formData.videoUrl} onChange={(e) => setFormData({...formData, videoUrl: e.target.value})} className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="YouTube, Vimeo, Cloudinary, MP4 or WebM URL" />
+                            <p className="text-xs text-gray-500">Supported: YouTube watch/share/Shorts links, Vimeo, Cloudinary, and direct hosted video links.</p>
+                            {formData.videoUrl && <ExternalVideo src={formData.videoUrl} poster={formData.desktopImage} controls className="w-full h-48 rounded bg-black object-cover" title="Video preview" />}
+                            <label className="block text-sm font-medium text-gray-700">Poster image (optional)</label>
+                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, 'desktopImage')} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                        </div>
+                    )}
 
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">

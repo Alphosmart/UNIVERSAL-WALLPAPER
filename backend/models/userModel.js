@@ -9,6 +9,11 @@ const userSchema = new mongoose.Schema({
         required : true,
     },
     password : String,
+    mustChangePassword: {
+        type: Boolean,
+        default: false
+    },
+    temporaryPasswordSetAt: Date,
     profilePic : String,
     phone : String,
     address : {

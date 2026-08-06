@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { toast } from 'react-toastify';
 import SummaryApi from '../common';
+import { DEFAULT_HERO_SLIDES } from '../components/HeroMediaCarousel';
+import uploadHeroMedia from '../helper/uploadHeroMedia';
+import BannerManagement from './BannerManagement';
 
 const SiteContentManagement = () => {
     const isLoadingData = useRef(false);
@@ -15,7 +18,8 @@ const SiteContentManagement = () => {
                 primaryButtonText: "Shop Now",
                 primaryButtonLink: "/products",
                 secondaryButtonText: "Learn More",
-                secondaryButtonLink: "/about-us"
+                secondaryButtonLink: "/about-us",
+                slides: DEFAULT_HERO_SLIDES
             },
             featuredProducts: {
                 title: "Featured Products",
@@ -162,6 +166,7 @@ const SiteContentManagement = () => {
         return 'homePage';
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [uploadingHeroSlide, setUploadingHeroSlide] = useState(null);
 
     // Load content data from backend only once
     useEffect(() => {
@@ -181,7 +186,21 @@ const SiteContentManagement = () => {
                 const data = await response.json();
                 
                 if (data.success && data.data && Object.keys(data.data).length > 0) {
-                    setContentData(prev => ({ ...prev, ...data.data }));
+                    setContentData(prev => ({
+                        ...prev,
+                        ...data.data,
+                        homePage: {
+                            ...prev.homePage,
+                            ...(data.data.homePage || {}),
+                            hero: {
+                                ...prev.homePage.hero,
+                                ...(data.data.homePage?.hero || {}),
+                                slides: Array.isArray(data.data.homePage?.hero?.slides)
+                                    ? data.data.homePage.hero.slides
+                                    : DEFAULT_HERO_SLIDES
+                            }
+                        }
+                    }));
                 }
             } catch (error) {
                 console.error('Error loading content data:', error);
@@ -266,6 +285,45 @@ const SiteContentManagement = () => {
                 }
             }
         }));
+    };
+
+    const updateHeroSlides = (slides) => {
+        updateNestedContentData('homePage', 'hero', 'slides', slides);
+    };
+
+    const updateHeroSlide = (index, field, value) => {
+        const slides = [...(contentData.homePage?.hero?.slides || [])];
+        slides[index] = { ...slides[index], [field]: value };
+        updateHeroSlides(slides);
+    };
+
+    const moveHeroSlide = (index, direction) => {
+        const slides = [...(contentData.homePage?.hero?.slides || [])];
+        const target = index + direction;
+        if (target < 0 || target >= slides.length) return;
+        [slides[index], slides[target]] = [slides[target], slides[index]];
+        updateHeroSlides(slides);
+    };
+
+    const handleHeroMediaUpload = async (index, file) => {
+        if (!file) return;
+        try {
+            setUploadingHeroSlide(index);
+            const mediaUrl = await uploadHeroMedia(file);
+            const slides = [...(contentData.homePage?.hero?.slides || [])];
+            slides[index] = {
+                ...slides[index],
+                src: mediaUrl,
+                type: file.type.startsWith('video/') ? 'video' : 'image'
+            };
+            updateHeroSlides(slides);
+            toast.success('Hero media uploaded. Save Home Page Content to publish it.');
+        } catch (error) {
+            console.error('Hero media upload failed:', error);
+            toast.error(error.message || 'Failed to upload hero media');
+        } finally {
+            setUploadingHeroSlide(null);
+        }
     };
 
     const updateFeaturedProductIds = (value) => {
@@ -936,6 +994,98 @@ const SiteContentManagement = () => {
                                                 />
                                             </div>
                                         </div>
+
+                                        <div className="border-t pt-5">
+                                            <div className="mb-4 rounded-lg bg-blue-50 p-4 text-sm text-blue-800">
+                                                Hero images and videos are shared with Banner Management. Changes made here update the live homepage carousel.
+                                            </div>
+                                            <BannerManagement />
+                                        </div>
+
+                                        {false && <div className="border-t pt-5">
+                                            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                                                <div>
+                                                    <h4 className="font-medium text-gray-800">Hero carousel media</h4>
+                                                    <p className="text-xs text-gray-500">Add image or direct MP4/WebM video URLs. The first active slide appears first.</p>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateHeroSlides([...(contentData.homePage?.hero?.slides || []), { type: 'image', src: '', poster: '', label: '', alt: '', isActive: true }])}
+                                                    className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                                                >
+                                                    + Add slide
+                                                </button>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                {(contentData.homePage?.hero?.slides || []).map((slide, index) => (
+                                                    <div key={index} className="rounded-lg border bg-gray-50 p-4">
+                                                        <div className="mb-3 flex items-center justify-between gap-3">
+                                                            <span className="text-sm font-semibold text-gray-700">Slide {index + 1}</span>
+                                                            <div className="flex gap-2">
+                                                                <button type="button" onClick={() => moveHeroSlide(index, -1)} disabled={index === 0} className="rounded border bg-white px-2 py-1 text-xs disabled:opacity-40" aria-label={`Move slide ${index + 1} up`}>↑</button>
+                                                                <button type="button" onClick={() => moveHeroSlide(index, 1)} disabled={index === (contentData.homePage?.hero?.slides || []).length - 1} className="rounded border bg-white px-2 py-1 text-xs disabled:opacity-40" aria-label={`Move slide ${index + 1} down`}>↓</button>
+                                                                <button type="button" onClick={() => updateHeroSlides((contentData.homePage?.hero?.slides || []).filter((_, slideIndex) => slideIndex !== index))} className="rounded border border-red-200 bg-white px-2 py-1 text-xs text-red-600 hover:bg-red-50">Remove</button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                                            <div>
+                                                                <label className="mb-1 block text-xs font-medium text-gray-600">Media type</label>
+                                                                <select value={slide.type || 'image'} onChange={(e) => updateHeroSlide(index, 'type', e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                                                                    <option value="image">Image</option>
+                                                                    <option value="video">Video</option>
+                                                                </select>
+                                                            </div>
+                                                            <div>
+                                                                <label className="mb-1 block text-xs font-medium text-gray-600">Short label</label>
+                                                                <input type="text" value={slide.label || ''} onChange={(e) => updateHeroSlide(index, 'label', e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" placeholder="Rooms with character" />
+                                                            </div>
+                                                            <div className="md:col-span-2">
+                                                                <label className="mb-1 block text-xs font-medium text-gray-600">{slide.type === 'video' ? 'Video URL' : 'Image URL'}</label>
+                                                                <input type="url" value={slide.src || ''} onChange={(e) => updateHeroSlide(index, 'src', e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" placeholder="https://..." />
+                                                            </div>
+                                                            <div className="md:col-span-2">
+                                                                <label className="mb-1 block text-xs font-medium text-gray-600">Upload or replace media</label>
+                                                                <input
+                                                                    type="file"
+                                                                    accept="image/*,video/mp4,video/webm,video/ogg"
+                                                                    disabled={uploadingHeroSlide !== null}
+                                                                    onChange={(e) => handleHeroMediaUpload(index, e.target.files?.[0])}
+                                                                    className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-blue-700"
+                                                                />
+                                                                <p className="mt-1 text-xs text-gray-500">Images up to 5MB; videos up to 50MB.</p>
+                                                                {uploadingHeroSlide === index && <p className="mt-2 text-sm font-medium text-blue-600">Uploading media…</p>}
+                                                            </div>
+                                                            {slide.src && (
+                                                                <div className="md:col-span-2">
+                                                                    {slide.type === 'video' ? (
+                                                                        <video src={slide.src} poster={slide.poster} controls muted className="h-44 w-full rounded-lg bg-black object-cover" />
+                                                                    ) : (
+                                                                        <img src={slide.src} alt={slide.alt || `Slide ${index + 1} preview`} className="h-44 w-full rounded-lg bg-gray-100 object-cover" />
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                            {slide.type === 'video' && (
+                                                                <div className="md:col-span-2">
+                                                                    <label className="mb-1 block text-xs font-medium text-gray-600">Video poster image URL</label>
+                                                                    <input type="url" value={slide.poster || ''} onChange={(e) => updateHeroSlide(index, 'poster', e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" placeholder="https://..." />
+                                                                </div>
+                                                            )}
+                                                            <div className="md:col-span-2">
+                                                                <label className="mb-1 block text-xs font-medium text-gray-600">Accessibility description</label>
+                                                                <input type="text" value={slide.alt || ''} onChange={(e) => updateHeroSlide(index, 'alt', e.target.value)} className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm" placeholder="Describe the room or scene" />
+                                                            </div>
+                                                        </div>
+
+                                                        <label className="mt-3 inline-flex items-center gap-2 text-sm text-gray-700">
+                                                            <input type="checkbox" checked={slide.isActive !== false} onChange={(e) => updateHeroSlide(index, 'isActive', e.target.checked)} className="rounded border-gray-300 text-blue-600" />
+                                                            Active on homepage
+                                                        </label>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>}
                                     </div>
                                 </div>
 

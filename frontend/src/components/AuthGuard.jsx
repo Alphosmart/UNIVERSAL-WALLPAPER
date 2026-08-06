@@ -11,6 +11,9 @@ export const ProtectedRoute = ({ children }) => {
     // Redirect to login with the attempted location
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
+  if (user.mustChangePassword && location.pathname !== '/change-password') {
+    return <Navigate to="/change-password" replace />;
+  }
   
   return children;
 };
@@ -37,6 +40,9 @@ export const AdminRoute = ({ children }) => {
   
   if (!user?._id) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  if (user.mustChangePassword) {
+    return <Navigate to="/change-password" replace />;
   }
   
   if (user?.role !== 'ADMIN') {

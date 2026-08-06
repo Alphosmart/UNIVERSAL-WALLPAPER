@@ -13,17 +13,22 @@ export const useProducts = () => {
 };
 
 export const ProductProvider = ({ children }) => {
-  console.log('🔍 ProductProvider: Initializing at', new Date().toISOString());
-  
   const user = useSelector(state => state?.user?.user);
   const [allProducts, setAllProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [lastFetch, setLastFetch] = useState(null);
   const [error, setError] = useState(null);
   const allProductsRef = useRef([]);
+  const lastFetchRef = useRef(null);
+  const hasFetchedProductsRef = useRef(false);
+  const didLogInitializeRef = useRef(false);
   const [currentCurrency, setCurrentCurrency] = useState('NGN');
+  const debugLog = (...args) => { if (process.env.NODE_ENV !== 'production') console.log(...args); };
 
-  console.log('🔍 ProductProvider: Initial state set. User:', user?.name || 'Not logged in');
+  if (!didLogInitializeRef.current) {
+    debugLog('🔍 ProductProvider: Initializing at', new Date().toISOString());
+    debugLog('🔍 ProductProvider: Initial state set. User:', user?.name || 'Not logged in');
+    didLogInitializeRef.current = true;
+  }
 
   // Cache products for 5 minutes
   const CACHE_DURATION = 5 * 60 * 1000;
@@ -60,7 +65,7 @@ export const ProductProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.log('Could not load user currency preferences:', error);
+        debugLog('Could not load user currency preferences:', error);
         // Fallback to localStorage or default
         const savedCurrency = localStorage.getItem('userCurrency');
         if (savedCurrency) {
@@ -73,20 +78,20 @@ export const ProductProvider = ({ children }) => {
   }, [user]);
 
   const fetchAllProducts = useCallback(async (forceRefresh = false, currency = null, useLite = true) => {
-    console.log('🔍 ProductContext: fetchAllProducts called', { forceRefresh, currency, useLite, currentProducts: allProductsRef.current.length });
+    debugLog('🔍 ProductContext: fetchAllProducts called', { forceRefresh, currency, useLite, currentProducts: allProductsRef.current.length });
     
     // Get user's preferred currency
     const userCurrency = currency || currentCurrency;
     
     // Check if we have recent data and don't need to refetch
-    if (!forceRefresh && allProductsRef.current.length > 0 && lastFetch && 
-        (Date.now() - lastFetch < CACHE_DURATION)) {
-      console.log('🔍 ProductContext: Using cached data', allProductsRef.current.length, 'products');
+    if (!forceRefresh && allProductsRef.current.length > 0 && lastFetchRef.current && 
+        (Date.now() - lastFetchRef.current < CACHE_DURATION)) {
+      debugLog('🔍 ProductContext: Using cached data', allProductsRef.current.length, 'products');
       return allProductsRef.current;
     }
 
     try {
-      console.log('🔍 ProductContext: Starting API fetch');
+      debugLog('🔍 ProductContext: Starting API fetch');
       setLoading(true);
       setError(null);
       
@@ -103,7 +108,7 @@ export const ProductProvider = ({ children }) => {
         url.searchParams.append('page', '1');
       }
       
-      console.log('🔍 ProductContext: Fetching from URL:', url.toString());
+      debugLog('🔍 ProductContext: Fetching from URL:', url.toString());
       const response = await fetch(url.toString(), {
         method: apiEndpoint.method,
         credentials: 'include',
@@ -112,45 +117,48 @@ export const ProductProvider = ({ children }) => {
         }
       });
 
-      console.log('🔍 ProductContext: API response status:', response.status);
+      debugLog('🔍 ProductContext: API response status:', response.status);
       const dataResponse = await response.json();
-      console.log('🔍 ProductContext: API response data:', { success: dataResponse.success, count: dataResponse.data?.length });
+      debugLog('🔍 ProductContext: API response data:', { success: dataResponse.success, count: dataResponse.data?.length });
 
       if (dataResponse.success) {
-        console.log('🔍 ProductContext: Success! Setting', dataResponse.data.length, 'products');
+        debugLog('🔍 ProductContext: Success! Setting', dataResponse.data.length, 'products');
         setAllProducts(dataResponse.data);
         allProductsRef.current = dataResponse.data;
-        setLastFetch(Date.now());
+        lastFetchRef.current = Date.now();
+        hasFetchedProductsRef.current = true;
         if (dataResponse.currency) {
           setCurrentCurrency(dataResponse.currency);
         }
         return dataResponse.data;
       } else {
-        console.log('🔍 ProductContext: API returned error:', dataResponse.message);
+        debugLog('🔍 ProductContext: API returned error:', dataResponse.message);
         setError(dataResponse.message || 'Failed to fetch products');
         return [];
       }
     } catch (error) {
       console.error('🔍 ProductContext: Fetch error:', error);
       setError(error.message);
+      hasFetchedProductsRef.current = true;
       return [];
     } finally {
       setLoading(false);
+      hasFetchedProductsRef.current = true;
     }
-  }, [lastFetch, CACHE_DURATION, currentCurrency]);
+  }, [CACHE_DURATION, currentCurrency]);
 
   const getProductsByCategory = useCallback((category) => {
-    console.log('🔍 ProductContext: getProductsByCategory called', { category, totalProducts: allProductsRef.current.length });
+    debugLog('🔍 ProductContext: getProductsByCategory called', { category, totalProducts: allProductsRef.current.length });
     
     if (!category || category === 'all') {
-      console.log('🔍 ProductContext: Returning all products:', allProductsRef.current.length);
+      debugLog('🔍 ProductContext: Returning all products:', allProductsRef.current.length);
       return allProductsRef.current;
     }
     
     const filtered = allProductsRef.current.filter(product => 
       product.category?.toLowerCase() === category?.toLowerCase()
     );
-    console.log('🔍 ProductContext: Filtered products for category', category, ':', filtered.length);
+    debugLog('🔍 ProductContext: Filtered products for category', category, ':', filtered.length);
     return filtered;
   }, []); // No dependencies needed since we use ref
 
@@ -160,20 +168,24 @@ export const ProductProvider = ({ children }) => {
 
   // Auto-fetch on mount and when currency changes
   useEffect(() => {
-    console.log('🔍 ProductContext: useEffect triggered', { 
+    debugLog('🔍 ProductContext: useEffect triggered', { 
       currentProducts: allProductsRef.current.length,
+      hasFetchedProducts: hasFetchedProductsRef.current,
       timestamp: new Date().toISOString(),
       fetchAllProductsRef: !!fetchAllProducts
     });
-    if (allProductsRef.current.length === 0) {
-      console.log('🔍 ProductContext: No products found, calling fetchAllProducts...');
+
+    if (allProductsRef.current.length === 0 && !hasFetchedProductsRef.current) {
+      debugLog('🔍 ProductContext: No products found and fetch not attempted yet, calling fetchAllProducts...');
       fetchAllProducts().then((products) => {
-        console.log('🔍 ProductContext: fetchAllProducts completed with', products?.length || 0, 'products');
+        debugLog('🔍 ProductContext: fetchAllProducts completed with', products?.length || 0, 'products');
       }).catch((error) => {
         console.error('🔍 ProductContext: fetchAllProducts failed:', error);
       });
+    } else if (allProductsRef.current.length === 0 && hasFetchedProductsRef.current) {
+      debugLog('🔍 ProductContext: Products are empty but initial fetch already completed, skipping auto-fetch');
     } else {
-      console.log('🔍 ProductContext: Already have', allProductsRef.current.length, 'products, skipping fetch');
+      debugLog('🔍 ProductContext: Already have', allProductsRef.current.length, 'products, skipping fetch');
     }
   }, [fetchAllProducts]);
 
@@ -201,7 +213,7 @@ export const ProductProvider = ({ children }) => {
         const updatedProducts = [...allProductsRef.current, ...dataResponse.data];
         setAllProducts(updatedProducts);
         allProductsRef.current = updatedProducts;
-        console.log('🔍 ProductContext: Loaded', dataResponse.data.length, 'more products. Total:', updatedProducts.length);
+        debugLog('🔍 ProductContext: Loaded', dataResponse.data.length, 'more products. Total:', updatedProducts.length);
         return dataResponse.pagination;
       }
       return null;
@@ -215,7 +227,7 @@ export const ProductProvider = ({ children }) => {
   }, [currentCurrency]);
 
   const changeCurrency = useCallback((newCurrency) => {
-    console.log('🔍 ProductContext: changeCurrency called', newCurrency);
+    debugLog('🔍 ProductContext: changeCurrency called', newCurrency);
     setCurrentCurrency(newCurrency);
     // Force refresh with new currency
     fetchAllProducts(true, newCurrency);
