@@ -47,6 +47,7 @@ import StaffManagement from '../pages/StaffManagement';
 import EmailTemplateManager from '../components/EmailTemplateManager';
 import PaymentConfiguration from '../pages/PaymentConfiguration';
 import DevLogin from '../pages/DevLogin';
+import ChangeRequiredPassword from '../pages/ChangeRequiredPassword';
 import { ProtectedRoute, GuestRoute, AdminRoute } from '../components/AuthGuard';
 
 
@@ -84,6 +85,11 @@ const router = createBrowserRouter([
             {
                 path: "reset-password",
                 element: <GuestRoute><ResetPassword /></GuestRoute>,
+                errorElement: <ErrorPage />
+            },
+            {
+                path: "change-password",
+                element: <ProtectedRoute><ChangeRequiredPassword /></ProtectedRoute>,
                 errorElement: <ErrorPage />
             },
             {

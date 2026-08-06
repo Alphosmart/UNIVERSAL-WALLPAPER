@@ -28,7 +28,7 @@ async function userDetailsController(req, res) {
             throw new Error("Invalid user ID format");
         }
 
-        const user = await User.findById(req.userId);
+        const user = await User.findById(req.userId).select('-password');
 
         if (!user) {
             throw new Error("User not found");

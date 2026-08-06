@@ -12,13 +12,22 @@ const bannerSchema = mongoose.Schema({
         trim: true,
         maxlength: 200
     },
+    mediaType: {
+        type: String,
+        enum: ['image', 'video'],
+        default: 'image'
+    },
+    videoUrl: {
+        type: String,
+        default: ''
+    },
     desktopImage: {
         type: String,
-        required: true
+        default: ''
     },
     mobileImage: {
         type: String,
-        required: true
+        default: ''
     },
     linkUrl: {
         type: String,

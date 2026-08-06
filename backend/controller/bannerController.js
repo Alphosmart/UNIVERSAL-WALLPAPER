@@ -1,6 +1,14 @@
 const bannerModel = require('../models/bannerModel')
 const userModel = require('../models/userModel')
-const uploadImage = require('../helper/uploadImage')
+const isWebUrl = (value) => typeof value === 'string' && /^https?:\/\//i.test(value)
+
+const validateMediaLinks = ({ mediaType = 'image', videoUrl = '', desktopImage = '', mobileImage = '' }) => {
+    if (mediaType === 'video' && !isWebUrl(videoUrl)) return 'Video must be a valid web or Cloudinary URL'
+    if (mediaType === 'image' && !isWebUrl(desktopImage)) return 'Image must be a valid web or Cloudinary URL'
+    if (desktopImage && !isWebUrl(desktopImage)) return 'Poster image must be a valid web or Cloudinary URL'
+    if (mobileImage && !isWebUrl(mobileImage)) return 'Mobile image must be a valid web or Cloudinary URL'
+    return null
+}
 
 // Get all active banners for display
 async function getBanners(req, res) {
@@ -55,6 +63,8 @@ async function addBanner(req, res) {
         const { 
             title, 
             description, 
+            mediaType = 'image',
+            videoUrl = '',
             desktopImage, 
             mobileImage, 
             linkUrl, 
@@ -62,19 +72,24 @@ async function addBanner(req, res) {
             order = 0 
         } = req.body
 
-        if (!title || !desktopImage || !mobileImage) {
+        if (!title || (mediaType === 'image' && !desktopImage) || (mediaType === 'video' && !videoUrl)) {
             return res.status(400).json({
-                message: "Title, desktop image, and mobile image are required",
+                message: mediaType === 'video' ? "Title and video are required" : "Title and image are required",
                 error: true,
                 success: false
             })
         }
 
+        const mediaError = validateMediaLinks({ mediaType, videoUrl, desktopImage, mobileImage })
+        if (mediaError) return res.status(400).json({ message: mediaError, error: true, success: false })
+
         const banner = new bannerModel({
             title,
             description,
-            desktopImage,
-            mobileImage,
+            mediaType,
+            videoUrl,
+            desktopImage: desktopImage || '',
+            mobileImage: mobileImage || desktopImage || '',
             linkUrl,
             isActive,
             order,
@@ -103,6 +118,8 @@ async function updateBanner(req, res) {
     try {
         const { bannerId } = req.params
         const updateData = { ...req.body }
+        const mediaError = validateMediaLinks(updateData)
+        if (mediaError) return res.status(400).json({ message: mediaError, error: true, success: false })
         updateData.updatedAt = new Date()
 
         const updatedBanner = await bannerModel.findByIdAndUpdate(

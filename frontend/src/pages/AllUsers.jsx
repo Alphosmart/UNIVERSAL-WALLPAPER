@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { FaEdit, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaDownload, FaCalendarAlt, FaUserCheck, FaUserTimes } from 'react-icons/fa';
+import { FaEdit, FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaDownload, FaCalendarAlt, FaUserCheck, FaUserTimes, FaKey } from 'react-icons/fa';
 import SummaryApi from '../common';
 
 const AllUsers = () => {
@@ -25,6 +25,39 @@ const AllUsers = () => {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('desc');
   const [exportFormat, setExportFormat] = useState('csv');
+  const [userModal, setUserModal] = useState(null);
+  const [userForm, setUserForm] = useState(null);
+  const [temporaryPassword, setTemporaryPassword] = useState('');
+  const [savingUser, setSavingUser] = useState(false);
+
+  const openUserModal = (mode, user) => {
+    setUserModal({ mode, user });
+    setUserForm(JSON.parse(JSON.stringify(user)));
+    setTemporaryPassword('');
+  };
+
+  const saveUser = async () => {
+    setSavingUser(true);
+    try {
+      const response = await fetch(`${SummaryApi.adminUpdateUser.url}/${userModal.user._id}`, { method: 'put', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: userForm.name, phone: userForm.phone || '', address: userForm.address || {} }) });
+      const result = await response.json();
+      if (!result.success) return toast.error(result.message);
+      toast.success('User updated successfully'); setUserModal(null); fetchAllUsers();
+    } catch (_) { toast.error('Unable to update user'); }
+    finally { setSavingUser(false); }
+  };
+
+  const resetUserPassword = async () => {
+    if (temporaryPassword.length < 8) return toast.error('Temporary password must be at least 8 characters');
+    setSavingUser(true);
+    try {
+      const response = await fetch(`${SummaryApi.adminResetUserPassword.url}/${userModal.user._id}/reset-password`, { method: 'put', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ temporaryPassword }) });
+      const result = await response.json();
+      if (!result.success) return toast.error(result.message);
+      toast.success(result.message); setUserModal(null); fetchAllUsers();
+    } catch (_) { toast.error('Unable to reset password'); }
+    finally { setSavingUser(false); }
+  };
 
   useEffect(() => {
     fetchAllUsers();
@@ -715,6 +748,7 @@ const AllUsers = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button 
+                          onClick={() => openUserModal('view', user)}
                           className="text-blue-600 hover:text-blue-900 flex items-center" 
                           title="View Profile"
                         >
@@ -722,18 +756,21 @@ const AllUsers = () => {
                           View
                         </button>
                         <button 
+                          onClick={() => openUserModal('edit', user)}
                           className="text-green-600 hover:text-green-900 flex items-center" 
                           title="Edit User"
                         >
                           <FaEdit className="mr-1" />
                           Edit
                         </button>
+                        <button onClick={() => openUserModal('password', user)} className="text-amber-600 hover:text-amber-900 flex items-center" title="Set temporary password"><FaKey className="mr-1" />Password</button>
                         <select
                           value={user.role}
                           onChange={(e) => handleRoleChange(user._id, e.target.value)}
                           className="ml-2 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
                           <option value="GENERAL">General</option>
+                          <option value="STAFF">Staff</option>
                           <option value="ADMIN">Admin</option>
                         </select>
                       </div>
@@ -745,6 +782,20 @@ const AllUsers = () => {
           </table>
         </div>
       </div>
+
+      {userModal && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onMouseDown={(e) => { if (e.target === e.currentTarget) setUserModal(null); }}>
+        <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
+          <div className="mb-5 flex items-start justify-between"><div><h2 className="text-xl font-bold text-gray-900">{userModal.mode === 'view' ? 'User details' : userModal.mode === 'edit' ? 'Edit user' : 'Set temporary password'}</h2><p className="text-sm text-gray-500">{userModal.user.email}</p></div><button onClick={() => setUserModal(null)} className="text-2xl text-gray-400">×</button></div>
+          {userModal.mode === 'password' ? <div className="space-y-4"><div className="rounded-md bg-amber-50 p-3 text-sm text-amber-800">The user will sign in with this temporary password and must immediately create a different password before accessing the website.</div><div><label className="mb-1 block text-sm font-medium">Temporary password</label><input type="text" value={temporaryPassword} onChange={(e)=>setTemporaryPassword(e.target.value)} className="w-full rounded-md border px-3 py-2" placeholder="Minimum 8 characters" /></div><button onClick={resetUserPassword} disabled={savingUser} className="w-full rounded-md bg-amber-600 px-4 py-2 font-medium text-white disabled:opacity-50">{savingUser ? 'Saving…' : 'Set temporary password'}</button></div> : <div className="space-y-4">
+            <div><label className="mb-1 block text-sm font-medium">Name</label><input disabled={userModal.mode === 'view'} value={userForm?.name || ''} onChange={(e)=>setUserForm({...userForm,name:e.target.value})} className="w-full rounded-md border px-3 py-2 disabled:bg-gray-100" /></div>
+            <div><label className="mb-1 block text-sm font-medium">Email</label><input disabled value={userForm?.email || ''} className="w-full rounded-md border bg-gray-100 px-3 py-2" /></div>
+            <div><label className="mb-1 block text-sm font-medium">Phone</label><input disabled={userModal.mode === 'view'} value={userForm?.phone || ''} onChange={(e)=>setUserForm({...userForm,phone:e.target.value})} className="w-full rounded-md border px-3 py-2 disabled:bg-gray-100" /></div>
+            <div className="grid grid-cols-2 gap-3">{['street','city','state','zipCode','country'].map(field=><div key={field} className={field==='street'?'col-span-2':''}><label className="mb-1 block text-sm font-medium capitalize">{field === 'zipCode' ? 'Postcode' : field}</label><input disabled={userModal.mode === 'view'} value={userForm?.address?.[field] || ''} onChange={(e)=>setUserForm({...userForm,address:{...(userForm.address||{}),[field]:e.target.value}})} className="w-full rounded-md border px-3 py-2 disabled:bg-gray-100" /></div>)}</div>
+            {userForm?.mustChangePassword && <p className="rounded bg-amber-50 p-2 text-sm text-amber-800">Password change required at next login</p>}
+            {userModal.mode === 'edit' && <button onClick={saveUser} disabled={savingUser} className="w-full rounded-md bg-blue-600 px-4 py-2 font-medium text-white disabled:opacity-50">{savingUser ? 'Saving…' : 'Save changes'}</button>}
+          </div>}
+        </div>
+      </div>}
 
       {/* Pagination */}
       {totalPages > 1 && (

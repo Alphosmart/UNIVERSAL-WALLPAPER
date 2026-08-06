@@ -55,7 +55,8 @@ const userSignInController = catchAsync(async (req, res) => {
             name: user.name,
             email: user.email,
             profilePic: user.profilePic,
-            role: user.role
+            role: user.role,
+            mustChangePassword: Boolean(user.mustChangePassword)
         }
     }, 'Login successful');
 });

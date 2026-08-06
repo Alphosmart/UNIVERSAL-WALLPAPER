@@ -4,6 +4,7 @@ import { trackLandingPageInteraction, trackShopButtonClick, trackNewsletterSignu
 import SummaryApi from '../common';
 import useSiteContent from '../hooks/useSiteContent';
 import { useProducts } from '../context/ProductContext';
+import HeroMediaCarousel from '../components/HeroMediaCarousel';
 import { 
   FaPlay, 
   FaStar, 
@@ -159,11 +160,9 @@ const LandingPage = () => {
       </Link>
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-pink-500 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="relative container mx-auto px-4 py-20 lg:py-32">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
+      <HeroMediaCarousel slides={heroContent.slides}>
+        <div className="container mx-auto px-4 py-24 lg:py-32">
+          <div className="max-w-3xl space-y-8">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
                 {heroContent.title}
               </h1>
@@ -202,21 +201,9 @@ const LandingPage = () => {
                   <span className="text-sm">Award Winning</span>
                 </div>
               </div>
-            </div>
-
-            {/* Hero Image/Video */}
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20">
-                <img 
-                  src="https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=600&h=400&fit=crop" 
-                  alt="Beautiful wallpaper interior" 
-                  className="rounded-xl w-full h-80 object-cover"
-                />
-              </div>
-            </div>
           </div>
         </div>
-      </section>
+      </HeroMediaCarousel>
 
       {/* Stats Section */}
       <section className="py-16 bg-gray-50">

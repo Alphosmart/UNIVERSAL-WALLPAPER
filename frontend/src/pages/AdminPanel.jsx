@@ -77,10 +77,10 @@ const AdminPanel = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="flex">
+    <div className="h-[calc(100vh-4rem)] overflow-hidden bg-gray-100">
+      <div className="flex h-full overflow-hidden">
         {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen h-screen flex flex-col">
+        <aside className="flex h-full w-64 shrink-0 flex-col overflow-hidden bg-white shadow-lg">
           <div className="p-6 flex-1 min-h-0 overflow-y-auto">
             <h1 className="text-2xl font-bold text-gray-800 mb-6 sticky top-0 bg-white py-1">Admin Panel</h1>
             <nav className="space-y-2 pb-4">
@@ -111,10 +111,10 @@ const AdminPanel = () => {
               </div>
             </div>
           </div>
-        </div>
+        </aside>
 
         {/* Main Content */}
-        <div className="flex-1 p-8">
+        <div className="h-full min-w-0 flex-1 overflow-y-auto overscroll-contain p-8">
           <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
