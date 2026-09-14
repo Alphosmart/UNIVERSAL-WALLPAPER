@@ -87,7 +87,7 @@ describe('Authentication Middleware', () => {
 
             await authToken(req, res, next);
 
-            expect(res.clearCookie).toHaveBeenCalledWith('token');
+            expect(res.clearCookie).toHaveBeenCalledWith('token', expect.objectContaining({ httpOnly: true, path: '/' }));
             expect(res.status).toHaveBeenCalledWith(401);
             expect(res.json).toHaveBeenCalledWith(
                 expect.objectContaining({

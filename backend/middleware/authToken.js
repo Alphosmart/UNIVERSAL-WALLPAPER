@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { ResponseHandler } = require('../utils/responseHandler');
+const { clearAuthCookie } = require('../utils/authCookie');
 
 async function authToken(req, res, next) {
     try {
@@ -8,7 +9,7 @@ async function authToken(req, res, next) {
         
         // If no token in cookies, check Authorization header
         if (!token) {
-            const authHeader = req.headers.authorization;
+            const authHeader = req.headers?.authorization;
             if (authHeader && authHeader.startsWith('Bearer ')) {
                 token = authHeader.substring(7); // Remove 'Bearer ' prefix
             }
@@ -29,7 +30,7 @@ async function authToken(req, res, next) {
                 // Handle token expiration without spamming console
                 if (err.name === 'TokenExpiredError') {
                     // Clear the expired cookie
-                    res.clearCookie('token');
+                    clearAuthCookie(res);
                     return res.status(401).json({
                         message: "Your session has expired. Please log in again to continue.",
                         error: true,
@@ -46,7 +47,7 @@ async function authToken(req, res, next) {
                 }
 
                 // Clear any invalid token cookie so the browser stops resending it.
-                res.clearCookie('token');
+                clearAuthCookie(res);
 
                 return res.status(401).json({
                     message: "Invalid authentication token. Please log in again to access your account.",
