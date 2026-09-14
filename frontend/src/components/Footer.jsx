@@ -18,13 +18,24 @@ const Footer = () => {
   const { content: siteContent } = useSiteContent();
 
   // Default content fallback
-  const companyInfo = siteContent?.footer?.companyInfo || {
+  const footerCompanyInfo = siteContent?.footer?.companyInfo || {
     name: "Universal Wallpaper",
     description: "Your premier destination for high-quality wallpapers and home décor solutions. Transform your space with our extensive collection from trusted sellers worldwide.",
     address: "123 Design Street, Creative District, NY 10001",
     phone: "+1 (555) 123-4567",
     whatsapp: "08038429541",
     email: "info@universalwallpaper.com"
+  };
+
+  // Address, phone and email come from the Contact Us Page settings (the same details used for
+  // WhatsApp and listings), so they only need to be edited in one place
+  const businessInfo = siteContent?.contactUs?.businessInfo || {};
+  const companyInfo = {
+    ...footerCompanyInfo,
+    address: businessInfo.address || footerCompanyInfo.address,
+    phone: businessInfo.phone || footerCompanyInfo.phone,
+    whatsapp: businessInfo.whatsapp || footerCompanyInfo.whatsapp,
+    email: businessInfo.email || footerCompanyInfo.email
   };
 
   return (

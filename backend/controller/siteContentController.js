@@ -1,11 +1,52 @@
 const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
+const SiteContent = require('../models/siteContentModel');
+const User = require('../models/userModel');
+
+// Changing site content is admin-only: the authToken middleware alone lets any signed-in user through
+const ensureAdmin = async (req, res) => {
+    const user = req.userId ? await User.findById(req.userId).select('role') : null;
+    if (user?.role === 'ADMIN') return true;
+    res.status(403).json({
+        success: false,
+        message: "Admin access required"
+    });
+    return false;
+};
+
+// Baseline content committed with the code. It only seeds MongoDB the first time (or is read
+// if the database is unreachable). Edits are stored in MongoDB, because the server's
+// filesystem is reset on every deploy/restart and edits saved to this file were being lost.
+const BASELINE_FILE = path.join(__dirname, '../data/siteContent.json');
+
+const readBaselineFile = async () => {
+    try {
+        return JSON.parse(await fs.readFile(BASELINE_FILE, 'utf8'));
+    } catch {
+        return null;
+    }
+};
+
+// Returns the stored sections, seeding MongoDB from the baseline file on first use
+const loadStoredContent = async () => {
+    try {
+        const doc = await SiteContent.findOne({ key: 'main' }).lean();
+        if (doc) return doc.sections || {};
+        const baseline = await readBaselineFile();
+        if (baseline) {
+            await SiteContent.updateOne({ key: 'main' }, { $setOnInsert: { sections: baseline } }, { upsert: true });
+        }
+        return baseline;
+    } catch (error) {
+        console.error('Site content database read failed, using baseline file:', error.message);
+        return readBaselineFile();
+    }
+};
 
 // Site content management controller
 const getSiteContent = async (req, res) => {
     try {
-        const contentFilePath = path.join(__dirname, '../data/siteContent.json');
         
         // Default content structure
         const defaultContent = {
@@ -256,8 +297,8 @@ const getSiteContent = async (req, res) => {
 
         try {
             // Try to read existing content file
-            const data = await fs.readFile(contentFilePath, 'utf8');
-            const content = JSON.parse(data);
+            const content = await loadStoredContent();
+            if (!content) throw new Error('No stored site content');
             
             // Prevent caching to ensure fresh content
             res.set({
@@ -298,6 +339,8 @@ const getSiteContent = async (req, res) => {
 
 const updateSiteContent = async (req, res) => {
     try {
+        if (!(await ensureAdmin(req, res))) return;
+
         const { section, data } = req.body;
         
         if (!section || !data) {
@@ -307,26 +350,16 @@ const updateSiteContent = async (req, res) => {
             });
         }
 
-        const contentFilePath = path.join(__dirname, '../data/siteContent.json');
-        const dataDir = path.dirname(contentFilePath);
-        
-        // Ensure data directory exists
-        try {
-            await fs.access(dataDir);
-        } catch {
-            await fs.mkdir(dataDir, { recursive: true });
+        // The section name becomes a MongoDB field path, so only allow plain names
+        if (!/^[A-Za-z][A-Za-z0-9]*$/.test(section)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid section name"
+            });
         }
 
-        let currentContent = {};
         
-        // Try to read existing content
-        try {
-            const existingData = await fs.readFile(contentFilePath, 'utf8');
-            currentContent = JSON.parse(existingData);
-        } catch (error) {
-            // File doesn't exist, start with empty object
-            console.log('Creating new site content file');
-        }
+        const currentContent = (await loadStoredContent()) || {};
 
         // Update the specific section
         currentContent[section] = {
@@ -380,8 +413,12 @@ const updateSiteContent = async (req, res) => {
             }
         }
 
-        // Write updated content back to file
-        await fs.writeFile(contentFilePath, JSON.stringify(currentContent, null, 2), 'utf8');
+        // Save to MongoDB so the change survives deploys and restarts
+        await SiteContent.updateOne(
+            { key: 'main' },
+            { $set: { [`sections.${section}`]: currentContent[section] } },
+            { upsert: true }
+        );
 
         res.json({
             success: true,
@@ -401,11 +438,10 @@ const updateSiteContent = async (req, res) => {
 
 const getAllSiteContent = async (req, res) => {
     try {
-        const contentFilePath = path.join(__dirname, '../data/siteContent.json');
         
         try {
-            const data = await fs.readFile(contentFilePath, 'utf8');
-            const content = JSON.parse(data);
+            const content = await loadStoredContent();
+            if (!content) throw new Error('No stored site content');
             
             res.json({
                 success: true,
@@ -432,14 +468,11 @@ const getAllSiteContent = async (req, res) => {
 
 const resetSiteContent = async (req, res) => {
     try {
-        const contentFilePath = path.join(__dirname, '../data/siteContent.json');
+        if (!(await ensureAdmin(req, res))) return;
+
         
-        // Delete the content file to reset to defaults
-        try {
-            await fs.unlink(contentFilePath);
-        } catch (error) {
-            // File might not exist, that's okay
-        }
+        // Remove stored content; the next read reseeds from the baseline file
+        await SiteContent.deleteOne({ key: 'main' });
 
         res.json({
             success: true,
